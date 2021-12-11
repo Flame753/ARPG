@@ -38,3 +38,15 @@ class Axe(Weapon):
         self.description = "This axe is showing its age, " \
                             "but still has some fight in it to do damage."
         self.damage = 25
+
+class Consumable:
+    def __init__(self) -> None:
+        raise NotImplementedError("Do not create raw Consumable objects.")
+    
+    def __str__(self) -> str:
+        return "{} (+{} HP)".format(self.name, self.healing_value)
+
+class CrustyBread(Consumable):
+    def __init__(self) -> None:
+        self.name = "Crusty Bread"
+        self.healing_value = 10

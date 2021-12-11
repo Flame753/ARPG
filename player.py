@@ -3,11 +3,12 @@ import world
 
 class Player:
     def __init__(self) -> None:
-        self.inventory = [items.Rock(), items.Dagger(), 'Gold(5)', "Crusty Bread"]
+        self.inventory = [items.Rock(), items.Dagger(), 'Gold(5)', items.CrustyBread(), items.CrustyBread()]
 
         self.x = 1
         self.y = 2
         self.hp = 100
+        self.max_hp = 100
 
     def move(self, dx, dy):
         self.x += dx
@@ -54,4 +55,28 @@ class Player:
             print("You killed {}!".format(enemy.name))
         else:
             print("{} HP is {}.".format(enemy.name, enemy.hp))
+
+    def heal(self):
+        consumables = [item for item in self.inventory if isinstance(item, items.Consumable)]
+        if not consumables:
+            print("You don't have any items to heal you!")
+            return
+        
+        print("Choose an item to use to heal: ")
+        for i, item in enumerate(consumables, 1):
+            print("{}. {}".format(i, item))
+        
+        valid = False
+        while not valid:
+            choice = input("")
+            try:
+                to_eat = consumables[max(0, int(choice) - 1)]
+                self.hp = min(self.max_hp, self.hp + to_eat.healing_value)
+                self.inventory.remove(to_eat)
+                print("Current HP: {}".format(self.hp))
+                valid = True
+            except (ValueError, IndexError):
+                print("Invalid choice, try again.")
+        
+
 
