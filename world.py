@@ -77,6 +77,9 @@ world_map = [
 ]
 
 def tile_at(x, y):
+    """
+    Returns the a specific tile in the world map if exists
+    """
     if x < 0 or y < 0:
         return None
     try:
