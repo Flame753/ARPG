@@ -9,7 +9,9 @@ def play():
         
     while True:
         room = world.tile_at(player.x, player.y)
+        text_separator()
         print(room.intro_text())
+        text_separator()
         room.modify_player(player)  # Enemy attacks player first
         choose_action(room, player)
 
@@ -22,6 +24,8 @@ def get_available_actions(room, player):
     print("Choose an action: ")
     if player.inventory:
         action_adder(actions, 'i', player.print_inventory, "Print Inventory")
+    if isinstance(room, world.TraderTile):
+        action_adder(actions, 't', player.trade, "Trade")
     if isinstance(room, world.EnemyTile) and room.enemy.is_alive():
         action_adder(actions, 'a', player.attack, "Attack")
     else:
@@ -56,6 +60,9 @@ def choose_action(room, player):
             action()
         else:
             print("Invalid action!")
+
+def text_separator():
+    print("-"*100)
 
 
 if __name__ == '__main__':
