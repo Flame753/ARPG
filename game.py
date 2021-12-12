@@ -1,15 +1,16 @@
-from typing_extensions import OrderedDict
+from collections import OrderedDict
 from player import Player
 import world
 
 def play():
     print("Escape from Cave Terror!")
+    world.parse_world_dsl()
     player = Player()
         
     while True:
         room = world.tile_at(player.x, player.y)
         print(room.intro_text())
-        room.modify_player(player) #Enemy attacks player first
+        room.modify_player(player)  # Enemy attacks player first
         choose_action(room, player)
 
 
@@ -20,7 +21,7 @@ def get_available_actions(room, player):
     actions = OrderedDict()
     print("Choose an action: ")
     if player.inventory:
-        action_adder(actions, 'i', player.print_inventroy, "Print Inventroy")
+        action_adder(actions, 'i', player.print_inventory, "Print Inventory")
     if isinstance(room, world.EnemyTile) and room.enemy.is_alive():
         action_adder(actions, 'a', player.attack, "Attack")
     else:
@@ -55,7 +56,6 @@ def choose_action(room, player):
             action()
         else:
             print("Invalid action!")
-
 
 
 if __name__ == '__main__':
