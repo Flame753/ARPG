@@ -7,13 +7,17 @@ def play():
     world.parse_world_dsl()
     player = Player()
         
-    while True:
+    while player.is_alive() and not player.victory:
         room = world.tile_at(player.x, player.y)
         text_separator()
         print(room.intro_text())
         text_separator()
         room.modify_player(player)  # Enemy attacks player first
-        choose_action(room, player)
+
+        if player.is_alive() and not player.victory:
+            choose_action(room, player)
+        elif not player.is_alive():
+            print("Your journey has come to an early end!")
 
 
 def get_available_actions(room, player):

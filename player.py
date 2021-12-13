@@ -10,6 +10,10 @@ class Player:
         self.hp = 100
         self.max_hp = 100
         self.gold = 5
+        self.victory = False
+
+    def is_alive(self):
+        return self.hp > 0
 
     def move(self, dx, dy):
         self.x += dx
@@ -72,11 +76,14 @@ class Player:
         while not valid:
             choice = input("")
             try:
-                to_eat = consumables[max(0, int(choice) - 1)]
-                self.hp = min(self.max_hp, self.hp + to_eat.healing_value)
-                self.inventory.remove(to_eat)
-                print("Current HP: {}".format(self.hp))
-                valid = True
+                if choice == 0:  # Preventing accidentally using the last item 
+                    print("Invalid choice, try again.")
+                else:
+                    to_eat = consumables[int(choice)]
+                    self.hp = min(self.max_hp, self.hp + to_eat.healing_value)
+                    self.inventory.remove(to_eat)
+                    print("Current HP: {}".format(self.hp))
+                    valid = True
             except (ValueError, IndexError):
                 print("Invalid choice, try again.")
 

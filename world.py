@@ -27,6 +27,9 @@ class BoringTile(MapTile):
         """
 
 class VictoryTile(MapTile):
+    def modify_player(self, player):
+        player.victory = True
+
     def intro_text(self):
         return """
         You see a bright light in the distance...
@@ -78,17 +81,20 @@ class TraderTile(MapTile):
     def trade(self, buyer, seller):
         for i, item in enumerate(seller.inventory, 1):
             print("{}. {} - {} Gold".format(i, item.name, item.value))
-            while True:
-                user_input = input("Choose an item or press Q to exit: ")
-                if user_input in ['Q', 'q']: 
-                    return
-                else:
-                    try:
-                        choice = int(user_input)
+        while True:
+            user_input = input("Choose an item or press Q to exit: ")
+            if user_input in ['Q', 'q']: 
+                return
+            else:
+                try:
+                    choice = int(user_input)
+                    if choice == 0: # Preventing accidentally using the last item 
+                        print("Invalid Choice!")
+                    else:
                         to_swap = seller.inventory[choice - 1]
                         self.swap(seller, buyer, to_swap)
-                    except ValueError:
-                        print("Invalid Choice!")
+                except (ValueError, IndexError):
+                    print("Invalid Choice!")
 
     def swap(self, seller, buyer, item):
         if item.value > buyer.gold:
@@ -110,7 +116,7 @@ class TraderTile(MapTile):
                 print("Here's whats available to buy: ")
                 self.trade(buyer=player, seller=self.trader)
             elif user_input in ['S', 's']:
-                print("Here's whats abailable to sell: ")
+                print("Here's whats available to sell: ")
                 self.trade(buyer=self.trader, seller=player)
             else:
                 print("Invalid choice!")
