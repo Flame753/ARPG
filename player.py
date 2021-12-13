@@ -1,7 +1,8 @@
 import items
 import world
+from creatures import Creature
 
-class Player:
+class Player(Creature):
     def __init__(self) -> None:
         self.inventory = [items.Rock(), items.Dagger(), items.CrustyBread(), items.CrustyBread()]
 
@@ -11,9 +12,6 @@ class Player:
         self.max_hp = 100
         self.gold = 5
         self.victory = False
-
-    def is_alive(self):
-        return self.hp > 0
 
     def move(self, dx, dy):
         self.x += dx

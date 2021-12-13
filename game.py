@@ -18,8 +18,7 @@ def play():
             choose_action(room, player)
         elif not player.is_alive():
             print("Your journey has come to an early end!")
-
-
+            
 def get_available_actions(room, player):
     """
     Returns a dictionary of functions that are valid action.

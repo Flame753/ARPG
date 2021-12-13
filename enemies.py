@@ -1,12 +1,12 @@
-class Enemy:
+from creatures import Creature
+
+
+class Enemy(Creature):
     def __init__(self) -> None:
         raise NotImplementedError("Do not create raw Enemy objects.")
     
-    def __init__(self) -> None:
+    def __str__(self) -> None:
         return self.name
-
-    def is_alive(self):
-        return self.hp > 0
 
 class GiantSpider(Enemy):
     def __init__(self) -> None:
