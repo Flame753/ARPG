@@ -121,18 +121,44 @@ class TraderTile(MapTile):
         clinking his gold coins together. He looks willing to trader.
         """
 
+class FindGoldTile(MapTile):
+    def __init__(self, x, y) -> None:
+        super().__init__(x, y)
+        self.gold = random.randint(1, 50)
+        self.gold_claimed = False
+    
+    def modify_player(self, player):
+        if not self.gold_claimed:
+            self.gold_claimed = True
+            player.gold = player.gold + self.gold
+            print("+{} gold added.".format(self.gold))
+    
+    def intro_text(self):
+        if self.gold_claimed:
+            return """
+            Another unremarkable part of the cave. You must forge onwards.
+            """
+        else:
+            return """
+            Someone dropped some gold. You pick it up.
+            """
+
 world_map = []
+start_tile_location = None
 
 tile_type_dict = {"VT": VictoryTile,
                     "EN": EnemyTile,
                     "ST": StartTile,
+                    "FG": FindGoldTile,
+                    "TT": TraderTile,
                     "  ": None}
 
 world_dsl = """
-|  |VT|  |
-|  |EN|  |
-|EN|ST|EN|
-|  |EN|  |
+|EN|EN|VT|EN|EN|
+|EN|  |  |  |EN|
+|EN|FG|EN|  |TT|
+|TT|  |ST|FG|EN|
+|FG|  |EN|  |FG|
 """
 
 def tile_at(x, y):
@@ -185,6 +211,10 @@ def parse_world_dsl():
         for x, dsl_cell in enumerate(dsl_cells):
             # Look up the abbreviation in the dictionary
             tile_type = tile_type_dict[dsl_cell]
+            if tile_type == StartTile:
+                # Setting the player at starting tile
+                global start_tile_location
+                start_tile_location = x, y
             # If the dictionary returned a vaild type, create 
             # a new tile object, pass it the X-Y coordinates
             # as required by the tile __init__(), and add

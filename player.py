@@ -5,8 +5,8 @@ class Player:
     def __init__(self) -> None:
         self.inventory = [items.Rock(), items.Dagger(), items.CrustyBread(), items.CrustyBread()]
 
-        self.x = 1
-        self.y = 2
+        self.x = world.start_tile_location[0]
+        self.y = world.start_tile_location[1]
         self.hp = 100
         self.max_hp = 100
         self.gold = 5
