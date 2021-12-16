@@ -61,7 +61,7 @@ class Player(Creature):
             print("{} HP is {}.".format(enemy.name, enemy.hp))
 
     def heal(self):
-        consumables = [item for item in self.inventory if isinstance(item, items.Consumable)]
+        consumables = [item for item in self.inventory if isinstance(item, items.CustomConsumable)]
         if not consumables:
             print("You don't have any items to heal you!")
             return

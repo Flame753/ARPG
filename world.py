@@ -80,7 +80,7 @@ class TraderTile(MapTile):
     
     def trade(self, buyer, seller):
         for i, item in enumerate(seller.inventory, 1):
-            print("{}. {} - {} Gold".format(i, item.name, item.value))
+            print("{}. {} - {} Gold".format(i, item.name, item.worth))
         while True:
             user_input = input("Choose an item or press Q to exit: ")
             if user_input in ['Q', 'q']: 
@@ -97,13 +97,13 @@ class TraderTile(MapTile):
                     print("Invalid Choice!")
 
     def swap(self, seller, buyer, item):
-        if item.value > buyer.gold:
+        if item.worth > buyer.gold:
             print("That's too expensive")
             return
         seller.inventory.remove(item)
         buyer.inventory.append(item)
-        seller.gold = seller.gold + item.value
-        buyer.gold  = buyer.gold - item.value
+        seller.gold = seller.gold + item.worth
+        buyer.gold  = buyer.gold - item.worth
         print("Trade complete!")
 
     def check_if_trade(self, player):
