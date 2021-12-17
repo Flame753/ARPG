@@ -34,8 +34,8 @@ class Player(Creature):
         for item in self.inventory:
             print('*' + str(item))
             best_weapon = self.most_powerful_weapon()
-        print("Your best weapon is your {}".format(best_weapon))
-        print("Gold: {}".format(self.gold))
+        print(f"Your best weapon is your {best_weapon}")
+        print(f"Gold: {self.gold}")
 
     def most_powerful_weapon(self):
         max_damage = 0
@@ -53,22 +53,23 @@ class Player(Creature):
         best_weapon = self.most_powerful_weapon()
         room = world.tile_at(self.x, self.y)
         enemy = room.enemy
-        print("You use {} against {}!".format(best_weapon.name, enemy.name))
+        print(f"You use {best_weapon.name} against {enemy.name}!")
         enemy.hp -= best_weapon.damage
         if not enemy.is_alive():
-            print("You killed {}!".format(enemy.name))
+            print(f"You killed {enemy.name}!")
         else:
-            print("{} HP is {}.".format(enemy.name, enemy.hp))
+            print(f"{enemy.name} HP is {enemy.hp}.")
 
     def heal(self):
-        consumables = [item for item in self.inventory if isinstance(item, items.CustomConsumable)]
+        consumables = [item for item in self.inventory if isinstance(item, items.Consumable)]
         if not consumables:
             print("You don't have any items to heal you!")
             return
         
+        print(f"Current HP {self.hp}")
         print("Choose an item to use to heal: ")
         for i, item in enumerate(consumables, 1):
-            print("{}. {}".format(i, item))
+            print(f"{i}. {item}")
         
         valid = False
         while not valid:
@@ -77,10 +78,11 @@ class Player(Creature):
                 if choice == 0:  # Preventing accidentally using the last item 
                     print("Invalid choice, try again.")
                 else:
-                    to_eat = consumables[int(choice)]
+                    to_eat = consumables[int(choice) - 1]
                     self.hp = min(self.max_hp, self.hp + to_eat.healing_value)
                     self.inventory.remove(to_eat)
-                    print("Current HP: {}".format(self.hp))
+                    print('')
+                    print(f"Now Current HP: {self.hp}")
                     valid = True
             except (ValueError, IndexError):
                 print("Invalid choice, try again.")

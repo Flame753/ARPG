@@ -83,6 +83,9 @@ class Consumable(BaseItem):
         if type(self) == Consumable:
             raise Exception('Do not instantiate Consumable directly')
 
+    def __str__(self):
+        return f'{self.description} {self.name} (+{self.healing_value})'
+
 class Bread(Consumable):
     def __init__(self, **kwargs):
         super().__init__(name = 'Bread',
