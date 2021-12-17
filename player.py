@@ -4,7 +4,7 @@ from creatures import Creature
 
 class Player(Creature):
     def __init__(self) -> None:
-        self.inventory = [items.Rock(), items.Dagger(), items.CrustyBread(), items.CrustyBread()]
+        self.inventory = [items.Rock(), items.Dagger(), items.Bread(), items.Bread()]
 
         self.x = world.start_tile_location[0]
         self.y = world.start_tile_location[1]
