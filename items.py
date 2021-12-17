@@ -8,6 +8,15 @@ class BaseItem(ABC):
         self.worth = worth
         self.weight = weight
         self.description = description
+
+    def modifyAttr(self, **kwargs):
+        for key in kwargs.keys():
+            if not hasattr(self, key):
+                return False
+
+        self.__dict__.update(kwargs)
+        return True
+
     
     def __str__(self):
         return f'{self.description} {self.name}'
@@ -184,4 +193,15 @@ if __name__ == "__main__":
     # Coin()
     print([CopperCoin(), Bread(), Sword()])
     print(CopperCoin(), Dagger(), Bread(), Backpack(), Sword())
+    
+    c = CopperCoin()
+    print(c.modifyAttr(name="l", ru=1))
+    print(c.modifyAttr(name="small copper coin"))
+    print(c.__dict__)
+
+    backpack = Backpack()
+    backpack.addItem(CopperCoin(), 10)
+    print('Backpack: worth -> {}, weight -> {}'.format(backpack.calculateTotalWorth(), backpack.calculateTotalWeight()))
+    backpack.addItem(GoldCoin(), 53)
+    print('Backpack: worth -> {}, weight -> {}'.format(backpack.calculateTotalWorth(), backpack.calculateTotalWeight()))
     pass
