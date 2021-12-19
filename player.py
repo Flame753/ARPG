@@ -1,10 +1,12 @@
 import items
 import world
 from creatures import Creature
+from inventory import Inventory
+
 
 class Player(Creature):
     def __init__(self) -> None:
-        self.bag = items.Backpack()
+        self.inventory = Inventory(bag = items.Backpack())
 
         self.x = world.start_tile_location[0]
         self.y = world.start_tile_location[1]
@@ -31,7 +33,7 @@ class Player(Creature):
 
     def print_inventory(self):
         print("Inventory:")
-        for item, amount in self.bag.inventory.items():
+        for item, amount in self.inventory.bag.inventory.items():
             amount = amount['amount']
             print(f'* {amount} {item}')
             best_weapon = self.most_powerful_weapon()
@@ -41,7 +43,7 @@ class Player(Creature):
     def most_powerful_weapon(self):
         max_damage = 0
         best_weapon = None
-        for item in self.bag.inventory.keys():
+        for item in self.inventory.bag.inventory.keys():
             try:
                 if item.damage > max_damage:
                     best_weapon = item
@@ -62,7 +64,7 @@ class Player(Creature):
             print(f"{enemy.name} HP is {enemy.hp}.")
 
     def heal(self):
-        consumables = [(item, amount['amount']) for item, amount in self.bag.inventory.items() if isinstance(item, items.Consumable)]
+        consumables = [(item, amount['amount']) for item, amount in self.inventory.bag.inventory.items() if isinstance(item, items.Consumable)]
         if not consumables:
             print("You don't have any items to heal you!")
             return
@@ -81,7 +83,7 @@ class Player(Creature):
                 else:
                     to_eat = consumables[int(choice) - 1][0]
                     self.hp = min(self.max_hp, self.hp + to_eat.healing_value)
-                    self.bag.removeItem(to_eat, 1)
+                    self.inventory.bag.removeItem(to_eat, 1)
                     print('')
                     print(f"Now Current HP: {self.hp}")
                     valid = True
@@ -98,7 +100,7 @@ def GeneratePlayer():
                         items.Dagger(): 1,
                         items.Bread(): 2}
     player = Player()
-    player.bag.addItems(starting_equipment)
+    player.inventory.addItemsToBag(starting_equipment)
     return player
 
 if __name__ == "__main__":

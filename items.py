@@ -1,5 +1,6 @@
 from abc import ABC
 
+
 class BaseItem(ABC):
     def __init__(self, name = None, worth = 0, weight = 0, description = '', **kwargs):
         if type(self) == BaseItem:
@@ -123,10 +124,6 @@ class Container(ABC):
             self.inventory[item]['amount'] += amount
         else:
             self.inventory[item] = {'amount': amount}
-    
-    def addItems(self, items):
-        for item, amount in items.items():
-            self.addItem(item, amount)
     
     def removeItem(self, item, amount = 0):
         self.ensureInventory()

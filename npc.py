@@ -1,4 +1,6 @@
 import items
+from inventory import Inventory
+
 
 class NonPlayableCharacter():
     def __init__(self) -> None:
@@ -11,10 +13,10 @@ class Trader(NonPlayableCharacter):
     def __init__(self) -> None:
         self.name = "Trader"
         self.gold = 100
-        self.bag = items.Backpack()
+        self.inventory = Inventory(bag = items.Backpack())
 
         starting_equipment = {items.Bread(): 4,
                             items.HealingPotion(): 2}
-        self.bag.addItems(starting_equipment)
+        self.inventory.addItemsToBag(starting_equipment)
 
                             

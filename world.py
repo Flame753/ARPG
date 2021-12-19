@@ -2,6 +2,7 @@ import random
 import enemies
 import npc
 
+
 class MapTile:
     def __init__(self, x, y) -> None:
         self.x = x
@@ -82,7 +83,7 @@ class TraderTile(MapTile):
         selling_list = {}
         
         while True:
-            seller_items = [(item, amount['amount']) for item, amount in seller.bag.inventory.items()]
+            seller_items = [(item, amount['amount']) for item, amount in seller.inventory.bag.inventory.items()]
             for i, item in enumerate(seller_items, 1):
                 # Creating item list that can be traded
                 selling_list.update({str(i): item[0]})
@@ -101,7 +102,7 @@ class TraderTile(MapTile):
                     print("Invalid Choice!")
 
     def swap(self, seller, buyer, item):
-        if not seller.bag.inventory:
+        if not seller.inventory.bag.inventory:
             if isinstance(seller, npc.NonPlayableCharacter):
                 print('Seller has ran out of stock of items.')
             else:
@@ -110,10 +111,8 @@ class TraderTile(MapTile):
         if item.worth > buyer.gold:
             print("That's too expensive")
             return
-        seller.bag.removeItem(item, 1)
-        print(seller.bag.inventory)
-        buyer.bag.addItem(item, 1)
-        print(buyer.bag.inventory)
+        seller.inventory.bag.removeItem(item, 1)
+        buyer.inventory.bag.addItem(item, 1)
         seller.gold = seller.gold + item.worth
         buyer.gold  = buyer.gold - item.worth
         print("Trade complete!")
