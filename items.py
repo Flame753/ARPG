@@ -19,7 +19,10 @@ class BaseItem(ABC):
 
     
     def __str__(self):
-        return f'{self.description} {self.name}'
+        if self.description:
+            return f'{self.description} {self.name}'
+        else:
+            return f'{self.name}'
 
     def __repr__(self):
         return f'{self.__class__.__name__}()'
@@ -120,6 +123,10 @@ class Container(ABC):
             self.inventory[item]['amount'] += amount
         else:
             self.inventory[item] = {'amount': amount}
+    
+    def addItems(self, items):
+        for item, amount in items.items():
+            self.addItem(item, amount)
     
     def removeItem(self, item, amount = 0):
         self.ensureInventory()

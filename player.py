@@ -4,7 +4,7 @@ from creatures import Creature
 
 class Player(Creature):
     def __init__(self) -> None:
-        self.inventory = [items.Rock(), items.Dagger(), items.Bread(), items.Bread()]
+        self.bag = items.Backpack()
 
         self.x = world.start_tile_location[0]
         self.y = world.start_tile_location[1]
@@ -31,8 +31,9 @@ class Player(Creature):
 
     def print_inventory(self):
         print("Inventory:")
-        for item in self.inventory:
-            print('*' + str(item))
+        for item, amount in self.bag.inventory.items():
+            amount = amount['amount']
+            print(f'* {amount} {item}')
             best_weapon = self.most_powerful_weapon()
         print(f"Your best weapon is your {best_weapon}")
         print(f"Gold: {self.gold}")
@@ -40,7 +41,7 @@ class Player(Creature):
     def most_powerful_weapon(self):
         max_damage = 0
         best_weapon = None
-        for item in self.inventory:
+        for item in self.bag.inventory.keys():
             try:
                 if item.damage > max_damage:
                     best_weapon = item
@@ -61,7 +62,7 @@ class Player(Creature):
             print(f"{enemy.name} HP is {enemy.hp}.")
 
     def heal(self):
-        consumables = [item for item in self.inventory if isinstance(item, items.Consumable)]
+        consumables = [(item, amount['amount']) for item, amount in self.bag.inventory.items() if isinstance(item, items.Consumable)]
         if not consumables:
             print("You don't have any items to heal you!")
             return
@@ -69,7 +70,7 @@ class Player(Creature):
         print(f"Current HP {self.hp}")
         print("Choose an item to use to heal: ")
         for i, item in enumerate(consumables, 1):
-            print(f"{i}. {item}")
+            print(f"{i}. {item[1]} {item[0]}")
         
         valid = False
         while not valid:
@@ -78,9 +79,9 @@ class Player(Creature):
                 if choice == 0:  # Preventing accidentally using the last item 
                     print("Invalid choice, try again.")
                 else:
-                    to_eat = consumables[int(choice) - 1]
+                    to_eat = consumables[int(choice) - 1][0]
                     self.hp = min(self.max_hp, self.hp + to_eat.healing_value)
-                    self.inventory.remove(to_eat)
+                    self.bag.removeItem(to_eat, 1)
                     print('')
                     print(f"Now Current HP: {self.hp}")
                     valid = True
@@ -91,4 +92,18 @@ class Player(Creature):
         room = world.tile_at(self.x, self.y)     
         room.check_if_trade(self)
 
+def GeneratePlayer():
+    # Adds the starting equipment to the player
+    starting_equipment = {items.Rock(): 3,
+                        items.Dagger(): 1,
+                        items.Bread(): 2}
+    player = Player()
+    player.bag.addItems(starting_equipment)
+    return player
 
+if __name__ == "__main__":
+    world.parse_world_dsl()
+    p = GeneratePlayer()
+    p.heal()
+    p.heal()
+    print(p.bag.inventory)

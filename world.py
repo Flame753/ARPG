@@ -79,32 +79,51 @@ class TraderTile(MapTile):
         self.trader = npc.Trader()
     
     def trade(self, buyer, seller):
-        for i, item in enumerate(seller.inventory, 1):
-            print("{}. {} - {} Gold".format(i, item.name, item.worth))
+        selling_list = {}
+        
         while True:
+            seller_items = [(item, amount['amount']) for item, amount in seller.bag.inventory.items()]
+            for i, item in enumerate(seller_items, 1):
+                # Creating item list that can be traded
+                selling_list.update({str(i): item[0]})
+                # Listing seller's items for sale
+                print(f'{i}. {item[1]} {item[0].name} - {item[0].worth} Gold')
+
             user_input = input("Choose an item or press Q to exit: ")
             if user_input in ['Q', 'q']: 
                 return
             else:
-                try:
-                    choice = int(user_input)
-                    if choice == 0: # Preventing accidentally using the last item 
-                        print("Invalid Choice!")
-                    else:
-                        to_swap = seller.inventory[choice - 1]
-                        self.swap(seller, buyer, to_swap)
-                except (ValueError, IndexError):
+                choice = user_input
+                to_swap = selling_list.get(choice)
+                if to_swap:
+                    self.swap(seller, buyer, to_swap)
+                else:
                     print("Invalid Choice!")
 
     def swap(self, seller, buyer, item):
+        if not seller.bag.inventory:
+            if isinstance(seller, npc.NonPlayableCharacter):
+                print('Seller has ran out of stock of items.')
+            else:
+                print('You have ran out of things to sell.')
+            return
         if item.worth > buyer.gold:
             print("That's too expensive")
             return
-        seller.inventory.remove(item)
-        buyer.inventory.append(item)
+        seller.bag.removeItem(item, 1)
+        print(seller.bag.inventory)
+        buyer.bag.addItem(item, 1)
+        print(buyer.bag.inventory)
         seller.gold = seller.gold + item.worth
         buyer.gold  = buyer.gold - item.worth
         print("Trade complete!")
+
+        # Printing player's current gold amount
+        text = 'You Currenlty have {} Gold.'
+        if not isinstance(seller, npc.NonPlayableCharacter):
+            print(text.format(seller.gold))
+        else:
+            print(text.format(buyer.gold))
 
     def check_if_trade(self, player):
         while True:

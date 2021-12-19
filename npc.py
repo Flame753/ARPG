@@ -11,10 +11,10 @@ class Trader(NonPlayableCharacter):
     def __init__(self) -> None:
         self.name = "Trader"
         self.gold = 100
-        self.inventory = [items.Bread(),
-                            items.Bread(),
-                            items.Bread(),
-                            items.Bread(),
-                            items.HealingPotion(),
-                            items.HealingPotion()]
+        self.bag = items.Backpack()
+
+        starting_equipment = {items.Bread(): 4,
+                            items.HealingPotion(): 2}
+        self.bag.addItems(starting_equipment)
+
                             
