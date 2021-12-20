@@ -14,14 +14,20 @@ class Inventory:
         self.off_hand = off_hand
         self.bag = bag
     
-    def isempty(self):
+    def isEmpty(self):
         return True if not self.__dict__ else False
 
-    def changeWornItem(self, **kwargs):
-        for key in kwargs.keys():
+    def isBagEmpty(self):
+        return True if not self.bag.__dict__ else False
+
+    def changeEquipment(self, **kwargs):
+        # Changes current equipment out with new one
+        for key, value in kwargs.items():
             if not hasattr(self, key):
                 return False
-
+            if value:
+                # Returns Equipment back into bag
+                self.bag.addItem(self.__dict__[key], 1)
         self.__dict__.update(kwargs)
         return True
 
@@ -53,8 +59,9 @@ class Inventory:
 
 if __name__ == '__main__':
     import items
-    i = Inventory(bag = items.Backpack())
-
+    i = Inventory(bag = items.Backpack(), main_hand=items.Dagger())
+    i.changeEquipment(main_hand=items.Rock())
     print(i.__dict__)
+    print(i.bag.inventory)
     print(i.calulateWeight())
     print(i.calulateWorth())
