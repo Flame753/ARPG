@@ -9,7 +9,7 @@ class NonPlayableCharacter():
     def __str__(self) -> str:
         return self.name
 
-class Trader(NonPlayableCharacter):
+class Trader(NonPlayableCharacter, items.Container):
     def __init__(self) -> None:
         self.name = "Trader"
         self.gold = 100

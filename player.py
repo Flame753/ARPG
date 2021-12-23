@@ -4,8 +4,8 @@ from creatures import Creature
 from inventory import Inventory
 
 
-class Player(Creature):
-    def __init__(self) -> None:
+class Player(Creature, items.Container):
+    def __init__(self):
         self.inventory = Inventory(bag = items.Backpack())
 
         self.x = world.start_tile_location[0]
