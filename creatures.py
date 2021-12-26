@@ -1,3 +1,4 @@
+import items
 from abc import ABC
 
 
@@ -72,12 +73,15 @@ class Creature(ABC):
         self.__dict__.update(kwargs)
         return True
 
-class Humonoid(Creature):
+class Humonoid(Creature, items.Container):
     def __init__(self, heads=1, eyes=2, legs=2, hands=2, fingers=10, **kwargs):
         super().__init__(heads=heads, eyes=eyes, legs=legs, hands=hands, fingers=fingers, **kwargs)
         if type(self) == Humonoid:
             raise Exception('Do not instantiate Humonoid directly')
 
+    def add_items(self, items):
+        for item, amount in items.items():
+            self.addItem(item, amount)
 
 class Beast(Creature):
     def __init__(self, **kwargs):

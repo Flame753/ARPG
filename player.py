@@ -1,19 +1,22 @@
 import items
 import world
-from creatures import Creature
+from creatures import Humonoid
 from inventory import Inventory
 
 
-class Player(Creature, items.Container):
+class Player(Humonoid):
     def __init__(self):
-        self.inventory = Inventory(bag = items.Backpack())
-
         self.x = world.start_tile_location[0]
         self.y = world.start_tile_location[1]
         self.hp = 100
         self.max_hp = 100
         self.gold = 5
         self.victory = False
+
+        starting_equipment = {items.Rock(): 3,
+                            items.Dagger(): 1,
+                            items.Bread(): 2}
+        self.add_items(starting_equipment)
 
     def move(self, dx, dy):
         self.x += dx
@@ -31,9 +34,12 @@ class Player(Creature, items.Container):
     def move_west(self):
         self.move(dx=-1, dy=0)
 
+    def inventory_empty(self):
+        return True if not self.inventory else False
+
     def print_inventory(self):
         print("Inventory:")
-        for item, amount in self.inventory.bag.inventory.items():
+        for item, amount in self.inventory.items():
             amount = amount['amount']
             print(f'* {amount} {item}')
             best_weapon = self.most_powerful_weapon()
@@ -43,7 +49,7 @@ class Player(Creature, items.Container):
     def most_powerful_weapon(self):
         max_damage = 0
         best_weapon = None
-        for item in self.inventory.bag.inventory.keys():
+        for item in self.inventory.keys():
             try:
                 if item.damage > max_damage:
                     best_weapon = item
@@ -64,7 +70,7 @@ class Player(Creature, items.Container):
             print(f"{enemy.name} HP is {enemy.hp}.")
 
     def heal(self):
-        consumables = [(item, amount['amount']) for item, amount in self.inventory.bag.inventory.items() if isinstance(item, items.Consumable)]
+        consumables = [(item, amount['amount']) for item, amount in self.inventory.items() if isinstance(item, items.Consumable)]
         if not consumables:
             print("You don't have any items to heal you!")
             return
@@ -83,7 +89,7 @@ class Player(Creature, items.Container):
                 else:
                     to_eat = consumables[int(choice) - 1][0]
                     self.hp = min(self.max_hp, self.hp + to_eat.healing_value)
-                    self.inventory.bag.removeItem(to_eat, 1)
+                    self.removeItem(to_eat, 1)
                     print('')
                     print(f"Now Current HP: {self.hp}")
                     valid = True
@@ -94,18 +100,20 @@ class Player(Creature, items.Container):
         room = world.tile_at(self.x, self.y)     
         room.check_if_trade(self)
 
-def GeneratePlayer():
-    # Adds the starting equipment to the player
-    starting_equipment = {items.Rock(): 3,
-                        items.Dagger(): 1,
-                        items.Bread(): 2}
-    player = Player()
-    player.inventory.addItemsToBag(starting_equipment)
-    return player
+# def GeneratePlayer():
+#     # Adds the starting equipment to the player
+#     starting_equipment = {items.Rock(): 3,
+#                         items.Dagger(): 1,
+#                         items.Bread(): 2}
+#     player = Player()
+#     for item, amount in starting_equipment.items():
+#         player.addItem(item, amount)
+#     return player
 
 if __name__ == "__main__":
-    world.parse_world_dsl()
-    p = GeneratePlayer()
-    p.heal()
-    p.heal()
-    print(p.bag.inventory)
+    # world.parse_world_dsl()
+    # p = GeneratePlayer()
+    # p.heal()
+    # p.heal()
+    # print(p.bag.inventory)
+    pass

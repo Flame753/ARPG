@@ -1,12 +1,12 @@
 from collections import OrderedDict
-from player import GeneratePlayer
+from player import Player
 import world
 
 
 def play():
     print("Escape from Cave Terror!")
     world.parse_world_dsl()
-    player = GeneratePlayer()
+    player = Player()
         
     while player.is_alive() and not player.victory:
         room = world.tile_at(player.x, player.y)
@@ -26,7 +26,7 @@ def get_available_actions(room, player):
     """
     actions = OrderedDict()
     print("Choose an action: ")
-    if not player.inventory.isEmpty():
+    if not player.inventory_empty():
         action_adder(actions, 'i', player.print_inventory, "Print Inventory")
     if isinstance(room, world.TraderTile):
         action_adder(actions, 't', player.trade, "Trade")

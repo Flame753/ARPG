@@ -1,5 +1,6 @@
+from creatures import Humonoid
 import items
-from inventory import Inventory
+from creatures import Humonoid
 
 
 class NonPlayableCharacter():
@@ -9,14 +10,14 @@ class NonPlayableCharacter():
     def __str__(self) -> str:
         return self.name
 
-class Trader(NonPlayableCharacter, items.Container):
+class Trader(NonPlayableCharacter, Humonoid):
     def __init__(self) -> None:
         self.name = "Trader"
         self.gold = 100
-        self.inventory = Inventory(bag = items.Backpack())
-
+        
         starting_equipment = {items.Bread(): 4,
                             items.HealingPotion(): 2}
-        self.inventory.addItemsToBag(starting_equipment)
+        self.add_items(starting_equipment)
+
 
                             
