@@ -37,47 +37,26 @@ class Weapon(BaseItem):
             raise Exception('Do not instantiate Weapon directly')
 
 class Rock(Weapon):
-    def __init__(self, **kwargs):
-        super().__init__(name = 'Rock',
-                        damage = 5,
-                        worth = 1,
-                        weight = 1,
-                        **kwargs)
+    def __init__(self, name='Rock', damage=5, worth=1, weight=1,**kwargs):
+        super().__init__(name=name, damage=damage, worth=worth, weight=weight, **kwargs)
 
 class Dagger(Weapon):
-    def __init__(self, **kwargs):
-        super().__init__(name = 'Dagger',
-                        damage = 10,
-                        worth = 20,
-                        weight = 1,
-                        **kwargs)
+    def __init__(self, name='Dagger', damage=10, worth=20, weight=1,**kwargs):
+        super().__init__(name=name, damage=damage, worth=worth, weight=weight, **kwargs)
 
 class Sword(Weapon):
-    def __init__(self, **kwargs):
-        super().__init__(name = "Sword",
-                        damage = 20,
-                        worth = 100,
-                        weight = 1,
-                        description = 'Rusty',
-                        **kwargs)
+    def __init__(self, name='Sword', damage=20, worth=100, weight=1, 
+                description='Rusty', **kwargs):
+        super().__init__(name=name, damage=damage, worth=worth, weight=weight, 
+                        description=description, **kwargs)
 
 class Crossbow(Weapon):
-    def __init__(self, **kwargs):
-        super().__init__(name = "Crossbow",
-                        damage = 15,
-                        worth = 75,
-                        weight = 2,
-                        description = "Strong and sturdy Crossbow." \
-                            "Allows a range attack.",
-                        **kwargs)
+    def __init__(self, name='Crossbow', damage=15, worth=75, weight=2,**kwargs):
+        super().__init__(name=name, damage=damage, worth=worth, weight=weight, **kwargs)
 
 class Axe(Weapon):
-    def __init__(self, **kwargs):
-        super().__init__(name = "Axe",
-                        damage = 25,
-                        worth = 60,
-                        weight = 2,
-                        **kwargs)
+    def __init__(self, name='Axe', damage=25, worth=60, weight=2,**kwargs):
+        super().__init__(name=name, damage=damage, worth=worth, weight=weight, **kwargs)
 
 # Consumables
 class Consumable(BaseItem):
@@ -91,21 +70,17 @@ class Consumable(BaseItem):
         return f'{self.description} {self.name} (+{self.healing_value})'
 
 class Bread(Consumable):
-    def __init__(self, **kwargs):
-        super().__init__(name = 'Bread',
-                        healing_value = 10,
-                        worth = 12,
-                        weight = 1,
-                        description = 'Crusty',
-                        **kwargs)
+    def __init__(self, name='Bread', healing_value=10, worth=12, weight=1,
+                 description='Crusty', **kwargs):
+        super().__init__(name=name, healing_value=healing_value, worth=worth, 
+                        weight=weight, description=description **kwargs)
+
 
 class HealingPotion(Consumable):
-    def __init__(self, **kwargs):
-        super().__init__(name = "Healing Potion",
-                        healing_value = 50,
-                        worth = 60,
-                        weight = 1,
-                        **kwargs)
+    def __init__(self, name="Healing Potion", healing_value=50, worth=60,
+                 weight=1, **kwargs):
+        super().__init__(name=name, healing_value=healing_value, worth=worth, 
+                        weight=weight, **kwargs)
 
 # Containers
 class Container(ABC):
@@ -165,8 +140,12 @@ class Container(ABC):
         return worth
     
 class Backpack(BaseItem, Container):
-    def __init__(self, **kwargs):
-        super().__init__(name='Backpack', worth=10, weight=1, **kwargs)
+    def __init__(self, name='Backpack', worth=10, weight=1,**kwargs):
+        super().__init__(name=name, worth=worth, weight=weight, **kwargs)
+
+class CoinPouch(BaseItem, Container):
+    def __init__(self, name='Coin Pouch', worth=1, weight=.1, **kwargs):
+        super().__init__(name=name, worth=worth, weight=weight, **kwargs)
 
 # Currency
 class Coin(BaseItem):
@@ -176,21 +155,22 @@ class Coin(BaseItem):
             raise Exception('Do not instantiate Coin directly')
 
 class CopperCoin(Coin):
-    def __init__(self, **kwargs):
-        super().__init__(name='Copper Coin', worth=1, **kwargs)
+    def __init__(self, name='Copper Coin', worth=1, **kwargs):
+        super().__init__(name=name, worth=worth, **kwargs)
 
 class SilverCoin(Coin):
-    def __init__(self, **kwargs):
-        super().__init__(name='Silver Coin', worth=10, **kwargs)
+    def __init__(self, name='Silver Coin', worth=10, **kwargs):
+        super().__init__(name=name, worth=worth, **kwargs)
+
 
 class GoldCoin(Coin):
-    def __init__(self, **kwargs):
-        super().__init__(name='Gold Coin', worth=100, **kwargs)
+    def __init__(self, name='Gold Coin', worth=100, **kwargs):
+        super().__init__(name=name, worth=worth, **kwargs)
 
 class PlatinumCoin(Coin):
-    def __init__(self, **kwargs):
-        super().__init__(name='Platinum Coin', worth=1000, **kwargs)
-
+    def __init__(self, name='Platinum Coin', worth=1000, **kwargs):
+        super().__init__(name=name, worth=worth, **kwargs)
+        
 
 if __name__ == "__main__":
     # BaseItem()
@@ -211,4 +191,4 @@ if __name__ == "__main__":
     print('Backpack: worth -> {}, weight -> {}'.format(backpack.calculateTotalWorth(), backpack.calculateTotalWeight()))
     backpack.addItem(GoldCoin(), 53)
     print('Backpack: worth -> {}, weight -> {}'.format(backpack.calculateTotalWorth(), backpack.calculateTotalWeight()))
-    pass
+
