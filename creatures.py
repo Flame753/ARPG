@@ -23,7 +23,7 @@ def GET_EQUIP_SLOTS():
     return slots
 
 
-class Creature(ABC):
+class Creature(items.Container):
     def __init__(self, heads=0, eyes=0, body=0, legs=0, hands=0, fingers=0, tails=0, wings=0, **kwargs):
         if type(self) == Creature:
             raise Exception('Do not instantiate Creature directly')
@@ -38,6 +38,7 @@ class Creature(ABC):
 
         self.slot_list = list()
 
+    # Methods that deal with Equipment Slots
     def define_slots(self):
         for bodypart, slot in EQUIP_SLOTS.items():
             self.slot_list.extend(slot*self.__dict__.get(bodypart))
@@ -56,7 +57,8 @@ class Creature(ABC):
         # Checks if an item is occupying the slot
         return False if self.equipment_slots.get(slot, None) else True
 
-    def add_equipment(self, item, slot):
+    def equip_item(self, item, slot):
+        # Adds item into equipment slot
         self.ensure_equipment_slots()
 
         if self.slot_available(slot):
@@ -64,24 +66,32 @@ class Creature(ABC):
             return True
         return False
 
-    def is_alive(self):
-        return self.hp > 0
-    
+    # Methods that deal with the Creature's inventory 
+    # including any methods that are form the Container class
+    def inventory_empty(self):
+        return True if not self.inventory else False
+
+    def add_items(self, items):
+        for item, amount in items.items():
+            self.addItem(item, amount)
+
+    # Methods that deal with physical form
     def change_physical_body(self, **kwargs):
         for key in kwargs.keys():
             if not hasattr(self, key): return False
         self.__dict__.update(kwargs)
         return True
 
-class Humonoid(Creature, items.Container):
+    def is_alive(self):
+        return self.hp > 0
+    
+
+class Humonoid(Creature):
     def __init__(self, heads=1, eyes=2, legs=2, hands=2, fingers=10, **kwargs):
         super().__init__(heads=heads, eyes=eyes, legs=legs, hands=hands, fingers=fingers, **kwargs)
         if type(self) == Humonoid:
             raise Exception('Do not instantiate Humonoid directly')
 
-    def add_items(self, items):
-        for item, amount in items.items():
-            self.addItem(item, amount)
 
 class Beast(Creature):
     def __init__(self, **kwargs):
