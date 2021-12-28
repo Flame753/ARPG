@@ -1,7 +1,6 @@
 import items
 import world
 from creatures import Humonoid
-from inventory import Inventory
 
 
 class Player(Humonoid):
@@ -33,9 +32,6 @@ class Player(Humonoid):
 
     def move_west(self):
         self.move(dx=-1, dy=0)
-
-    def inventory_empty(self):
-        return True if not self.inventory else False
 
     def print_inventory(self):
         print("Inventory:")
@@ -89,7 +85,7 @@ class Player(Humonoid):
                 else:
                     to_eat = consumables[int(choice) - 1][0]
                     self.hp = min(self.max_hp, self.hp + to_eat.healing_value)
-                    self.removeItem(to_eat, 1)
+                    self.remove_item(to_eat, 1)
                     print('')
                     print(f"Now Current HP: {self.hp}")
                     valid = True

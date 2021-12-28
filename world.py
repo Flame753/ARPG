@@ -111,8 +111,8 @@ class TraderTile(MapTile):
         if item.worth > buyer.gold:
             print("That's too expensive")
             return
-        seller.removeItem(item, 1)
-        buyer.addItem(item, 1)
+        seller.remove_item(item, 1)
+        buyer.add_item(item, 1)
         seller.gold = seller.gold + item.worth
         buyer.gold  = buyer.gold - item.worth
         print("Trade complete!")

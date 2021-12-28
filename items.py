@@ -10,7 +10,7 @@ class BaseItem(ABC):
         self.weight = weight
         self.description = description
 
-    def modifyAttr(self, **kwargs):
+    def modify_attr(self, **kwargs):
         for key in kwargs.keys():
             if not hasattr(self, key):
                 return False
@@ -73,7 +73,7 @@ class Bread(Consumable):
     def __init__(self, name='Bread', healing_value=10, worth=12, weight=1,
                  description='Crusty', **kwargs):
         super().__init__(name=name, healing_value=healing_value, worth=worth, 
-                        weight=weight, description=description **kwargs)
+                        weight=weight, description=description, **kwargs)
 
 
 class HealingPotion(Consumable):
@@ -88,20 +88,20 @@ class Container(ABC):
         if type(self) == Container:
             raise Exception('Do not instantiate Container directly')
 
-    def ensureInventory(self):
+    def ensure_inventory(self):
         if not hasattr(self, 'inventory'):
             self.inventory = {}
     
-    def addItem(self, item, amount=0):
-        self.ensureInventory()
+    def add_item(self, item, amount=0):
+        self.ensure_inventory()
 
         if item in self.inventory:
             self.inventory[item]['amount'] += amount
         else:
             self.inventory[item] = {'amount': amount}
     
-    def removeItem(self, item, amount = 0):
-        self.ensureInventory()
+    def remove_item(self, item, amount = 0):
+        self.ensure_inventory()
 
         if item in self.inventory:
             if self.inventory[item]['amount'] >= amount:
@@ -111,28 +111,28 @@ class Container(ABC):
                 return True
         return False
 
-    def calculateItemWeight(self, item):
-        self.ensureInventory()
+    def calculate_item_weight(self, item):
+        self.ensure_inventory()
         
         if item in self.inventory:
             return item.weight * self.inventory[item]['amount']
 
-    def calculateItemWorth(self, item):
-        self.ensureInventory()
+    def calculate_item_worth(self, item):
+        self.ensure_inventory()
         
         if item in self.inventory:
             return item.worth * self.inventory[item]['amount']
 
-    def calculateTotalWeight(self):
-        self.ensureInventory()
+    def calculate_total_weight(self):
+        self.ensure_inventory()
 
         weight = 0
         for item, data in self.inventory.items():
             weight += item.weight * data['amount']
         return weight
 
-    def calculateTotalWorth(self):
-        self.ensureInventory()
+    def calculate_total_worth(self):
+        self.ensure_inventory()
 
         worth = 0
         for item, data in self.inventory.items():
@@ -170,7 +170,7 @@ class GoldCoin(Coin):
 class PlatinumCoin(Coin):
     def __init__(self, name='Platinum Coin', worth=1000, **kwargs):
         super().__init__(name=name, worth=worth, **kwargs)
-        
+
 
 if __name__ == "__main__":
     # BaseItem()
@@ -182,13 +182,13 @@ if __name__ == "__main__":
     print(CopperCoin(), Dagger(), Bread(), Backpack(), Sword())
     
     c = CopperCoin()
-    print(c.modifyAttr(name="l", ru=1))
-    print(c.modifyAttr(name="small copper coin"))
+    print(c.modify_attr(name="l", ru=1))
+    print(c.modify_attr(name="small copper coin"))
     print(c.__dict__)
 
     backpack = Backpack()
-    backpack.addItem(CopperCoin(), 10)
-    print('Backpack: worth -> {}, weight -> {}'.format(backpack.calculateTotalWorth(), backpack.calculateTotalWeight()))
-    backpack.addItem(GoldCoin(), 53)
-    print('Backpack: worth -> {}, weight -> {}'.format(backpack.calculateTotalWorth(), backpack.calculateTotalWeight()))
+    backpack.add_item(CopperCoin(), 10)
+    print('Backpack: worth -> {}, weight -> {}'.format(backpack.calculate_total_worth(), backpack.calculate_total_weight()))
+    backpack.add_item(GoldCoin(), 53)
+    print('Backpack: worth -> {}, weight -> {}'.format(backpack.calculate_total_worth(), backpack.calculate_total_weight()))
 
