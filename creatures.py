@@ -87,25 +87,39 @@ class Creature(Inventory):
 
     # Methods that deal with the Creature's inventory 
     # including any methods that are form the Container class
-    @staticmethod
-    def add_item(inventory, item, amount=0):
-        if not isinstance(item, Inventory): pass
-        print(inventory,)
-        if item in inventory:
-            inventory[item]['amount'] += amount
+    def add_item(self, item, amount=0, container=None):
+        if isinstance(container, Container):
+            container.ensure_inventory()
+            if item in container.inventory:
+                container.inventory[item]['amount'] += amount
+            else:
+                container.inventory[item] = {'amount': amount}
         else:
-            inventory[item] = {'amount': amount}
+            self.ensure_inventory()
+            if item in self.inventory:
+                self.inventory[item]['amount'] += amount
+            else:
+                self.inventory[item] = {'amount': amount}
 
-    @staticmethod
-    def remove_item(inventory, item, amount=0):
-        if not isinstance(item, Inventory): pass
-        if item in inventory:
-            if inventory[item]['amount'] >= amount:
-                inventory[item]['amount'] -= amount
-                if inventory[item]['amount'] == 0:
-                    del(inventory[item])
-                return True
-        return False
+    def remove_item(self, item, amount=0, container=None):
+        if isinstance(container, Container):
+            container.ensure_inventory()
+            if item in container.inventory:
+                if container.inventory[item]['amount'] >= amount:
+                    container.inventory[item]['amount'] -= amount
+                    if container.inventory[item]['amount'] == 0:
+                        del(container.inventory[item])
+                    return True
+            return False
+        else:
+            self.ensure_inventory()
+            if item in self.inventory:
+                if self.inventory[item]['amount'] >= amount:
+                    self.inventory[item]['amount'] -= amount
+                    if self.inventory[item]['amount'] == 0:
+                        del(self.inventory[item])
+                    return True
+            return False
 
     def calculate_total_weight(self):
         self.ensure_inventory()
@@ -142,21 +156,21 @@ class Creature(Inventory):
                 if item.inventory.get(item, None): return item.inventory
         return None
 
-    def equip_item(self, storage_locker, item, slot):
+    def equip_item(self, container, item, slot):
         self.ensure_equipment_slots()
-        if not storage_locker: return False
+        if not container: return False
 
         if self.add_item_to_slot(item, slot): 
-            self.remove_item(storage_locker, item, 1)
-            self.add_item(self.inventory, item, 1)
+            self.remove_item(item, 1, container)
+            self.add_item(item, 1)
         return True
 
-    def unquip_item(self, storage_locker, item, slot):
+    def unquip_item(self, container, item, slot):
         self.ensure_equipment_slots()
 
         if self.remove_item_from_slot(slot): 
-            self.remove_item(self.inventory, item, 1)
-            self.add_item(storage_locker, item, 1)
+            self.remove_item(item, 1)
+            self.add_item(item, 1, container)
             return True
         return False
 
@@ -196,14 +210,15 @@ if __name__ == '__main__':
                     b: 1}
     for k, v in starting_equipment.items():
         # h.ensure_inventory()
-        h.add_item(h.inventory, k, v)
+        h.add_item(k, v)
     # print(h.inventory)
     # h.ensure_equipment_slots()
     # b.ensure_inventory()
     print(h.inventory, h.equipment_slots)
-    print(h.equip_item(h.inventory, d, 'EQUIP_SLOT_HEAD'))
+    print(h.equip_item(h, d, 'EQUIP_SLOT_HEAD'))
     print(h.inventory, h.equipment_slots)
-    print(h.unquip_item(b.inventory, d, 'EQUIP_SLOT_HEAD'))
+    print(h.unquip_item(b, d, 'EQUIP_SLOT_HEAD'))
     print(h.inventory, h.equipment_slots)
+    print(b.inventory)
     # print(h.add_item(h.inventory, items.Backpack(), 1))
     # print(h.inventory)
