@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractstaticmethod
 
 
 class BaseItem(ABC):
@@ -75,7 +75,6 @@ class Bread(Consumable):
         super().__init__(name=name, healing_value=healing_value, worth=worth, 
                         weight=weight, description=description, **kwargs)
 
-
 class HealingPotion(Consumable):
     def __init__(self, name="Healing Potion", healing_value=50, worth=60,
                  weight=1, **kwargs):
@@ -83,14 +82,34 @@ class HealingPotion(Consumable):
                         weight=weight, **kwargs)
 
 # Containers
-class Container(ABC):
-    def __init__(self):
-        if type(self) == Container:
-            raise Exception('Do not instantiate Container directly')
+class Inventory(ABC):
 
     def ensure_inventory(self):
         if not hasattr(self, 'inventory'):
             self.inventory = {}
+    
+    @abstractstaticmethod
+    def add_item():
+        pass
+
+    @abstractstaticmethod
+    def remove_item():
+        pass
+
+    @abstractstaticmethod
+    def calculate_total_weight():
+        pass
+
+    @abstractstaticmethod
+    def calculate_total_worth():
+        pass
+
+class Container(Inventory):
+    def __init__(self, **kwargs):
+        if type(self) == Container:
+            raise Exception('Do not instantiate Container directly')
+        super().__init__(**kwargs)
+        self.ensure_inventory()
     
     def add_item(self, item, amount=0):
         self.ensure_inventory()
@@ -139,37 +158,60 @@ class Container(ABC):
             worth += item.worth * data['amount']
         return worth
     
-class Backpack(BaseItem, Container):
+class Backpack(Container, BaseItem):
     def __init__(self, name='Backpack', worth=10, weight=1,**kwargs):
         super().__init__(name=name, worth=worth, weight=weight, **kwargs)
 
-class CoinPouch(BaseItem, Container):
+class CoinPouch(Container, BaseItem):
     def __init__(self, name='Coin Pouch', worth=1, weight=.1, **kwargs):
         super().__init__(name=name, worth=worth, weight=weight, **kwargs)
 
 # Currency
 class Coin(BaseItem):
-    def __init__(self, **kwargs):
+    def __init__(self, worth=1, purity=1, **kwargs):
         super().__init__(weight=0.01, **kwargs)
+        self.purity = purity
+        self.worth = worth * purity
         if type(self) == Coin:
             raise Exception('Do not instantiate Coin directly')
+
+class GreaterCoin(Coin):
+    def __init__(self, **kwargs):
+        super().__init__(purity=5, **kwargs)
+        if type(self) == Coin:
+            raise Exception('Do not instantiate GreaterCoin directly')
 
 class CopperCoin(Coin):
     def __init__(self, name='Copper Coin', worth=1, **kwargs):
         super().__init__(name=name, worth=worth, **kwargs)
 
+class GreaterCopperCoin(GreaterCoin, CopperCoin):
+    def __init__(self, name='Greater Copper Coin', **kwargs):
+        super().__init__(name=name, **kwargs)
+
 class SilverCoin(Coin):
     def __init__(self, name='Silver Coin', worth=10, **kwargs):
         super().__init__(name=name, worth=worth, **kwargs)
 
+class GreaterSilverCoin(GreaterCoin, SilverCoin):
+    def __init__(self, name='Greater Silver Coin', **kwargs):
+        super().__init__(name=name, **kwargs)
 
 class GoldCoin(Coin):
     def __init__(self, name='Gold Coin', worth=100, **kwargs):
         super().__init__(name=name, worth=worth, **kwargs)
 
+class GreaterGoldCoin(GreaterCoin, SilverCoin):
+    def __init__(self, name='Greater Gold Coin', **kwargs):
+        super().__init__(name=name, **kwargs)
+
 class PlatinumCoin(Coin):
     def __init__(self, name='Platinum Coin', worth=1000, **kwargs):
         super().__init__(name=name, worth=worth, **kwargs)
+
+class GraterPlatinumCoin(GreaterCoin, PlatinumCoin):
+    def __init__(self, name='Greater Platinum Coin', **kwargs):
+        super().__init__(name=name, **kwargs)
 
 
 if __name__ == "__main__":
