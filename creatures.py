@@ -35,10 +35,6 @@ class Creature(Inventory):
         self.tails = tails
         self.wings = wings
 
-        self.ensure_slot_list()
-        self.ensure_inventory()
-        self.ensure_equipment_slots()
-
     # Methods that deal with Equipment Slots
     def define_slots(self):
         self.ensure_slot_list()
@@ -214,11 +210,14 @@ if __name__ == '__main__':
     # print(h.inventory)
     # h.ensure_equipment_slots()
     # b.ensure_inventory()
-    print(h.inventory, h.equipment_slots)
+    # print(h.inventory, h.equipment_slots)
     print(h.equip_item(h, d, 'EQUIP_SLOT_HEAD'))
     print(h.inventory, h.equipment_slots)
     print(h.unquip_item(b, d, 'EQUIP_SLOT_HEAD'))
     print(h.inventory, h.equipment_slots)
-    print(b.inventory)
+    print("bag:", b.inventory)
+    print(h.equip_item(b, d, 'EQUIP_SLOT_HEAD'))
+    print(h.inventory, h.equipment_slots)
+    print("bag:", b.inventory)
     # print(h.add_item(h.inventory, items.Backpack(), 1))
     # print(h.inventory)

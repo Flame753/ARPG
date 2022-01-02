@@ -109,7 +109,6 @@ class Container(Inventory):
         if type(self) == Container:
             raise Exception('Do not instantiate Container directly')
         super().__init__(**kwargs)
-        self.ensure_inventory()
     
     def add_item(self, item, amount=0):
         self.ensure_inventory()
