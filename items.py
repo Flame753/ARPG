@@ -2,12 +2,14 @@ from abc import ABC, abstractstaticmethod
 
 
 class BaseItem(ABC):
-    def __init__(self, name = None, worth = 0, weight = 0, description = '', **kwargs):
+    def __init__(self, name=None, worth=0, weight=0, 
+                valid_slots=[], description='', **kwargs):
         if type(self) == BaseItem:
             raise Exception('Do not instantiate BaseItem directly')
         self.name = name
         self.worth = worth
         self.weight = weight
+        self.valid_slots = valid_slots
         self.description = description
 
     def modify_attr(self, **kwargs):
@@ -37,26 +39,35 @@ class Weapon(BaseItem):
             raise Exception('Do not instantiate Weapon directly')
 
 class Rock(Weapon):
-    def __init__(self, name='Rock', damage=5, worth=1, weight=1,**kwargs):
-        super().__init__(name=name, damage=damage, worth=worth, weight=weight, **kwargs)
+    def __init__(self, name='Rock', damage=5, worth=1, weight=1, 
+                valid_slots=['EQUIP_SLOT_MAIN_HAND'], **kwargs):
+        super().__init__(name=name, damage=damage, worth=worth, weight=weight, 
+                        valid_slots=valid_slots, **kwargs)
 
 class Dagger(Weapon):
-    def __init__(self, name='Dagger', damage=10, worth=20, weight=1,**kwargs):
-        super().__init__(name=name, damage=damage, worth=worth, weight=weight, **kwargs)
+    def __init__(self, name='Dagger', damage=10, worth=20, weight=1, 
+                valid_slots=['EQUIP_SLOT_MAIN_HAND', 'EQUIP_SLOT_OFF_HAND'], **kwargs):
+        super().__init__(name=name, damage=damage, worth=worth, weight=weight,
+                        valid_slots=valid_slots, **kwargs)
 
 class Sword(Weapon):
     def __init__(self, name='Sword', damage=20, worth=100, weight=1, 
+                valid_slots=['EQUIP_SLOT_MAIN_HAND', 'EQUIP_SLOT_OFF_HAND'], 
                 description='Rusty', **kwargs):
         super().__init__(name=name, damage=damage, worth=worth, weight=weight, 
-                        description=description, **kwargs)
+                        valid_slots=valid_slots, description=description, **kwargs)
 
 class Crossbow(Weapon):
-    def __init__(self, name='Crossbow', damage=15, worth=75, weight=2,**kwargs):
-        super().__init__(name=name, damage=damage, worth=worth, weight=weight, **kwargs)
+    def __init__(self, name='Crossbow', damage=15, worth=75, weight=2, 
+                valid_slots=['EQUIP_SLOT_TWO_HAND'], **kwargs):
+        super().__init__(name=name, damage=damage, worth=worth, weight=weight, 
+                        valid_slots=valid_slots, **kwargs)
 
 class Axe(Weapon):
-    def __init__(self, name='Axe', damage=25, worth=60, weight=2,**kwargs):
-        super().__init__(name=name, damage=damage, worth=worth, weight=weight, **kwargs)
+    def __init__(self, name='Axe', damage=25, worth=60, weight=2, 
+                valid_slots=['EQUIP_SLOT_TWO_HAND'], **kwargs):
+        super().__init__(name=name, damage=damage, worth=worth, weight=weight,
+                        valid_slots=valid_slots, **kwargs)
 
 # Consumables
 class Consumable(BaseItem):
