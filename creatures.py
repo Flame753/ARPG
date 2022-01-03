@@ -3,81 +3,82 @@ from items import BaseItem, Inventory, Container
 
 # Equipment Slots that are Exist
 EQUIP_SLOTS = {'heads': ['EQUIP_SLOT_HEAD',
-                    'EQUIP_SLOT_NECK',],
+                        'EQUIP_SLOT_FOREHEAD',
+                        'EQUIP_SLOT_NECK',],
             'eyes': [],
-            'body': ['EQUIP_SLOT_TORSO',
-                    'EQUIP_SLOT_WAIST',],
+            'upper_body': ['EQUIP_SLOT_CHEST',
+                        'EQUIP_SLOT_WAIST',],
             'legs': ['EQUIP_SLOT_LEGS',
                     'EQUIP_SLOT_FEETS',],
-            'hands': ['EQUIP_SLOT_MAIN_HAND',
-                    'EQUIP_SLOT_OFF_HAND',],
+            'hands': ['EQUIP_SLOT_TWO_HAND',
+                            'EQUIP_SLOT_MAIN_HAND',
+                            'EQUIP_SLOT_OFF_HAND',],
             'fingers': ['EQUIP_SLOT_RING'],
             'tails': ['EQUIP_SLOT_TAIL'],
             'wings': ['EQUIP_SLOT_WINGS']}
 
-def GET_EQUIP_SLOTS():
-    slots = list()
-    for slot in EQUIP_SLOTS.values():
-        slots.extend(slot)
-    return slots
-
 
 class Creature(Inventory):
-    def __init__(self, heads=0, eyes=0, body=0, legs=0, hands=0, fingers=0, tails=0, wings=0, **kwargs):
+    def __init__(self, heads=0, eyes=0, upper_body=0, legs=0, hands=0, fingers=0, tails=0, wings=0, **kwargs):
         if type(self) == Creature:
             raise Exception('Do not instantiate Creature directly')
         self.heads = heads
-        self.eyes = eyes//2
-        self.body = body
-        self.legs = legs//2
-        self.hands = hands//2
-        self.fingers = fingers//max(1, hands)
+        self.eyes = eyes
+        self.upper_body = upper_body
+        self.legs = legs
+        self.hands = hands
+        self.fingers = fingers
         self.tails = tails
         self.wings = wings
 
     # Methods that deal with Equipment Slots
-    def define_slots(self):
-        self.ensure_slot_list()
-        for bodypart, slot in EQUIP_SLOTS.items():
-            self.slot_list.extend(slot*self.__dict__.get(bodypart))
-
-    def ensure_slot_list(self):
-        if not hasattr(self, 'equipment_slots'):
-            self.slot_list = list()
+    def define_slots(self) -> dict:
+        pair_of = ['eyes', 'legs', 'hands', 'wings']
+        default_slot = {}
+        for bodypart, slots in EQUIP_SLOTS.items():
+            for slot in slots:
+                if bodypart in pair_of:
+                    amount_of_parts = self.__dict__.get(bodypart)
+                    default_slot.update({slot: (amount_of_parts//2)})   
+                else:
+                    default_slot.update({slot: self.__dict__.get(bodypart)})
+        return default_slot
 
     def ensure_equipment_slots(self):
         if not hasattr(self, 'equipment_slots'):
             equipment_slots = {}
-            self.define_slots()
-            self.equipment_slots = equipment_slots.fromkeys(self.slot_list, None)
-            
-    def slot_exist(self, slot):
-        self.ensure_slot_list()
-        return True if slot in self.slot_list else False
-
-    def slot_available(self, slot):
-        self.ensure_equipment_slots()
-        # Checks if the slot doesn't exist
-        if not self.slot_exist(slot): return False
-        # Checks if an item is occupying the slot
-        return False if self.equipment_slots.get(slot, None) else True
+            slots = self.define_slots()
+            for slot, amount in slots.items():
+                equipment_slots[slot] = {'amount': amount}
+                equipment_slots[slot]['items'] = []
+            self.equipment_slots = equipment_slots
     
-    def proper_slot(self, item, slot):
+    def proper_slot(self, item: BaseItem, slot: str):
         pass
 
-    def add_item_to_slot(self, item, slot):
-        # Adds item into equipment slot
+    def add_item_to_slot(self, item: BaseItem, slot: str) -> bool:
         self.ensure_equipment_slots()
-        if self.slot_available(slot):
-            self.equipment_slots[slot] = item
-            return True
-        return False
-    
-    def remove_item_from_slot(self, slot):
-        # Removes item from equipment slot
+        slot = self.equipment_slots.get(slot, None)
+
+        # Slot doesn't exist
+        if not slot: return False
+        items = slot['items']
+        amount = slot['amount']
+
+        # Slot fully occupying 
+        if len(items) == amount: return False
+        items.append(item)
+        return True
+
+    def remove_item_from_slot(self, item: BaseItem, slot: str) -> bool:
         self.ensure_equipment_slots()
-        if self.slot_exist(slot):
-            self.equipment_slots[slot] = None
+        slot = self.equipment_slots.get(slot, None)
+
+        # Slot doesn't exist
+        if not slot: return False
+        items = slot['items']
+        if item in items:
+            items.remove(item)
             return True
         return False
 
@@ -164,7 +165,7 @@ class Creature(Inventory):
     def unquip_item(self, container, item, slot):
         self.ensure_equipment_slots()
 
-        if self.remove_item_from_slot(slot): 
+        if self.remove_item_from_slot(item, slot): 
             self.remove_item(item, 1)
             self.add_item(item, 1, container)
             return True
@@ -212,12 +213,13 @@ if __name__ == '__main__':
     # b.ensure_inventory()
     # print(h.inventory, h.equipment_slots)
     print(h.equip_item(h, d, 'EQUIP_SLOT_HEAD'))
-    print(h.inventory, h.equipment_slots)
+    # print(h.inventory, h.equipment_slots)
     print(h.unquip_item(b, d, 'EQUIP_SLOT_HEAD'))
-    print(h.inventory, h.equipment_slots)
-    print("bag:", b.inventory)
+    # print(h.inventory, h.equipment_slots)
+    # print("bag:", b.inventory)
     print(h.equip_item(b, d, 'EQUIP_SLOT_HEAD'))
-    print(h.inventory, h.equipment_slots)
-    print("bag:", b.inventory)
+    print(h.equipment_slots)
+    # print(h.inventory, h.equipment_slots)
+    # print("bag:", b.inventory)
     # print(h.add_item(h.inventory, items.Backpack(), 1))
     # print(h.inventory)
