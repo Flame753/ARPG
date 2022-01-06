@@ -183,8 +183,8 @@ class Creature(Inventory):
     
 
 class Humonoid(Creature):
-    def __init__(self, heads=1, eyes=2, legs=2, hands=2, fingers=10, **kwargs):
-        super().__init__(heads=heads, eyes=eyes, legs=legs, hands=hands, fingers=fingers, **kwargs)
+    def __init__(self, heads=1, eyes=2, upper_body=1, legs=2, hands=2, fingers=10, **kwargs):
+        super().__init__(heads=heads, eyes=eyes, upper_body=upper_body, legs=legs, hands=hands, fingers=fingers, **kwargs)
         # if type(self) == Humonoid:
         #     raise Exception('Do not instantiate Humonoid directly')
 
