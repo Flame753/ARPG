@@ -1,6 +1,5 @@
 import items
 from creatures import Creature
-from abc import ABC
 
 
 class NonPlayableCharacter(Creature):
@@ -8,7 +7,7 @@ class NonPlayableCharacter(Creature):
         super().__init__(**kwargs)
         self.name = name
         if type(self) == Creature:
-            raise Exception('Do not instantiate NonPlayableCharacter directly')
+            raise NotImplementedError('Do not instantiate NonPlayableCharacter directly')
 
     def __str__(self) -> str:
         return self.name

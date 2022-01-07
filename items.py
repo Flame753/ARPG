@@ -5,7 +5,7 @@ class BaseItem(ABC):
     def __init__(self, name=None, worth=0, weight=0, 
                 slot=None, description='', **kwargs):
         if type(self) == BaseItem:
-            raise Exception('Do not instantiate BaseItem directly')
+            raise NotImplementedError('Do not instantiate BaseItem directly')
         self.name = name
         self.worth = worth
         self.weight = weight
@@ -35,7 +35,7 @@ class Weapon(BaseItem):
         super().__init__(**kwargs)
         self.damage = damage
         if type(self) == Weapon:
-            raise Exception('Do not instantiate Weapon directly')
+            raise NotImplementedError('Do not instantiate Weapon directly')
 
 class Rock(Weapon):
     def __init__(self, name='Rock', damage=5, worth=1, weight=1, 
@@ -74,7 +74,7 @@ class Consumable(BaseItem):
         super().__init__(**kwargs)
         self.healing_value = healing_value
         if type(self) == Consumable:
-            raise Exception('Do not instantiate Consumable directly')
+            raise NotImplementedError('Do not instantiate Consumable directly')
 
     def __str__(self):
         return f'{self.description} {self.name} (+{self.healing_value})'
@@ -97,7 +97,7 @@ class Container(BaseItem):
         self.update_limit = update_limit
         super().__init__(**kwargs)
         if type(self) == Container:
-            raise Exception('Do not instantiate Container directly')
+            raise NotImplementedError('Do not instantiate Container directly')
     
     def updateSlotLimit(self, slots, amount=1, negative=False):
         for slot in slots.__dict__.values():
@@ -130,13 +130,13 @@ class Coin(BaseItem):
         self.purity = purity
         self.worth = worth * purity
         if type(self) == Coin:
-            raise Exception('Do not instantiate Coin directly')
+            raise NotImplementedError('Do not instantiate Coin directly')
 
 class GreaterCoin(Coin):
     def __init__(self, **kwargs):
         super().__init__(purity=5, **kwargs)
         if type(self) == Coin:
-            raise Exception('Do not instantiate GreaterCoin directly')
+            raise NotImplementedError('Do not instantiate GreaterCoin directly')
 
 class CopperCoin(Coin):
     def __init__(self, name='Copper Coin', worth=1, **kwargs):
