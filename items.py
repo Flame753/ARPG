@@ -1,18 +1,18 @@
 from abc import ABC, abstractstaticmethod
-
+import slots
 
 class BaseItem(ABC):
     def __init__(self, name=None, worth=0, weight=0, 
-                valid_slots=[], description='', **kwargs):
+                slot=None, description='', **kwargs):
         if type(self) == BaseItem:
             raise Exception('Do not instantiate BaseItem directly')
         self.name = name
         self.worth = worth
         self.weight = weight
-        self.valid_slots = valid_slots
+        self.slot = slot
         self.description = description
 
-    def modify_attr(self, **kwargs):
+    def modifyAttr(self, **kwargs):
         for key in kwargs.keys():
             if not hasattr(self, key):
                 return False
@@ -20,7 +20,6 @@ class BaseItem(ABC):
         self.__dict__.update(kwargs)
         return True
 
-    
     def __str__(self):
         if self.description:
             return f'{self.description} {self.name}'
@@ -40,36 +39,36 @@ class Weapon(BaseItem):
 
 class Rock(Weapon):
     def __init__(self, name='Rock', damage=5, worth=1, weight=1, 
-                valid_slots=['EQUIP_SLOT_MAIN_HAND'], **kwargs):
+                slot=slots.OneHand().name, **kwargs):
         super().__init__(name=name, damage=damage, worth=worth, weight=weight, 
-                        valid_slots=valid_slots, **kwargs)
+                        slot=slot, **kwargs)
 
 class Dagger(Weapon):
     def __init__(self, name='Dagger', damage=10, worth=20, weight=1, 
-                valid_slots=['EQUIP_SLOT_MAIN_HAND', 'EQUIP_SLOT_OFF_HAND'], **kwargs):
+                slot=slots.OneHand().name, **kwargs):
         super().__init__(name=name, damage=damage, worth=worth, weight=weight,
-                        valid_slots=valid_slots, **kwargs)
+                        slot=slot, **kwargs)
 
 class Sword(Weapon):
     def __init__(self, name='Sword', damage=20, worth=100, weight=1, 
-                valid_slots=['EQUIP_SLOT_MAIN_HAND', 'EQUIP_SLOT_OFF_HAND'], 
+                slot=slots.OneHand().name, 
                 description='Rusty', **kwargs):
         super().__init__(name=name, damage=damage, worth=worth, weight=weight, 
-                        valid_slots=valid_slots, description=description, **kwargs)
+                        slot=slot, description=description, **kwargs)
 
 class Crossbow(Weapon):
     def __init__(self, name='Crossbow', damage=15, worth=75, weight=2, 
-                valid_slots=['EQUIP_SLOT_TWO_HAND'], **kwargs):
+                slot=slots.TwoHands(), **kwargs):
         super().__init__(name=name, damage=damage, worth=worth, weight=weight, 
-                        valid_slots=valid_slots, **kwargs)
+                        slot=slot, **kwargs)
 
 class Axe(Weapon):
     def __init__(self, name='Axe', damage=25, worth=60, weight=2, 
-                valid_slots=['EQUIP_SLOT_TWO_HAND'], **kwargs):
+                slot=slots.TwoHands().name, **kwargs):
         super().__init__(name=name, damage=damage, worth=worth, weight=weight,
-                        valid_slots=valid_slots, **kwargs)
+                        slot=slot, **kwargs)
 
-# Consumables
+# Consumables/Healing
 class Consumable(BaseItem):
     def __init__(self, healing_value = 0, **kwargs):
         super().__init__(**kwargs)
@@ -82,104 +81,50 @@ class Consumable(BaseItem):
 
 class Bread(Consumable):
     def __init__(self, name='Bread', healing_value=10, worth=12, weight=1,
-                 description='Crusty', **kwargs):
+                 slot=slots.SmallItem().name, description='Crusty', **kwargs):
         super().__init__(name=name, healing_value=healing_value, worth=worth, 
-                        weight=weight, description=description, **kwargs)
+                        weight=weight, slot=slot, description=description, **kwargs)
 
 class HealingPotion(Consumable):
     def __init__(self, name="Healing Potion", healing_value=50, worth=60,
-                 weight=1, **kwargs):
+                 weight=1, slot=slots.SmallItem().name, **kwargs):
         super().__init__(name=name, healing_value=healing_value, worth=worth, 
-                        weight=weight, **kwargs)
+                        weight=weight, slot=slot, **kwargs)
 
 # Containers
-class Inventory(ABC):
-
-    def ensure_inventory(self):
-        if not hasattr(self, 'inventory'):
-            self.inventory = {}
-    
-    @abstractstaticmethod
-    def add_item():
-        pass
-
-    @abstractstaticmethod
-    def remove_item():
-        pass
-
-    @abstractstaticmethod
-    def calculate_total_weight():
-        pass
-
-    @abstractstaticmethod
-    def calculate_total_worth():
-        pass
-
-class Container(Inventory):
+class Container(ABC):
     def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         if type(self) == Container:
             raise Exception('Do not instantiate Container directly')
-        super().__init__(**kwargs)
-    
-    def add_item(self, item, amount=0):
-        self.ensure_inventory()
-
-        if item in self.inventory:
-            self.inventory[item]['amount'] += amount
-        else:
-            self.inventory[item] = {'amount': amount}
-    
-    def remove_item(self, item, amount = 0):
-        self.ensure_inventory()
-
-        if item in self.inventory:
-            if self.inventory[item]['amount'] >= amount:
-                self.inventory[item]['amount'] -= amount
-                if self.inventory[item]['amount'] == 0:
-                    del(self.inventory[item])
-                return True
-        return False
-
-    def calculate_item_weight(self, item):
-        self.ensure_inventory()
         
-        if item in self.inventory:
-            return item.weight * self.inventory[item]['amount']
+    @abstractstaticmethod
+    def updateSlotLimit(self, slot):
+        pass
 
-    def calculate_item_worth(self, item):
-        self.ensure_inventory()
-        
-        if item in self.inventory:
-            return item.worth * self.inventory[item]['amount']
-
-    def calculate_total_weight(self):
-        self.ensure_inventory()
-
-        weight = 0
-        for item, data in self.inventory.items():
-            weight += item.weight * data['amount']
-        return weight
-
-    def calculate_total_worth(self):
-        self.ensure_inventory()
-
-        worth = 0
-        for item, data in self.inventory.items():
-            worth += item.worth * data['amount']
-        return worth
-    
 class Backpack(Container, BaseItem):
-    def __init__(self, name='Backpack', worth=10, weight=1,**kwargs):
-        super().__init__(name=name, worth=worth, weight=weight, **kwargs)
+    def __init__(self, name='Backpack', worth=10, weight=1, 
+                slot=slots.Body().name, **kwargs):
+        super().__init__(name=name, worth=worth, weight=weight, 
+                        slot=slot, **kwargs)
+    
+    def updateSlotLimit(self, slot):
+        if slot.name == slots.SmallItem().name:
+            slot.item_limit = slot.item_limit + 6
 
 class CoinPouch(Container, BaseItem):
-    def __init__(self, name='Coin Pouch', worth=1, weight=.1, **kwargs):
-        super().__init__(name=name, worth=worth, weight=weight, **kwargs)
+    def __init__(self, name='Coin Pouch', worth=1, weight=.1, 
+                slot=slots.SmallItem(), **kwargs):
+        super().__init__(name=name, worth=worth, weight=weight, 
+                        slot=slot, **kwargs)
+        
+    def updateSlotLimit(self, slot):
+        slot.item_limit = slot.item_limit + 50
 
 # Currency
 class Coin(BaseItem):
-    def __init__(self, worth=1, purity=1, **kwargs):
-        super().__init__(weight=0.01, **kwargs)
+    def __init__(self, worth=1, purity=1, slot=slots.Coins(), **kwargs):
+        super().__init__(weight=0.01, slot=slot,**kwargs)
         self.purity = purity
         self.worth = worth * purity
         if type(self) == Coin:
