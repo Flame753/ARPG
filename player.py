@@ -1,10 +1,12 @@
 import items
 import world
-from creatures import Humonoid
+import slots
+from creatures import Creature
 
 
-class Player(Humonoid):
-    def __init__(self):
+class Player(Creature):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.x = world.start_tile_location[0]
         self.y = world.start_tile_location[1]
         self.hp = 100
@@ -12,10 +14,10 @@ class Player(Humonoid):
         self.gold = 5
         self.victory = False
 
-        starting_equipment = {items.Rock(): 3,
-                            items.Dagger(): 1,
-                            items.Bread(): 2}
-        self.add_items(starting_equipment)
+        self.addItem(items.Dagger())
+        self.addItem(items.Bread(), 2)
+        self.addItem(items.SilverCoin(), 3)
+
 
     def move(self, dx, dy):
         self.x += dx
@@ -35,7 +37,7 @@ class Player(Humonoid):
 
     def print_inventory(self):
         print("Inventory:")
-        for item, amount in self.inventory.items():
+        for item, amount in self.getAllItems():
             amount = amount['amount']
             print(f'* {amount} {item}')
             best_weapon = self.most_powerful_weapon()
@@ -45,13 +47,13 @@ class Player(Humonoid):
     def most_powerful_weapon(self):
         max_damage = 0
         best_weapon = None
-        for item in self.inventory.keys():
-            try:
+        self.one_hand.ensureInventory()
+        self.two_hands.ensureInventory()
+        for slot in [self.one_hand, self.two_hands]:
+            for item in slot.inventory.keys():
                 if item.damage > max_damage:
                     best_weapon = item
                     max_damage = item.damage
-            except AttributeError:
-                pass
         return best_weapon
 
     def attack(self):
@@ -66,7 +68,7 @@ class Player(Humonoid):
             print(f"{enemy.name} HP is {enemy.hp}.")
 
     def heal(self):
-        consumables = [(item, amount['amount']) for item, amount in self.inventory.items() if isinstance(item, items.Consumable)]
+        consumables = [(item, amount['amount']) for item, amount in self.small_items.inventory.items() if isinstance(item, items.Consumable)]
         if not consumables:
             print("You don't have any items to heal you!")
             return
@@ -85,7 +87,7 @@ class Player(Humonoid):
                 else:
                     to_eat = consumables[int(choice) - 1][0]
                     self.hp = min(self.max_hp, self.hp + to_eat.healing_value)
-                    self.remove_item(to_eat, 1)
+                    self.removeItem(to_eat, 1)
                     print('')
                     print(f"Now Current HP: {self.hp}")
                     valid = True
@@ -107,7 +109,11 @@ class Player(Humonoid):
 #     return player
 
 if __name__ == "__main__":
-    # world.parse_world_dsl()
+    world.parse_world_dsl()
+    player = Player()
+    best = player.most_powerful_weapon()
+    print(best)
+    player.print_inventory()
     # p = GeneratePlayer()
     # p.heal()
     # p.heal()

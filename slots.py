@@ -1,8 +1,8 @@
 from abc import ABC
-import items
+
 
 class Slot(ABC):
-    def __init__(self, name=None, item_limit=1):
+    def __init__(self, name=None, item_limit=1, **kwargs):
         self.name = name
         self.item_limit = item_limit
 
@@ -18,10 +18,9 @@ class Slot(ABC):
 
     def addItem(self, item, amount=0):
         self.ensureInventory()
-
-        if not isinstance(item, items.BaseItem):
-            return False
-        if len(self.inventory) >= self.item_limit:
+        # if not isinstance(item, self.valid_type):
+        #     return False
+        if len(self.inventory) + amount > self.item_limit:
             return False
         if item in self.inventory:
             self.inventory[item]['amount'] += amount
@@ -70,63 +69,36 @@ class Slot(ABC):
         return worth
 
 class Head(Slot):
-    def __init__(self):
-        super().__init__(name='HeadSlot')
+    def __init__(self, **kwargs):
+        super().__init__(name='HeadSlot', **kwargs)
 
 class Body(Slot):
-    def __init__(self):
-        super().__init__(name='BodySlot')
+    def __init__(self, **kwargs):
+        super().__init__(name='BodySlot', **kwargs)
 
 class Legs(Slot):
-    def __init__(self):
-        super().__init__(name='LegsSlot')
+    def __init__(self, **kwargs):
+        super().__init__(name='LegsSlot', **kwargs)
 
 class OneHand(Slot):
-    def __init__(self, name='OneHandSlot'):
-        super().__init__(name=name)
+    def __init__(self, name='OneHandSlot', item_limit=2, **kwargs):
+        super().__init__(name=name, item_limit=item_limit, **kwargs)
     
-    def addItem(self, item, amount=0):
-        self.ensureInventory()
-
-        if not isinstance(item, items.Weapon):
-            return False
-        if len(self.inventory) >= self.item_limit:
-            return False
-        if item in self.inventory:
-            self.inventory[item]['amount'] += amount
-            return True
-        else:
-            self.inventory[item] = {'amount': amount}
-            return True
-
 class TwoHands(OneHand):
-    def __init__(self):
-        super().__init__(name='TwoHandsSlot')
+    def __init__(self, **kwargs):
+        super().__init__(name='TwoHandsSlot', **kwargs)
 
 class SmallItem(Slot):
-    def __init__(self):
-        super().__init__(name='SmallItemSlot', item_limit=2)
+    def __init__(self, **kwargs):
+        super().__init__(name='SmallItemSlot', item_limit=2, **kwargs)
 
 class Coins(Slot):
-    def __init__(self):
-        super().__init__(name='CoinSlot', item_limit=10)
-
-    def addItem(self, item, amount=0):
-        self.ensureInventory()
-
-        if not isinstance(item, items.Coin):
-            return False
-        if len(self.inventory) >= self.item_limit:
-            return False
-        if item in self.inventory:
-            self.inventory[item]['amount'] += amount
-            return True
-        else:
-            self.inventory[item] = {'amount': amount}
-            return True
+    def __init__(self, **kwargs):
+        super().__init__(name='CoinSlot', item_limit=10, **kwargs)
 
 
 if __name__ == "__main__":
+    import items
     c = Coins()
     print(c.addItem(items.Dagger(), 1))
     print(c.inventory)
