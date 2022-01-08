@@ -69,6 +69,8 @@ def choose_action(room, player):
 def text_separator():
     print("-"*100)
 
+def main():
+    play()
 
 if __name__ == '__main__':
-    play()
+    main()
