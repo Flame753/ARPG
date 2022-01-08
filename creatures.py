@@ -58,7 +58,7 @@ class Creature():
                 return slot
         return None
 
-    def getAllItems(self) -> tuple[BaseItem, dict['Amount']]:
+    def getAllItems(self) -> tuple[BaseItem, dict]:
         items = {}
         for slot in self.__dict__.values():
             if not isinstance(slot, slots.Slot): continue
