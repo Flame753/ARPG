@@ -1,6 +1,7 @@
 import random
 import enemies
 import npc
+import items
 
 
 class MapTile:
@@ -39,7 +40,7 @@ class VictoryTile(MapTile):
         """
 
 class EnemyTile(MapTile):
-    def __init__(self, x, y) -> None:
+    def __init__(self, x, y):
         super().__init__(x,y)
         r = random.random()
         if r < 0.50:
@@ -75,7 +76,7 @@ class EnemyTile(MapTile):
             print("Enemy does {} damage. You have {} HP remaining.".format(self.enemy.damage, player.hp))
 
 class TraderTile(MapTile):
-    def __init__(self, x, y) -> None:
+    def __init__(self, x, y):
         super().__init__(x, y)
         self.trader = npc.Trader()
     
@@ -158,26 +159,52 @@ class TraderTile(MapTile):
         clinking his gold coins together. He looks willing to trader.
         """
 
-class FindGoldTile(MapTile):
-    def __init__(self, x, y) -> None:
+class FindCoinTile(MapTile):
+    def __init__(self, x, y):
         super().__init__(x, y)
-        self.gold = random.randint(1, 50)
-        self.gold_claimed = False
+        self.coins_claimed = False
+        self.coins_remainding = False
+        r = random.random()
+        if r < 0.75:
+            self.coin = items.CopperCoin() 
+            self.amount = random.randint(1, 50)
+        elif r < 0.9:
+            self.coin = items.SilverCoin()
+            self.amount = random.randint(1, 25)
+        elif r < 0.99:
+            self.coin = items.GoldCoin()
+            self.amount = random.randint(1, 10)
+        else:
+            self.coin = items.PlatinumCoin()
+            self.amount = random.randint(1, 5)
     
     def modify_player(self, player):
-        if not self.gold_claimed:
-            self.gold_claimed = True
-            player.gold = player.gold + self.gold
-            print("+{} gold added.".format(self.gold))
+        if not self.coins_claimed:
+            carry_capacity = player.coins.item_limit
+            currently_have = player.coins.amountOfItems()
+            allowed_to_get = carry_capacity - currently_have
+            if allowed_to_get > self.amount:
+                player.addItem(self.coin, self.amount)
+                self.coins_claimed = True
+            else:
+                player.addItem(self.coin, allowed_to_get)
+                self.amount = self.amount - allowed_to_get
+                self.coins_remainding = True
+
+            if self.coins_remainding:
+                print(f"Unfortunately, {allowed_to_get} {self.coin}s you'r able to can pick.")
+            else:
+                print(f"You have picked {self.amount} {self.coin}s.")
+
     
     def intro_text(self):
-        if self.gold_claimed:
+        if self.coins_claimed:
             return """
             Another unremarkable part of the cave. You must forge onwards.
             """
         else:
-            return """
-            Someone dropped some gold. You pick it up.
+            return f"""
+            You found {self.amount} {self.coin}s!
             """
 
 world_map = []
@@ -186,16 +213,16 @@ start_tile_location = None
 tile_type_dict = {"VT": VictoryTile,
                     "EN": EnemyTile,
                     "ST": StartTile,
-                    "FG": FindGoldTile,
+                    "FC": FindCoinTile,
                     "TT": TraderTile,
                     "  ": None}
 
 world_dsl = """
 |EN|EN|VT|EN|EN|
 |EN|  |  |  |EN|
-|EN|FG|EN|  |TT|
-|TT|  |ST|FG|EN|
-|FG|  |EN|  |FG|
+|EN|FC|EN|  |TT|
+|TT|  |ST|FC|EN|
+|FC|  |EN|  |FC|
 """
 
 def tile_at(x, y):
