@@ -3,7 +3,7 @@ import slots
 
 class BaseItem(ABC):
     def __init__(self, name=None, worth=0, weight=0, 
-                slot=None, description='', **kwargs):
+                slot=None, description='', sellable=True, **kwargs):
         if type(self) == BaseItem:
             raise NotImplementedError('Do not instantiate BaseItem directly')
         self.name = name
@@ -11,6 +11,7 @@ class BaseItem(ABC):
         self.weight = weight
         self.slot = slot
         self.description = description
+        self.sellable = sellable
 
     def modifyAttr(self, **kwargs):
         for key in kwargs.keys():
@@ -125,8 +126,8 @@ class CoinPouch(Container, BaseItem):
 
 # Currency
 class Coin(BaseItem):
-    def __init__(self, worth=1, purity=1, slot=slots.Coins().name, **kwargs):
-        super().__init__(weight=0.01, slot=slot,**kwargs)
+    def __init__(self, worth=1, purity=1, slot=slots.Coins().name, sellable=False, **kwargs):
+        super().__init__(weight=0.01, slot=slot, sellable=sellable, **kwargs)
         self.purity = purity
         self.worth = worth * purity
         if type(self) == Coin:

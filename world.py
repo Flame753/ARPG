@@ -83,7 +83,7 @@ class TraderTile(MapTile):
         selling_list = {}
         
         while True:
-            seller_items = [(item, amount['amount']) for item, amount in seller.getAllItems()]
+            seller_items = [(item, amount['amount']) for item, amount in self.sellableItems(seller)]
             for i, item in enumerate(seller_items, 1):
                 # Creating item list that can be traded
                 selling_list.update({str(i): item[0]})
@@ -102,7 +102,7 @@ class TraderTile(MapTile):
                     print("Invalid Choice!")
 
     def swap(self, seller, buyer, item):
-        if not seller.getAllItems():
+        if not self.sellableItems(seller):
             if isinstance(seller, npc.NonPlayableCharacter):
                 print('Seller has ran out of stock of items.')
             else:
@@ -111,11 +111,17 @@ class TraderTile(MapTile):
         if item.worth > buyer.gold:
             print("That's too expensive")
             return
-        seller.removeItem(item, 1)
-        buyer.addItem(item, 1)
-        seller.gold = seller.gold + item.worth
-        buyer.gold  = buyer.gold - item.worth
-        print("Trade complete!")
+        try:
+            buyer.addItem(item, 1)
+            seller.removeItem(item, 1)
+            seller.gold = seller.gold + item.worth
+            buyer.gold  = buyer.gold - item.worth
+            print("Trade complete!")
+        except IndexError:
+            if isinstance(buyer, npc.NonPlayableCharacter):
+                print('Buyer has reached thier carring capacity.')
+            else:
+                print(f'You have reached your carring capacity.')
 
         # Printing player's current gold amount
         text = 'You Currenlty have {} Gold.'
@@ -123,6 +129,13 @@ class TraderTile(MapTile):
             print(text.format(seller.gold))
         else:
             print(text.format(buyer.gold))
+
+    def sellableItems(self, seller):
+            items = list()
+            for item, amount in seller.getAllItems():
+                if not item.sellable: continue
+                items.append((item, amount))
+            return items
 
     def check_if_trade(self, player):
         while True:
