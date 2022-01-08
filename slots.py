@@ -18,16 +18,11 @@ class Slot(ABC):
 
     def addItem(self, item, amount=0):
         self.ensureInventory()
-        # if not isinstance(item, self.valid_type):
-        #     return False
-        if len(self.inventory) + amount > self.item_limit:
-            return False
+
         if item in self.inventory:
             self.inventory[item]['amount'] += amount
-            return True
         else:
             self.inventory[item] = {'amount': amount}
-            return True
     
     def removeItem(self, item, amount = 0):
         self.ensureInventory()
@@ -39,6 +34,14 @@ class Slot(ABC):
                     del(self.inventory[item])
                 return True
         return False
+
+    def amountOfItems(self):
+        self.ensureInventory()
+
+        total_amount = 0
+        for data in self.inventory.values():
+            total_amount += data['amount']
+        return total_amount
 
     def calculateItemWeight(self, item):
         self.ensureInventory()
@@ -100,9 +103,10 @@ class Coins(Slot):
 if __name__ == "__main__":
     import items
     c = Coins()
-    print(c.addItem(items.Dagger(), 1))
-    print(c.inventory)
-    print(c.addItem(items.CopperCoin(), 1))
-    print(c.inventory)
-    print(c.addItem(items.GraterPlatinumCoin(), 1))
-    print(c.inventory)
+    # print(c.addItem(items.Dagger(), 1))
+    # print(c.inventory)
+    # print(c.addItem(items.CopperCoin(), 1))
+    # print(c.inventory)
+    # print(c.addItem(items.GraterPlatinumCoin(), 1))
+    # print(c.inventory)
+    print(c.amountOfItems())

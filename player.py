@@ -1,6 +1,5 @@
 import items
 import world
-import slots
 from creatures import Creature
 
 
