@@ -6,7 +6,7 @@ import slots
 class Creature():
     def __init__(self, **kwargs):
         # if type(self) == Creature:
-        #     raise Exception('Do not instantiate Creature directly')
+        #     raise NotImplementedError('Do not instantiate Creature directly')
         self.head = slots.Head()
         self.body = slots.Body()
         self.legs = slots.Legs()
@@ -21,36 +21,32 @@ class Creature():
             if not isinstance(slot, slots.Slot): continue
             if slot.name == item.slot:
                 return slot
-        return None
 
     def addItem(self, item: BaseItem, amount: int=1) -> bool:
         slot = self.findProperSlot(item)
-        if not slot: return False
+        # Determining if capacity was reached
+        if slot.amountOfItems() + amount > slot.item_limit:
+            raise IndexError(f"Added {amount} of {item} is exceeding the limited of {slot.item_limit}")
         if isinstance(item, Container): item.updateSlotLimit(self, amount)
-        return slot.addItem(item, amount)
+        slot.addItem(item, amount)
 
     def removeItem(self, item: BaseItem, amount: int=1) -> bool:
         slot = self.findProperSlot(item)
-        if not slot: return False
-        if isinstance(item, Container): item.updateSlotLimit(self, amount, True)
+        if isinstance(item, Container): item.updateSlotLimit(self, amount, negative=True)
         return slot.removeItem(item, amount)
 
     def calculateTotalWeight(self) -> int:
         weight = 0
         for slot in self.__dict__.values():
             if not isinstance(slot, slots.Slot): continue
-            slot.ensureInventory()
-            for item, data in slot.inventory.items():
-                weight += item.weight * data['amount']
+            weight = weight + slot.calculateItemWeight()
         return weight
 
     def calculateTotalWorth(self) -> int:
         worth = 0
         for slot in self.__dict__.values():
             if not isinstance(slot, slots.Slot): continue
-            slot.ensureInventory()
-            for item, data in slot.inventory.items():
-                worth += item.worth * data['amount']
+            worth = worth + slot.calculateItemWorth()
         return worth
 
     def findItem(self, item:BaseItem) -> dict[slots.Slot]:
@@ -82,8 +78,12 @@ if __name__ == '__main__':
     d = items.Dagger()
     b = items.Backpack()
 
-    print(h.addItem(items.Dagger()))
-    print(h.addItem(items.Backpack()))
-    print(h.one_hand.inventory, h.body.inventory)
+    h.addItem(items.Dagger(), 2)
+    print(h.getAllItems())
+    h.addItem(items.Backpack())
+    print(h.getAllItems())
+
+    # print(h.addItem(items.Backpack()))
+    # print(h.one_hand.inventory, h.body.inventory)
     # print(h.findItem(d))
     # print(h.calculateTotalWeight())
