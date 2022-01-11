@@ -79,9 +79,11 @@ class TraderTile(MapTile):
     def __init__(self, x, y):
         super().__init__(x, y)
         self.trader = npc.Trader()
+        self.base_price = items.SilverCoin()
     
     def trade(self, buyer, seller):
         selling_list = {}
+        base_price_name = self.base_price.name.split() 
         
         while True:
             seller_items = [(item, amount['amount']) for item, amount in self.sellableItems(seller)]
@@ -89,7 +91,7 @@ class TraderTile(MapTile):
                 # Creating item list that can be traded
                 selling_list.update({str(i): item[0]})
                 # Listing seller's items for sale
-                print(f'{i}. {item[1]} {item[0].name} - {item[0].worth} Gold')
+                print(f'{i}. {item[1]} {item[0].name} - {item[0].worth} {base_price_name[0]}')
 
             user_input = input("Choose an item or press Q to exit: ")
             if user_input in ['Q', 'q']: 
@@ -103,20 +105,29 @@ class TraderTile(MapTile):
                     print("Invalid Choice!")
 
     def swap(self, seller, buyer, item):
+        # When the seller runs out of items to sell
+        # Otherwords seller's inventory is empty
         if not self.sellableItems(seller):
             if isinstance(seller, npc.NonPlayableCharacter):
                 print('Seller has ran out of stock of items.')
             else:
                 print('You have ran out of things to sell.')
             return
-        if item.worth > buyer.gold:
+
+        # Verifying that the buyer has enough cash to buy the item
+        if (item.worth * self.base_price.worth) > buyer.coins.calculateTotalWorth():
             print("That's too expensive")
             return
+
+        # Where exchanging items happen
+        # Buyer.addItem can return expection if buyer has no space for item
         try:
+            # Where exchanging coins happen
+            if not self.transaction(seller, buyer, item):
+                print(f"Transaction incomplete! No Trade!")
+                return
             buyer.addItem(item, 1)
             seller.removeItem(item, 1)
-            seller.gold = seller.gold + item.worth
-            buyer.gold  = buyer.gold - item.worth
             print("Trade complete!")
         except IndexError:
             if isinstance(buyer, npc.NonPlayableCharacter):
@@ -124,19 +135,48 @@ class TraderTile(MapTile):
             else:
                 print(f'You have reached your carring capacity.')
 
-        # Printing player's current gold amount
-        text = 'You Currenlty have {} Gold.'
+        # Prints the player's coins
+        def display_coins(player):
+            print('You currenlty have;')
+            player.coins.order()
+            for coin, amount in player.coins.inventory.items():
+                amount = amount['amount']
+                print(f'    {amount} {coin}')
+
         if not isinstance(seller, npc.NonPlayableCharacter):
-            print(text.format(seller.gold))
+            display_coins(seller)
         else:
-            print(text.format(buyer.gold))
+            display_coins(buyer)
 
     def sellableItems(self, seller):
+        # Returns a list of value items that can be sold
             items = list()
             for item, amount in seller.getAllItems():
                 if not item.sellable: continue
                 items.append((item, amount))
             return items
+
+    # Transaction NEEDS to be FIXED
+    def transaction(self, seller, buyer, item):
+        price = item.worth * self.base_price.worth
+        buyer.coins.order()
+        for coin in buyer.coins.inventory:
+            physical_amount = price // coin.worth
+            buyer.removeItem(coin, physical_amount)
+            seller.addItem(coin, physical_amount)
+            price -= (physical_amount * coin.worth)
+            if price == 0: return True
+        return False
+    
+    def exchange(self, amount, coin_one, coin_two):
+        # Exchange the amount of coin one into the equal value of coin two if possible
+        total_value_of_coin_one = coin_one.worth * amount
+        amount_of_coin_two = total_value_of_coin_one // coin_two.worth
+        total_value_of_coin_two = amount_of_coin_two * coin_two.worth
+        total_value_of_coin_one -= total_value_of_coin_two
+        amount_of_coin_one = total_value_of_coin_one // coin_one.worth
+        return [(amount_of_coin_one, coin_one),(amount_of_coin_two, coin_two)]
+
 
     def check_if_trade(self, player):
         while True:
@@ -224,6 +264,8 @@ world_dsl = """
 |TT|  |ST|FC|EN|
 |FC|  |EN|  |FC|
 """
+# Test World
+world_dsl = """|ST|FC|TT|VT|"""
 
 def tile_at(x, y):
     """
@@ -287,3 +329,21 @@ def parse_world_dsl():
             row.append(tile_type(x, y) if tile_type else None)
         #Add the whole row io the world_map
         world_map.append(row)
+
+
+
+def main():
+    s = items.SilverCoin()
+    c = items.CopperCoin()
+    g = items.GoldCoin()
+    t = TraderTile(1, 1)
+    print(t.exchange(9, c, s))
+    print(t.exchange(11, c, s))
+    print(t.exchange(3, s, c))
+    print(t.exchange(9, s, g))
+    print(t.exchange(11, s, g))
+    print(t.exchange(3, g, s))
+
+
+if __name__ == '__main__':
+    main()

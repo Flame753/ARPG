@@ -19,14 +19,22 @@ class Creature():
         # Returns the slot location of the item.
         for slot in self.__dict__.values():
             if not isinstance(slot, slots.Slot): continue
-            if slot.name == item.slot:
+            if slot.properSlot(item):
                 return slot
 
-    def addItem(self, item: BaseItem, amount: int=1) -> bool:
+    def preventDuplicate(self, item: BaseItem) -> BaseItem:
+        # Prevent Duplicates in slots
         slot = self.findProperSlot(item)
-        # Determining if capacity was reached
-        if slot.amountOfItems() + amount > slot.item_limit:
-            raise IndexError(f"Added {amount} of {item} is exceeding the limited of {slot.item_limit}")
+        slot.ensureInventory()
+        if slot.inventory:
+            for i in slot.inventory:
+                if i.name == item.name:
+                    return i
+        return item
+
+    def addItem(self, item: BaseItem, amount: int=1) -> bool:
+        item = self.preventDuplicate(item)
+        slot = self.findProperSlot(item)
         if isinstance(item, Container): item.updateSlotLimit(self, amount)
         slot.addItem(item, amount)
 
@@ -68,10 +76,9 @@ class Creature():
 
     def is_alive(self) -> bool:
         return self.hp > 0
-    
 
 
-if __name__ == '__main__':
+def main():
     import items
     h = Creature()
 
@@ -87,3 +94,6 @@ if __name__ == '__main__':
     # print(h.one_hand.inventory, h.body.inventory)
     # print(h.findItem(d))
     # print(h.calculateTotalWeight())
+
+if __name__ == '__main__':
+    main()

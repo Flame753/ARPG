@@ -10,12 +10,12 @@ class Player(Creature):
         self.y = world.start_tile_location[1]
         self.hp = 100
         self.max_hp = 100
-        self.gold = 5
         self.victory = False
 
         self.addItem(items.Dagger())
-        self.addItem(items.Bread(), 2)
+        self.addItem(items.Bread())
         self.addItem(items.SilverCoin(), 3)
+        self.addItem(items.CoinPouch(sellable=False))
 
 
     def move(self, dx, dy):
@@ -37,11 +37,17 @@ class Player(Creature):
     def print_inventory(self):
         print("Inventory:")
         for item, amount in self.getAllItems():
+            if isinstance(item, items.Coin): continue
             amount = amount['amount']
             print(f'* {amount} {item}')
-            best_weapon = self.most_powerful_weapon()
+        best_weapon = self.most_powerful_weapon()
         print(f"Your best weapon is your {best_weapon}")
-        print(f"Gold: {self.gold}")
+
+        print("Coins:")
+        self.coins.order()
+        for coin, amount in self.coins.inventory.items():
+            amount = amount['amount']
+            print(f'* {amount} {coin}')
 
     def most_powerful_weapon(self):
         max_damage = 0
@@ -97,17 +103,17 @@ class Player(Creature):
         room = world.tile_at(self.x, self.y)     
         room.check_if_trade(self)
 
-# def GeneratePlayer():
-#     # Adds the starting equipment to the player
-#     starting_equipment = {items.Rock(): 3,
-#                         items.Dagger(): 1,
-#                         items.Bread(): 2}
-#     player = Player()
-#     for item, amount in starting_equipment.items():
-#         player.addItem(item, amount)
-#     return player
 
-if __name__ == "__main__":
+def main():
+    # def GeneratePlayer():
+    #     # Adds the starting equipment to the player
+    #     starting_equipment = {items.Rock(): 3,
+    #                         items.Dagger(): 1,
+    #                         items.Bread(): 2}
+    #     player = Player()
+    #     for item, amount in starting_equipment.items():
+    #         player.addItem(item, amount)
+    #     return player
     world.parse_world_dsl()
     player = Player()
     best = player.most_powerful_weapon()
@@ -117,4 +123,7 @@ if __name__ == "__main__":
     # p.heal()
     # p.heal()
     # print(p.bag.inventory)
-    pass
+
+
+if __name__ == "__main__":
+    main()

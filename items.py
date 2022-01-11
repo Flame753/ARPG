@@ -94,7 +94,7 @@ class HealingPotion(Consumable):
 
 # Containers
 class Container(BaseItem):
-    def __init__(self, update_limit=[], **kwargs):
+    def __init__(self, update_limit=tuple(), **kwargs):
         self.update_limit = update_limit
         super().__init__(**kwargs)
         if type(self) == Container:
@@ -114,7 +114,7 @@ class Container(BaseItem):
         
 class Backpack(Container, BaseItem):
     def __init__(self, name='Backpack', worth=10, weight=1, 
-                slot=slots.Body().name, update_limit=(slots.SmallItem, 6), **kwargs):
+                slot=slots.Body().name, update_limit=(slots.SmallItem, 8), **kwargs):
         super().__init__(name=name, worth=worth, weight=weight, 
                         slot=slot, update_limit=update_limit, **kwargs)
     
@@ -167,12 +167,12 @@ class PlatinumCoin(Coin):
     def __init__(self, name='Platinum Coin', worth=1000, **kwargs):
         super().__init__(name=name, worth=worth, **kwargs)
 
-class GraterPlatinumCoin(GreaterCoin, PlatinumCoin):
+class GreaterPlatinumCoin(GreaterCoin, PlatinumCoin):
     def __init__(self, name='Greater Platinum Coin', **kwargs):
         super().__init__(name=name, **kwargs)
 
 
-if __name__ == "__main__":
+def main():
     # BaseItem()
     # Weapon()
     # Consumable()
@@ -192,3 +192,6 @@ if __name__ == "__main__":
     # backpack.add_item(GoldCoin(), 53)
     # print('Backpack: worth -> {}, weight -> {}'.format(backpack.calculate_total_worth(), backpack.calculate_total_weight()))
     print(CoinPouch().slot)
+
+if __name__ == "__main__":
+    main()

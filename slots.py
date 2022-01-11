@@ -16,9 +16,17 @@ class Slot(ABC):
         if not hasattr(self, 'inventory'):
             self.inventory = {}
 
+    def properSlot(self, item) -> bool:
+        # Returns the slot location of the item.
+        return self.name == item.slot
+
     def addItem(self, item, amount=0):
         self.ensureInventory()
-
+        if not self.properSlot(item): 
+            raise ValueError(f'A {item} object can not be added to {self.name}.')
+        # Determining if capacity was reached
+        if self.amountOfItems() + amount > self.item_limit:
+            raise IndexError(f"Added {amount} of {item} is exceeding the limited of {self.item_limit}")
         if item in self.inventory:
             self.inventory[item]['amount'] += amount
         else:
@@ -73,34 +81,43 @@ class Slot(ABC):
 
 class Head(Slot):
     def __init__(self, **kwargs):
-        super().__init__(name='HeadSlot', **kwargs)
+        super().__init__(name='Head Slot', **kwargs)
 
 class Body(Slot):
     def __init__(self, **kwargs):
-        super().__init__(name='BodySlot', **kwargs)
+        super().__init__(name='Body Slot', **kwargs)
 
 class Legs(Slot):
     def __init__(self, **kwargs):
-        super().__init__(name='LegsSlot', **kwargs)
+        super().__init__(name='Legs Slot', **kwargs)
 
 class OneHand(Slot):
-    def __init__(self, name='OneHandSlot', item_limit=2, **kwargs):
+    def __init__(self, name='One Hand Slot', item_limit=2, **kwargs):
         super().__init__(name=name, item_limit=item_limit, **kwargs)
     
 class TwoHands(OneHand):
     def __init__(self, **kwargs):
-        super().__init__(name='TwoHandsSlot', **kwargs)
+        super().__init__(name='Two Hands Slot', **kwargs)
 
 class SmallItem(Slot):
     def __init__(self, **kwargs):
-        super().__init__(name='SmallItemSlot', item_limit=2, **kwargs)
+        super().__init__(name='Small Item Slot', item_limit=2, **kwargs)
 
 class Coins(Slot):
     def __init__(self, **kwargs):
-        super().__init__(name='CoinSlot', item_limit=10, **kwargs)
+        super().__init__(name='Coin Slot', item_limit=10, **kwargs)
+
+    def order(self) -> list:
+        # Puts the inventory from largest worth to smallest
+        coins = list(self.inventory.items())
+        worth = lambda coin: coin[0].worth
+        coins.sort(key=worth)  # Sort function only works with a list type
+        ordict = dict(coins)
+        self.inventory.clear()
+        self.inventory.update(ordict)
 
 
-if __name__ == "__main__":
+def main():
     import items
     c = Coins()
     # print(c.addItem(items.Dagger(), 1))
@@ -109,4 +126,15 @@ if __name__ == "__main__":
     # print(c.inventory)
     # print(c.addItem(items.GraterPlatinumCoin(), 1))
     # print(c.inventory)
-    print(c.amountOfItems())
+    # print(c.amountOfItems())
+    # c.addItem(items.Dagger(), 5)
+    # print(c.amountOfItems())
+    c.addItem(items.SilverCoin(), 3)
+
+    c.addItem(items.CopperCoin(), 4)
+    # c.addItem(items.Backpack)
+    c.order()
+    # print(c.inventory)
+
+if __name__ == "__main__":
+    main()
