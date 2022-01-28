@@ -1,96 +1,97 @@
 from abc import ABC, abstractstaticmethod
+from dataclasses import dataclass
+import dataclasses
 import slots
 
+@dataclass(unsafe_hash=True)
 class BaseItem(ABC):
-    def __init__(self, name=None, worth=0, weight=0, 
-                slot=None, description='', sellable=True, **kwargs):
+    name: str = None
+    worth: int = 0
+    weight: int = 0
+    slot: str = None
+    description: str = None
+    sellable: bool = True
+
+    def __init__(self, *args, **kwargs):
         if type(self) == BaseItem:
             raise NotImplementedError('Do not instantiate BaseItem directly')
-        self.name = name
-        self.worth = worth
-        self.weight = weight
-        self.slot = slot
-        self.description = description
-        self.sellable = sellable
-
-    def modifyAttr(self, **kwargs):
-        for key in kwargs.keys():
-            if not hasattr(self, key):
-                return False
-
-        self.__dict__.update(kwargs)
-        return True
-
-    def __str__(self):
-        if self.description:
-            return f'{self.description} {self.name}'
-        else:
-            return f'{self.name}'
-
-    def __repr__(self):
-        return f'{self.__class__.__name__}()'
 
 # Weapons
+@dataclass(unsafe_hash=True)
 class Weapon(BaseItem):
-    def __init__(self, damage = 0, **kwargs):
-        super().__init__(**kwargs)
-        self.damage = damage
-        if type(self) == Weapon:
-            raise NotImplementedError('Do not instantiate Weapon directly')
+    damage: int = 0
 
+    def __init__(self, *args, **kwargs):
+        if type(self) == BaseItem:
+            raise NotImplementedError('Do not instantiate BaseItem directly')
+
+@dataclass(unsafe_hash=True)
 class Rock(Weapon):
-    def __init__(self, name='Rock', damage=5, worth=1, weight=1, 
-                slot=slots.OneHand().name, **kwargs):
-        super().__init__(name=name, damage=damage, worth=worth, weight=weight, 
-                        slot=slot, **kwargs)
+    name: str = 'Rock'
+    worth: int = 1
+    weight: int = 1
+    slot: str = slots.OneHand().name
+    damage: int = 5
 
+@dataclass(unsafe_hash=True)
 class Dagger(Weapon):
-    def __init__(self, name='Dagger', damage=10, worth=20, weight=1, 
-                slot=slots.OneHand().name, **kwargs):
-        super().__init__(name=name, damage=damage, worth=worth, weight=weight,
-                        slot=slot, **kwargs)
+    name: str = 'Dagger'
+    worth: int = 1
+    weight: int = 1
+    slot: str = slots.OneHand().name
+    damage: int = 5
 
+@dataclass(unsafe_hash=True)
 class Sword(Weapon):
-    def __init__(self, name='Sword', damage=20, worth=100, weight=1, 
-                slot=slots.OneHand().name, 
-                description='Rusty', **kwargs):
-        super().__init__(name=name, damage=damage, worth=worth, weight=weight, 
-                        slot=slot, description=description, **kwargs)
+    name: str = 'Sword'
+    worth: int = 1
+    weight: int = 1
+    slot: str = slots.OneHand().name
+    damage: int = 5
 
+@dataclass(unsafe_hash=True)
 class Crossbow(Weapon):
-    def __init__(self, name='Crossbow', damage=15, worth=75, weight=2, 
-                slot=slots.TwoHands(), **kwargs):
-        super().__init__(name=name, damage=damage, worth=worth, weight=weight, 
-                        slot=slot, **kwargs)
+    name: str = 'Crossbow'
+    worth: int = 75
+    weight: int = 2
+    slot: str = slots.TwoHands().name
+    damage: int = 15
 
+@dataclass(unsafe_hash=True)
 class Axe(Weapon):
-    def __init__(self, name='Axe', damage=25, worth=60, weight=2, 
-                slot=slots.TwoHands().name, **kwargs):
-        super().__init__(name=name, damage=damage, worth=worth, weight=weight,
-                        slot=slot, **kwargs)
+    name: str = 'Axe'
+    worth: int = 60
+    weight: int = 2
+    slot: str = slots.TwoHands().name
+    damage: int = 25
 
 # Consumables/Healing
+@dataclass(unsafe_hash=True, init=False)
 class Consumable(BaseItem):
-    def __init__(self, healing_value = 0, **kwargs):
-        super().__init__(**kwargs)
-        self.healing_value = healing_value
+    healing_value: int = 0
+
+    def __init__(self, *args, **kwargs):
         if type(self) == Consumable:
             raise NotImplementedError('Do not instantiate Consumable directly')
+    
+    # def __str__(self):
+    #     return f'{self.description} {self.name} (+{self.healing_value})'
 
-    def __str__(self):
-        return f'{self.description} {self.name} (+{self.healing_value})'
+@dataclass(unsafe_hash=True)
+class Bread(Weapon):
+    name: str = 'Bread'
+    worth: int = 12
+    weight: int = 1
+    description: str = 'Cursty'
+    healing_value: int = 10
 
-class Bread(Consumable):
-    def __init__(self, name='Bread', healing_value=10, worth=12, weight=1,
-                 slot=slots.SmallItem().name, description='Crusty', **kwargs):
-        super().__init__(name=name, healing_value=healing_value, worth=worth, 
-                        weight=weight, slot=slot, description=description, **kwargs)
+@dataclass(unsafe_hash=True)
+class HealingPotion(Weapon):
+    name: str = 'Healing Potion'
+    worth: int = 60
+    weight: int = 1
+    healing_value: int = 50
 
-class HealingPotion(Consumable):
-    def __init__(self, name="Healing Potion", healing_value=50, worth=60,
-                 weight=1, slot=slots.SmallItem().name, **kwargs):
-        super().__init__(name=name, healing_value=healing_value, worth=worth, 
-                        weight=weight, slot=slot, **kwargs)
 
 # Containers
 # class Container(BaseItem):
@@ -125,51 +126,87 @@ class HealingPotion(Consumable):
 #                         slot=slot, update_limit=update_limit, **kwargs)
 
 # Currency
+@dataclass(unsafe_hash=True)
 class Coin(BaseItem):
-    def __init__(self, worth=1, purity=1, slot=slots.Coins().name, sellable=False, **kwargs):
-        super().__init__(weight=0.01, slot=slot, sellable=sellable, **kwargs)
-        self.purity = purity
-        self.worth = worth * purity
+    purity: int = 1
+    weight: int = 0.01
+    slot=slots.Coins().name
+    sellable: bool = False
+
+    def __init__(self, *args, **kwargs):
+        self.worth = self.worth * self.purity
         if type(self) == Coin:
             raise NotImplementedError('Do not instantiate Coin directly')
 
+@dataclass(unsafe_hash=True)
 class GreaterCoin(Coin):
-    def __init__(self, **kwargs):
-        super().__init__(purity=5, **kwargs)
+    purity: int = 5
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         if type(self) == Coin:
             raise NotImplementedError('Do not instantiate GreaterCoin directly')
 
+@dataclass(unsafe_hash=True)
 class CopperCoin(Coin):
-    def __init__(self, name='Copper Coin', worth=1, **kwargs):
-        super().__init__(name=name, worth=worth, **kwargs)
+    name: str = 'Copper Coin'
+    worth: int = 1
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+@dataclass(unsafe_hash=True)
 class GreaterCopperCoin(GreaterCoin, CopperCoin):
-    def __init__(self, name='Greater Copper Coin', **kwargs):
-        super().__init__(name=name, **kwargs)
+    name: str = 'Greater Copper Coin'
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+@dataclass(unsafe_hash=True)
 class SilverCoin(Coin):
-    def __init__(self, name='Silver Coin', worth=10, **kwargs):
-        super().__init__(name=name, worth=worth, **kwargs)
+    name: str = 'Silver Coin'
+    worth: int = 10
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+@dataclass(unsafe_hash=True)
 class GreaterSilverCoin(GreaterCoin, SilverCoin):
-    def __init__(self, name='Greater Silver Coin', **kwargs):
-        super().__init__(name=name, **kwargs)
+    name: str = 'Greater Silver Coin'
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+@dataclass(unsafe_hash=True)
 class GoldCoin(Coin):
-    def __init__(self, name='Gold Coin', worth=100, **kwargs):
-        super().__init__(name=name, worth=worth, **kwargs)
+    name: str = 'Gold Coin'
+    worth: int = 100
 
-class GreaterGoldCoin(GreaterCoin, SilverCoin):
-    def __init__(self, name='Greater Gold Coin', **kwargs):
-        super().__init__(name=name, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
+@dataclass(unsafe_hash=True)
+class GreaterGoldCoin(GreaterCoin, GoldCoin):
+    name: str = 'Greater Gold Coin'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+@dataclass(unsafe_hash=True)
 class PlatinumCoin(Coin):
-    def __init__(self, name='Platinum Coin', worth=1000, **kwargs):
-        super().__init__(name=name, worth=worth, **kwargs)
+    name: str = 'Platinum Coin'
+    worth: int = 100
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+@dataclass(unsafe_hash=True)
 class GreaterPlatinumCoin(GreaterCoin, PlatinumCoin):
-    def __init__(self, name='Greater Platinum Coin', **kwargs):
-        super().__init__(name=name, **kwargs)
+    name: str = 'Greater Platinum Coin'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
 
 
 def main():
@@ -177,14 +214,19 @@ def main():
     # Weapon()
     # Consumable()
     # Container()
-    # Coin()
-    print([CopperCoin(), Bread(), Sword()])
-    # print(CopperCoin(), Dagger(), Bread(), Backpack(), Sword())
+    c = GoldCoin()
+    gc = GreaterSilverCoin()
+    b = Bread()
+    print(b)
+    print(c, gc)
+    print(f'{b}')
+    # print([CopperCoin(), Bread(), Sword()])
+    # # print(CopperCoin(), Dagger(), Bread(), Backpack(), Sword())
     
-    c = CopperCoin()
-    print(c.modifyAttr(name="l", ru=1))
-    print(c.modifyAttr(name="small copper coin"))
-    print(c.__dict__)
+    # c = CopperCoin()
+    # print(c.modifyAttr(name="l", ru=1))
+    # print(c.modifyAttr(name="small copper coin"))
+    # print(c.__dict__)
 
     # backpack = Backpack()
     # backpack.add_item(CopperCoin(), 10)
@@ -192,6 +234,7 @@ def main():
     # backpack.add_item(GoldCoin(), 53)
     # print('Backpack: worth -> {}, weight -> {}'.format(backpack.calculate_total_worth(), backpack.calculate_total_weight()))
     # print(CoinPouch().slot)
+
 
 if __name__ == "__main__":
     main()
