@@ -15,12 +15,10 @@ class NonPlayableCharacter(Creature):
 class Trader(NonPlayableCharacter):
     def __init__(self, **kwargs):
         super().__init__(name="Trader", **kwargs)
-        
-        self.gold = 100
 
-        self.addItem(items.CoinPouch(sellable=False), 2)
+        # self.addItem(items.CoinPouch(sellable=False), 2)
         self.addItem(items.GoldCoin(), 100)
-        self.addItem(items.Backpack(sellable=False))
+        # self.addItem(items.Backpack(sellable=False))
         self.addItem(items.Bread(), 4)
         self.addItem(items.HealingPotion(), 2)
 

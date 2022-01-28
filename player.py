@@ -15,7 +15,7 @@ class Player(Creature):
         self.addItem(items.Dagger())
         self.addItem(items.Bread())
         self.addItem(items.SilverCoin(), 3)
-        self.addItem(items.CoinPouch(sellable=False))
+        # self.addItem(items.CoinPouch(sellable=False))
 
 
     def move(self, dx, dy):
@@ -44,17 +44,19 @@ class Player(Creature):
         print(f"Your best weapon is your {best_weapon}")
 
         print("Coins:")
-        self.coins.order()
-        for coin, amount in self.coins.inventory.items():
+        self.getSlot('Coin').order()
+        for coin, amount in self.getSlot('Coin').inventory.items():
             amount = amount['amount']
             print(f'* {amount} {coin}')
 
     def most_powerful_weapon(self):
         max_damage = 0
         best_weapon = None
-        self.one_hand.ensureInventory()
-        self.two_hands.ensureInventory()
-        for slot in [self.one_hand, self.two_hands]:
+        one_hand = self.getSlot('One Hand')
+        two_hands = self.getSlot('Two Hands')
+        one_hand.ensureInventory()
+        two_hands.ensureInventory()
+        for slot in [one_hand, two_hands]:
             for item in slot.inventory.keys():
                 if item.damage > max_damage:
                     best_weapon = item
@@ -73,7 +75,7 @@ class Player(Creature):
             print(f"{enemy.name} HP is {enemy.hp}.")
 
     def heal(self):
-        consumables = [(item, amount['amount']) for item, amount in self.small_items.inventory.items() if isinstance(item, items.Consumable)]
+        consumables = [(item, amount['amount']) for item, amount in self.getSlot('Miscellaneous').items() if isinstance(item, items.Consumable)]
         if not consumables:
             print("You don't have any items to heal you!")
             return

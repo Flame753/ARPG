@@ -93,36 +93,36 @@ class HealingPotion(Consumable):
                         weight=weight, slot=slot, **kwargs)
 
 # Containers
-class Container(BaseItem):
-    def __init__(self, update_limit=tuple(), **kwargs):
-        self.update_limit = update_limit
-        super().__init__(**kwargs)
-        if type(self) == Container:
-            raise NotImplementedError('Do not instantiate Container directly')
+# class Container(BaseItem):
+#     def __init__(self, update_limit=tuple(), **kwargs):
+#         self.update_limit = update_limit
+#         super().__init__(**kwargs)
+#         if type(self) == Container:
+#             raise NotImplementedError('Do not instantiate Container directly')
     
-    def updateSlotLimit(self, slots, amount=1, negative=False):
-        for slot in slots.__dict__.values():
-            # checks if self.update_limit is an emputy list
-            if not self.update_limit: return False
-            if not isinstance(slot, self.update_limit[0]): continue
-            if negative:
-                slot.item_limit = slot.item_limit - self.update_limit[1] * amount
-                return True
-            else:
-                slot.item_limit = slot.item_limit + self.update_limit[1] * amount
-                return True
+#     def updateSlotLimit(self, slots, amount=1, negative=False):
+#         for slot in slots.__dict__.values():
+#             # checks if self.update_limit is an emputy list
+#             if not self.update_limit: return False
+#             if not isinstance(slot, self.update_limit[0]): continue
+#             if negative:
+#                 slot.item_limit = slot.item_limit - self.update_limit[1] * amount
+#                 return True
+#             else:
+#                 slot.item_limit = slot.item_limit + self.update_limit[1] * amount
+#                 return True
         
-class Backpack(Container, BaseItem):
-    def __init__(self, name='Backpack', worth=10, weight=1, 
-                slot=slots.Body().name, update_limit=(slots.SmallItem, 8), **kwargs):
-        super().__init__(name=name, worth=worth, weight=weight, 
-                        slot=slot, update_limit=update_limit, **kwargs)
+# class Backpack(Container, BaseItem):
+#     def __init__(self, name='Backpack', worth=10, weight=1, 
+#                 slot=slots.Body().name, update_limit=(slots.SmallItem, 8), **kwargs):
+#         super().__init__(name=name, worth=worth, weight=weight, 
+#                         slot=slot, update_limit=update_limit, **kwargs)
     
-class CoinPouch(Container, BaseItem):
-    def __init__(self, name='Coin Pouch', worth=1, weight=.1, 
-                slot=slots.SmallItem().name, update_limit=(slots.Coins, 50), **kwargs):
-        super().__init__(name=name, worth=worth, weight=weight, 
-                        slot=slot, update_limit=update_limit, **kwargs)
+# class CoinPouch(Container, BaseItem):
+#     def __init__(self, name='Coin Pouch', worth=1, weight=.1, 
+#                 slot=slots.SmallItem().name, update_limit=(slots.Coins, 50), **kwargs):
+#         super().__init__(name=name, worth=worth, weight=weight, 
+#                         slot=slot, update_limit=update_limit, **kwargs)
 
 # Currency
 class Coin(BaseItem):
@@ -179,7 +179,7 @@ def main():
     # Container()
     # Coin()
     print([CopperCoin(), Bread(), Sword()])
-    print(CopperCoin(), Dagger(), Bread(), Backpack(), Sword())
+    # print(CopperCoin(), Dagger(), Bread(), Backpack(), Sword())
     
     c = CopperCoin()
     print(c.modifyAttr(name="l", ru=1))
@@ -191,7 +191,7 @@ def main():
     # print('Backpack: worth -> {}, weight -> {}'.format(backpack.calculate_total_worth(), backpack.calculate_total_weight()))
     # backpack.add_item(GoldCoin(), 53)
     # print('Backpack: worth -> {}, weight -> {}'.format(backpack.calculate_total_worth(), backpack.calculate_total_weight()))
-    print(CoinPouch().slot)
+    # print(CoinPouch().slot)
 
 if __name__ == "__main__":
     main()

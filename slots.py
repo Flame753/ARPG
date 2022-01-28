@@ -2,31 +2,21 @@ from abc import ABC
 
 
 class Slot(ABC):
-    def __init__(self, name=None, item_limit=1, **kwargs):
+    def __init__(self, name=None, **kwargs):
         self.name = name
-        self.item_limit = item_limit
 
     def __str__(self):
-        return f'{self.name}'
+        return f'{self.name} Slot'
 
     def __repr__(self):
-        return f'{self.__class__.__name__}(name={self.name}, item_limit={self.item_limit})'
+        return f'{self.__class__.__name__}(name={self.name})'
 
     def ensureInventory(self):
         if not hasattr(self, 'inventory'):
             self.inventory = {}
 
-    def properSlot(self, item) -> bool:
-        # Returns the slot location of the item.
-        return self.name == item.slot
-
     def addItem(self, item, amount=0):
         self.ensureInventory()
-        if not self.properSlot(item): 
-            raise ValueError(f'A {item} object can not be added to {self.name}.')
-        # Determining if capacity was reached
-        if self.amountOfItems() + amount > self.item_limit:
-            raise IndexError(f"Added {amount} of {item} is exceeding the limited of {self.item_limit}")
         if item in self.inventory:
             self.inventory[item]['amount'] += amount
         else:
@@ -81,31 +71,31 @@ class Slot(ABC):
 
 class Head(Slot):
     def __init__(self, **kwargs):
-        super().__init__(name='Head Slot', **kwargs)
+        super().__init__(name='Head', **kwargs)
 
 class Body(Slot):
     def __init__(self, **kwargs):
-        super().__init__(name='Body Slot', **kwargs)
+        super().__init__(name='Body', **kwargs)
 
 class Legs(Slot):
     def __init__(self, **kwargs):
-        super().__init__(name='Legs Slot', **kwargs)
+        super().__init__(name='Legs', **kwargs)
 
 class OneHand(Slot):
-    def __init__(self, name='One Hand Slot', item_limit=2, **kwargs):
-        super().__init__(name=name, item_limit=item_limit, **kwargs)
+    def __init__(self, name='One Hand', **kwargs):
+        super().__init__(name=name, **kwargs)
     
 class TwoHands(OneHand):
     def __init__(self, **kwargs):
-        super().__init__(name='Two Hands Slot', **kwargs)
+        super().__init__(name='Two Hands', **kwargs)
 
 class SmallItem(Slot):
     def __init__(self, **kwargs):
-        super().__init__(name='Small Item Slot', item_limit=2, **kwargs)
+        super().__init__(name='Small Item', **kwargs)
 
 class Coins(Slot):
     def __init__(self, **kwargs):
-        super().__init__(name='Coin Slot', item_limit=10, **kwargs)
+        super().__init__(name='Coin', **kwargs)
 
     def order(self) -> list:
         # Puts the inventory from largest worth to smallest
@@ -116,6 +106,9 @@ class Coins(Slot):
         self.inventory.clear()
         self.inventory.update(ordict)
 
+class Miscellaneous(Slot):
+    def __init__(self, **kwargs):
+        super().__init__(name='Miscellaneous', **kwargs)
 
 def main():
     import items

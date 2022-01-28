@@ -115,7 +115,7 @@ class TraderTile(MapTile):
             return
 
         # Verifying that the buyer has enough cash to buy the item
-        if (item.worth * self.base_price.worth) > buyer.coins.calculateTotalWorth():
+        if (item.worth * self.base_price.worth) > buyer.getSlot('Coin').calculateTotalWorth():
             print("That's too expensive")
             return
 
@@ -138,15 +138,18 @@ class TraderTile(MapTile):
         # Prints the player's coins
         def display_coins(player):
             print('You currenlty have;')
-            player.coins.order()
-            for coin, amount in player.coins.inventory.items():
+            player.getSlot('Coin').order()
+            for coin, amount in player.getSlot('Coin').inventory.items():
                 amount = amount['amount']
                 print(f'    {amount} {coin}')
 
         if not isinstance(seller, npc.NonPlayableCharacter):
+            # Player is the seller
             display_coins(seller)
         else:
+            # Playser is the buyer
             display_coins(buyer)
+        print('-'*20)
 
     def sellableItems(self, seller):
         # Returns a list of value items that can be sold
@@ -157,17 +160,31 @@ class TraderTile(MapTile):
             return items
 
     # Transaction NEEDS to be FIXED
+    # def transaction(self, seller, buyer, item):
+    #     price = item.worth * self.base_price.worth
+    #     buyer.getSlot('Coin').order()
+    #     for coin in buyer.getSlot('Coin').inventory:
+    #         physical_amount = price // coin.worth
+    #         buyer.removeItem(coin, physical_amount)
+    #         seller.addItem(coin, physical_amount)
+    #         price -= (physical_amount * coin.worth)
+    #         if price == 0: return True
+    #     return False
+
     def transaction(self, seller, buyer, item):
         price = item.worth * self.base_price.worth
-        buyer.coins.order()
-        for coin in buyer.coins.inventory:
-            physical_amount = price // coin.worth
-            buyer.removeItem(coin, physical_amount)
-            seller.addItem(coin, physical_amount)
-            price -= (physical_amount * coin.worth)
-            if price == 0: return True
+        buyer_weight = buyer.getSlot('Coin').calculateTotalWorth()
+
+        if not isinstance(seller, npc.NonPlayableCharacter):
+            # Player is the seller
+            seller.addItem(self.base_price, item.worth)
+            return True
+        else:
+            # Playser is the buyer
+            # Need to figure out how to do this part
+            return True
         return False
-    
+
     def exchange(self, amount, coin_one, coin_two):
         # Exchange the amount of coin one into the equal value of coin two if possible
         total_value_of_coin_one = coin_one.worth * amount
@@ -203,7 +220,7 @@ class FindCoinTile(MapTile):
     def __init__(self, x, y):
         super().__init__(x, y)
         self.coins_claimed = False
-        self.coins_remainding = False
+        # self.coins_remainding = False
         r = random.random()
         if r < 0.75:
             self.coin = items.CopperCoin() 
@@ -219,22 +236,27 @@ class FindCoinTile(MapTile):
             self.amount = random.randint(1, 5)
     
     def modify_player(self, player):
-        if not self.coins_claimed:
-            carry_capacity = player.coins.item_limit
-            currently_have = player.coins.amountOfItems()
-            allowed_to_get = carry_capacity - currently_have
-            if allowed_to_get > self.amount:
-                player.addItem(self.coin, self.amount)
-                self.coins_claimed = True
-            else:
-                player.addItem(self.coin, allowed_to_get)
-                self.amount = self.amount - allowed_to_get
-                self.coins_remainding = True
+        # if not self.coins_claimed:
+        #     carry_capacity = player.coins.item_limit
+        #     currently_have = player.coins.amountOfItems()
+        #     allowed_to_get = carry_capacity - currently_have
+        #     if allowed_to_get > self.amount:
+        #         player.addItem(self.coin, self.amount)
+        #         self.coins_claimed = True
+        #     else:
+        #         player.addItem(self.coin, allowed_to_get)
+        #         self.amount = self.amount - allowed_to_get
+        #         self.coins_remainding = True
 
-            if self.coins_remainding:
-                print(f"Unfortunately, {allowed_to_get} {self.coin}s you'r able to can pick.")
-            else:
-                print(f"You have picked {self.amount} {self.coin}s.")
+        #     if self.coins_remainding:
+        #         print(f"Unfortunately, {allowed_to_get} {self.coin}s you'r able to can pick.")
+        #     else:
+        #         print(f"You have picked {self.amount} {self.coin}s.")
+            
+        if not self.coins_claimed:
+            player.getSlot('Coin').addItem(self.coin, self.amount)
+            print(f"You have picked {self.amount} {self.coin}s.")
+            self.coins_claimed = True
 
     
     def intro_text(self):
@@ -265,7 +287,7 @@ world_dsl = """
 |FC|  |EN|  |FC|
 """
 # Test World
-world_dsl = """|ST|FC|TT|VT|"""
+world_dsl = """|EN|ST|FC|TT|VT|"""
 
 def tile_at(x, y):
     """
