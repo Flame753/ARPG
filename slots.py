@@ -1,30 +1,20 @@
 from abc import ABC
+from dataclasses import dataclass, field
+import setting
 
 
+@dataclass()
 class Slot(ABC):
-    def __init__(self, name=None, **kwargs):
-        self.name = name
-
-    def __str__(self):
-        return f'{self.name} Slot'
-
-    def __repr__(self):
-        return f'{self.__class__.__name__}(name={self.name})'
-
-    def ensureInventory(self):
-        if not hasattr(self, 'inventory'):
-            self.inventory = {}
+    name: str = None
+    inventory: list = field(default_factory=list)
 
     def addItem(self, item, amount=0):
-        self.ensureInventory()
         if item in self.inventory:
             self.inventory[item]['amount'] += amount
         else:
             self.inventory[item] = {'amount': amount}
     
     def removeItem(self, item, amount = 0):
-        self.ensureInventory()
-
         if item in self.inventory:
             if self.inventory[item]['amount'] >= amount:
                 self.inventory[item]['amount'] -= amount
@@ -34,68 +24,54 @@ class Slot(ABC):
         return False
 
     def amountOfItems(self):
-        self.ensureInventory()
-
         total_amount = 0
         for data in self.inventory.values():
             total_amount += data['amount']
         return total_amount
 
     def calculateItemWeight(self, item):
-        self.ensureInventory()
-        
         if item in self.inventory:
             return item.weight * self.inventory[item]['amount']
 
     def calculateItemWorth(self, item):
-        self.ensureInventory()
-        
         if item in self.inventory:
             return item.worth * self.inventory[item]['amount']
 
     def calculateTotalWeight(self):
-        self.ensureInventory()
-
         weight = 0
         for item, data in self.inventory.items():
             weight += item.weight * data['amount']
         return weight
 
     def calculateTotalWorth(self):
-        self.ensureInventory()
-
         worth = 0
         for item, data in self.inventory.items():
             worth += item.worth * data['amount']
         return worth
 
+@dataclass()
 class Head(Slot):
-    def __init__(self, **kwargs):
-        super().__init__(name='Head', **kwargs)
+    name: str = setting.HEAD_SLOT
 
+@dataclass()
 class Body(Slot):
-    def __init__(self, **kwargs):
-        super().__init__(name='Body', **kwargs)
+    name: str = setting.BODY_SLOT
 
+@dataclass()
 class Legs(Slot):
-    def __init__(self, **kwargs):
-        super().__init__(name='Legs', **kwargs)
+    name: str = setting.LEGS_SLOT
 
-class OneHand(Slot):
-    def __init__(self, name='One Hand', **kwargs):
-        super().__init__(name=name, **kwargs)
+@dataclass()
+class OneHanded(Slot):
+    name: str = setting.TWO_HANDED_SLOT
     
-class TwoHands(OneHand):
-    def __init__(self, **kwargs):
-        super().__init__(name='Two Hands', **kwargs)
+@dataclass()    
+class TwoHanded(Slot):
+    name: str = setting.ONE_HANDED_SLOT
 
-class SmallItem(Slot):
-    def __init__(self, **kwargs):
-        super().__init__(name='Small Item', **kwargs)
-
+@dataclass()
 class Coins(Slot):
-    def __init__(self, **kwargs):
-        super().__init__(name='Coin', **kwargs)
+    name: str = setting.COIN_SLOT
 
     def order(self) -> list:
         # Puts the inventory from largest worth to smallest
@@ -106,28 +82,15 @@ class Coins(Slot):
         self.inventory.clear()
         self.inventory.update(ordict)
 
+@dataclass()
 class Miscellaneous(Slot):
-    def __init__(self, **kwargs):
-        super().__init__(name='Miscellaneous', **kwargs)
+    name: str = setting.MISC_SLOT
+
 
 def main():
     import items
-    c = Coins()
-    # print(c.addItem(items.Dagger(), 1))
-    # print(c.inventory)
-    # print(c.addItem(items.CopperCoin(), 1))
-    # print(c.inventory)
-    # print(c.addItem(items.GraterPlatinumCoin(), 1))
-    # print(c.inventory)
-    # print(c.amountOfItems())
-    # c.addItem(items.Dagger(), 5)
-    # print(c.amountOfItems())
-    c.addItem(items.SilverCoin(), 3)
-
-    c.addItem(items.CopperCoin(), 4)
-    # c.addItem(items.Backpack)
-    c.order()
-    # print(c.inventory)
+    s = Slot()
+    print(s.inventory)
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,6 @@
-from abc import ABC, abstractstaticmethod
+from abc import ABC
 from dataclasses import dataclass
-import dataclasses
-import slots
+import setting
 
 @dataclass(unsafe_hash=True)
 class BaseItem(ABC):
@@ -22,53 +21,65 @@ class Weapon(BaseItem):
     damage: int = 0
 
     def __init__(self, *args, **kwargs):
-        if type(self) == BaseItem:
-            raise NotImplementedError('Do not instantiate BaseItem directly')
+        if type(self) == Weapon:
+            raise NotImplementedError('Do not instantiate Weapon directly')
 
 @dataclass(unsafe_hash=True)
-class Rock(Weapon):
+class OneHandedWeapon(Weapon):
+    slot: str = setting.ONE_HANDED_SLOT
+
+    def __init__(self, *args, **kwargs):
+        if type(self) == OneHandedWeapon:
+            raise NotImplementedError('Do not instantiate OneHandedWeapon directly')
+
+@dataclass(unsafe_hash=True)
+class TwoHandedWeapon(Weapon):
+    slot: str = setting.TWO_HANDED_SLOT
+
+    def __init__(self, *args, **kwargs):
+        if type(self) == TwoHandedWeapon:
+            raise NotImplementedError('Do not instantiate TwoHandedWeapon directly')
+
+@dataclass(unsafe_hash=True)
+class Rock(OneHandedWeapon):
     name: str = 'Rock'
     worth: int = 1
     weight: int = 1
-    slot: str = slots.OneHand().name
     damage: int = 5
 
 @dataclass(unsafe_hash=True)
-class Dagger(Weapon):
+class Dagger(OneHandedWeapon):
     name: str = 'Dagger'
     worth: int = 1
     weight: int = 1
-    slot: str = slots.OneHand().name
     damage: int = 5
 
 @dataclass(unsafe_hash=True)
-class Sword(Weapon):
+class Sword(OneHandedWeapon):
     name: str = 'Sword'
     worth: int = 1
     weight: int = 1
-    slot: str = slots.OneHand().name
     damage: int = 5
 
 @dataclass(unsafe_hash=True)
-class Crossbow(Weapon):
+class Crossbow(TwoHandedWeapon):
     name: str = 'Crossbow'
     worth: int = 75
     weight: int = 2
-    slot: str = slots.TwoHands().name
     damage: int = 15
 
 @dataclass(unsafe_hash=True)
-class Axe(Weapon):
+class Axe(TwoHandedWeapon):
     name: str = 'Axe'
     worth: int = 60
     weight: int = 2
-    slot: str = slots.TwoHands().name
     damage: int = 25
 
 # Consumables/Healing
 @dataclass(unsafe_hash=True, init=False)
 class Consumable(BaseItem):
     healing_value: int = 0
+    slot: str = setting.MISC_SLOT
 
     def __init__(self, *args, **kwargs):
         if type(self) == Consumable:
@@ -78,7 +89,7 @@ class Consumable(BaseItem):
     #     return f'{self.description} {self.name} (+{self.healing_value})'
 
 @dataclass(unsafe_hash=True)
-class Bread(Weapon):
+class Bread(Consumable):
     name: str = 'Bread'
     worth: int = 12
     weight: int = 1
@@ -86,7 +97,7 @@ class Bread(Weapon):
     healing_value: int = 10
 
 @dataclass(unsafe_hash=True)
-class HealingPotion(Weapon):
+class HealingPotion(Consumable):
     name: str = 'Healing Potion'
     worth: int = 60
     weight: int = 1
@@ -130,7 +141,7 @@ class HealingPotion(Weapon):
 class Coin(BaseItem):
     purity: int = 1
     weight: int = 0.01
-    slot=slots.Coins().name
+    slot: str = setting.COIN_SLOT
     sellable: bool = False
 
     def __init__(self, *args, **kwargs):
@@ -209,6 +220,7 @@ class GreaterPlatinumCoin(GreaterCoin, PlatinumCoin):
 
 
 
+
 def main():
     # BaseItem()
     # Weapon()
@@ -220,6 +232,7 @@ def main():
     print(b)
     print(c, gc)
     print(f'{b}')
+    
     # print([CopperCoin(), Bread(), Sword()])
     # # print(CopperCoin(), Dagger(), Bread(), Backpack(), Sword())
     
