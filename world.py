@@ -1,3 +1,4 @@
+import setting
 import random
 import enemies
 import npc
@@ -115,7 +116,7 @@ class TraderTile(MapTile):
             return
 
         # Verifying that the buyer has enough cash to buy the item
-        if (item.worth * self.base_price.worth) > buyer.getSlot('Coin').calculateTotalWorth():
+        if (item.worth * self.base_price.worth) > buyer.getSlot(setting.COIN_SLOT).calculateTotalWorth():
             print("That's too expensive")
             return
 
@@ -138,8 +139,8 @@ class TraderTile(MapTile):
         # Prints the player's coins
         def display_coins(player):
             print('You currenlty have;')
-            player.getSlot('Coin').order()
-            for coin, amount in player.getSlot('Coin').inventory.items():
+            player.getSlot(setting.COIN_SLOT).order()
+            for coin, amount in player.getSlot(setting.COIN_SLOT).inventory.items():
                 amount = amount['amount']
                 print(f'    {amount} {coin}')
 
@@ -162,8 +163,8 @@ class TraderTile(MapTile):
     # Transaction NEEDS to be FIXED
     # def transaction(self, seller, buyer, item):
     #     price = item.worth * self.base_price.worth
-    #     buyer.getSlot('Coin').order()
-    #     for coin in buyer.getSlot('Coin').inventory:
+    #     buyer.getSlot(setting.COIN_SLOT).order()
+    #     for coin in buyer.getSlot(setting.COIN_SLOT).inventory:
     #         physical_amount = price // coin.worth
     #         buyer.removeItem(coin, physical_amount)
     #         seller.addItem(coin, physical_amount)
@@ -173,7 +174,7 @@ class TraderTile(MapTile):
 
     def transaction(self, seller, buyer, item):
         price = item.worth * self.base_price.worth
-        buyer_weight = buyer.getSlot('Coin').calculateTotalWorth()
+        buyer_weight = buyer.getSlot(setting.COIN_SLOT).calculateTotalWorth()
 
         if not isinstance(seller, npc.NonPlayableCharacter):
             # Player is the seller
@@ -254,7 +255,7 @@ class FindCoinTile(MapTile):
         #         print(f"You have picked {self.amount} {self.coin}s.")
             
         if not self.coins_claimed:
-            player.getSlot('Coin').addItem(self.coin, self.amount)
+            player.getSlot(setting.COIN_SLOT).addItem(self.coin, self.amount)
             print(f"You have picked {self.amount} {self.coin}s.")
             self.coins_claimed = True
 

@@ -1,96 +1,89 @@
 from abc import ABC
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from container import Container
 import setting
 
 
 @dataclass()
-class Slot(ABC):
-    name: str = None
-    inventory: list = field(default_factory=list)
+class Slot(Container):
+    type: str = None
+    item_limit: int = None
+    # container = Container()
+        
+    # def isEquipped(self, item) -> bool:
+    #     return True if self.container.ctnr.get(item, None) else False
 
-    def addItem(self, item, amount=0):
-        if item in self.inventory:
-            self.inventory[item]['amount'] += amount
-        else:
-            self.inventory[item] = {'amount': amount}
+    # def equip(self, item):
+    #     # If there is no item limit or item is not equipped
+    #     if not self.item_limit or not self.isEquipped(item):
+    #         self.container.addItem(item, 1)
     
-    def removeItem(self, item, amount = 0):
-        if item in self.inventory:
-            if self.inventory[item]['amount'] >= amount:
-                self.inventory[item]['amount'] -= amount
-                if self.inventory[item]['amount'] == 0:
-                    del(self.inventory[item])
-                return True
-        return False
-
-    def amountOfItems(self):
-        total_amount = 0
-        for data in self.inventory.values():
-            total_amount += data['amount']
-        return total_amount
-
-    def calculateItemWeight(self, item):
-        if item in self.inventory:
-            return item.weight * self.inventory[item]['amount']
-
-    def calculateItemWorth(self, item):
-        if item in self.inventory:
-            return item.worth * self.inventory[item]['amount']
-
-    def calculateTotalWeight(self):
-        weight = 0
-        for item, data in self.inventory.items():
-            weight += item.weight * data['amount']
-        return weight
-
-    def calculateTotalWorth(self):
-        worth = 0
-        for item, data in self.inventory.items():
-            worth += item.worth * data['amount']
-        return worth
+    # def unequip(self, item) -> bool:
+    #     return self.container.removeItem(item, 1)
 
 @dataclass()
 class Head(Slot):
-    name: str = setting.HEAD_SLOT
+    type: str = setting.HEAD_SLOT
+    item_limit: int = 1
 
 @dataclass()
 class Body(Slot):
-    name: str = setting.BODY_SLOT
+    type: str = setting.BODY_SLOT
+    item_limit: int = 1
 
 @dataclass()
 class Legs(Slot):
-    name: str = setting.LEGS_SLOT
+    type: str = setting.LEGS_SLOT
+    item_limit: int = 1
 
 @dataclass()
 class OneHanded(Slot):
-    name: str = setting.TWO_HANDED_SLOT
+    type: str = setting.ONE_HANDED_SLOT
+    item_limit: int = 1
     
 @dataclass()    
 class TwoHanded(Slot):
-    name: str = setting.ONE_HANDED_SLOT
+    type: str = setting.TWO_HANDED_SLOT
+    item_limit: int = 1
 
 @dataclass()
 class Coins(Slot):
-    name: str = setting.COIN_SLOT
+    type: str = setting.COIN_SLOT
 
     def order(self) -> list:
-        # Puts the inventory from largest worth to smallest
-        coins = list(self.inventory.items())
+        # Puts the container from largest worth to smallest
+        coins = list(self.container.items())
         worth = lambda coin: coin[0].worth
         coins.sort(key=worth)  # Sort function only works with a list type
         ordict = dict(coins)
-        self.inventory.clear()
-        self.inventory.update(ordict)
+        self.container.clear()
+        self.container.update(ordict)
 
 @dataclass()
 class Miscellaneous(Slot):
-    name: str = setting.MISC_SLOT
+    type: str = setting.MISC_SLOT
 
 
 def main():
     import items
-    s = Slot()
-    print(s.inventory)
+    a = OneHanded()
+    b = OneHanded()
+    c = TwoHanded()
+    print(a==b)
+    print(a is b)
+    print(a.container==b.container)
+    print(a.container is b.container)
+
+    print('_'*20)
+    print(a == c)
+    print(a is c , "here")
+    print(a.container==c.container)
+    print(a.container is c.container)
+
+
+
+
+
 
 if __name__ == "__main__":
     main()
