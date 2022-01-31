@@ -1,25 +1,30 @@
 from abc import ABC
 from dataclasses import dataclass
 from container import Container
+from items import BaseItem
 import setting
+
 
 
 @dataclass()
 class Slot(Container):
     type: str = None
     item_limit: int = None
-    # container = Container()
-        
-    # def isEquipped(self, item) -> bool:
-    #     return True if self.container.ctnr.get(item, None) else False
-
-    # def equip(self, item):
-    #     # If there is no item limit or item is not equipped
-    #     if not self.item_limit or not self.isEquipped(item):
-    #         self.container.addItem(item, 1)
     
-    # def unequip(self, item) -> bool:
-    #     return self.container.removeItem(item, 1)
+    def addItem(self, item: BaseItem, amount: int=1) -> bool:
+        # Checks if there a limit or not
+        if self.item_limit:
+            # Check if limit was passed
+            if len(self.container) >= self.item_limit: 
+                return False
+        # Adds another items if exist
+        if item in self.container:
+            self.container[item]['amount'] += amount
+            return True
+        # Adds new item
+        else:
+            self.container[item] = {'amount': amount}
+            return True
 
 @dataclass()
 class Head(Slot):
