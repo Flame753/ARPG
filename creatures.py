@@ -1,7 +1,6 @@
-from ast import Pass
+from optparse import AmbiguousOptionError
 from items import BaseItem
 from dataclasses import dataclass, field
-from container import Container
 import slots
 import setting
 
@@ -16,115 +15,69 @@ class Creature():
     inventory: slots.Slot = slots.Miscellaneous()
     coin: slots.Slot = slots.Coins()
 
+    def _verifyArguments(self, item=None, amount=None):
+        # Verifys if Arguments are enter correctly 
+        if item:
+            if not isinstance(item, BaseItem):
+                raise TypeError(f'The item argument requires to be a BaseItem Object, not a {type(item)}!')
+        if amount:
+            if not type(amount) == int:
+                raise TypeError(f'The amount argurment requires to be a intger, not a {type(amount)}!')
+            if amount < 0:
+                raise ValueError("The amount argurment can't be an negative real number!")
+
+
     def addItem(self, item: BaseItem, amount: int=1):
+        self._verifyArguments(item, amount)
+
+        # Always adds the amount of items into the invenotry slot excluding any Coin items
         if item.slot_type == setting.COIN_SLOT:
             self.coin.addItem(item, amount)
         else:
             self.inventory.addItem(item, amount)
 
     def removeItem(self, item: BaseItem, amount: int=1) -> bool:
+        self._verifyArguments(item, amount)
+        
         return self.inventory.removeItem(item, amount)
 
-    def equipped(self, item: BaseItem):
-        slot = self.equipment_slots.get(item.slot, None)
-        if slot:
-            slot.equip(item)
-            self.removeItem(item, 1)
+    def equip(self, item: BaseItem):
+        self._verifyArguments(item)
 
-    def unequipped(self, item: BaseItem) -> bool:
-        slot = self.equipment_slots.get(item.slot)
-        slot.unequip(item)
-        self.addItem(item, 1)
+        for slot in self.__dict__.values():
+            # Finds proper slot for item
+            if slot.type == item.slot_type:
+                # Adds item and checks if item was added
+                if slot.addItem(item, 1):
+                    # removes item from default inventory
+                    self.removeItem(item, 1)
+
+    def unequip(self, item: BaseItem) -> bool:
+        self._verifyArguments(item)
+
+        for slot in self.__dict__.values():
+            if slot.type == item.slot_type:
+                if slot.removeItem(item, 1):
+                    self.addItem(item, 1)
+    
+    def calculateItemWorth(self, item):
+        self._verifyArguments(item)
+
+        # Calcuates the total worth for the item, regarding where it is on the "Creature"
+        worth = 0
+        for slot in self.__dict__.values():
+            # Checks if item in the inventory or if equipped
+            if item.slot_type == slot.type or slot.type == setting.MISC_SLOT:
+                worth += slot.calculateItemWorth(item)
+        return worth
 
     def calculateTotalWorth(self) -> int:
-        worth = self.inventory.calculateTotalWorth()
-
-        for slot in self.equipment_slots.values():
-            
-            worth += slot.inventory.calculateTotalWorth()
+        # Calcuates the total worth of all coin and items regarding where it is on the "Creature"
+        worth = 0
+        for slot in self.__dict__.values():
+            if not isinstance(slot, slots.Slot): continue
+            worth += slot.calculateTotalWorth()
         return worth
-    
-    
-
-
-    # def preventDuplicate(self, item: BaseItem) -> BaseItem:
-    #     # Prevent Duplicates Items
-    #     slots = []
-    #     slots.append(self.inventory['Miscellaneous']['slot'])
-
-    #     # Prevents Duplicate if an item starts equippted 
-    #     # None is means items has no slot type
-    #     data = self.inventory.get(item.slot, None)
-    #     if data:
-    #         slots.append(data['slot'])
-
-    #     for slot in slots:
-    #         if slot.inventory:
-    #             for i in slot.inventory:
-    #                 # NEEDS TO CHECK MORE THEN JUST NAME TO BE FULLY WORKING
-    #                 if i.name == item.name:
-    #                     return i
-    #     return item
-
-    # def addItem(self, item: BaseItem, amount: int=1):
-    #     item = self.preventDuplicate(item)
-    #     if item.slot == 'Coin':
-    #         slot = self.getSlot('Coin')
-    #     else:
-    #         slot = self.getSlot('Miscellaneous')
-    #     slot.addItem(item, amount)
-
-    # def removeItem(self, item: BaseItem, amount: int=1) -> bool:
-    #     item = self.preventDuplicate(item)
-    #     slot = self.inventory['Miscellaneous']['slot']
-    #     return slot.removeItem(item, amount)
-            
-    # def equipped(self, item: BaseItem):
-    #     item = self.preventDuplicate(item)
-    #     data = self.inventory.get(item.slot, None)
-
-    #     # "not data" looks for items that dosen't have a specific slot type like a bread object
-    #     if not data:
-    #         raise KeyError(f"'{item}' is not equiptable Object!")
-    #     slot = data['slot']
-
-    #     # "not limit" checks if there is no item slot limit like a coin object
-    #     limit= data['item_limit']
-    #     if not limit:
-    #         raise ValueError(f"'{item}' is not equiptable Object!!")
-
-    #     if slot.amountOfItems() >= limit:
-    #         raise IndexError(f"{slot} is Fully Occupied!")
-
-    #     slot.addItem(item, 1)
-    #     self.removeItem(item, 1)
-
-    # def unequipped(self, item: BaseItem) -> bool:
-    #     item = self.preventDuplicate(item)
-    #     data = self.inventory.get(item.slot, None)
-    #     slot = data['slot']
-    #     if not slot:
-    #         raise KeyError(f"This {slot} Doesn't Exist!")
-
-    #     self.addItem(item, 1)
-    #     return slot.removeItem(item, 1)  
-
-    # def getSlot(self, slot: str) -> slots.Slot:
-    #     return self.inventory[slot]['slot']
-
-    # # def calculateTotalWeight(self) -> int:
-    # #     weight = 0
-    # #     for slot in self.__dict__.values():
-    # #         if not isinstance(slot, slots.Slot): continue
-    # #         weight = weight + slot.calculateItemWeight()
-    # #     return weight
-
-    # def calculateTotalWorth(self) -> int:
-    #     worth = 0
-    #     for data in self.inventory.values():
-    #         slot = data['slot']
-    #         worth = worth + slot.calculateTotalWorth()
-    #     return worth
 
     # def getAllItems(self) -> tuple[BaseItem, dict]:
     #     items = {}
@@ -134,8 +87,9 @@ class Creature():
     #         items.update(slot.inventory)
     #     return items.items()
 
-    # def is_alive(self) -> bool:
-    #     return self.hp > 0
+    def is_alive(self) -> bool:
+        return self.hp > 0
+  
 
 
 
@@ -180,21 +134,40 @@ def main2():
     import items
     from pprint import pprint
     c = Creature()
-    d = Creature()
-    # print(c)
-    # print(c == d)
-    # print(c is d)
-    # print(c.head.container == d.inventory.container)
-    # print(c.head.container is d.inventory.container)
+
     ig1 = items.GoldCoin()
     ig2 = items.GoldCoin()
-    print(ig1 == ig2)
-    print(ig1 is ig2)
-    items.GoldCoin()
-    c.addItem(ig1)
+    d = items.Dagger()
+    e = items.Dagger()
+    # print(ig1 == ig2)
+    # print(ig1 is ig2)
+    # c.addItem(ig1)
+    c.addItem(d, 4)
+    c.addItem(e, 5)
     pprint(c)
-    print(c.removeItem(ig2))
+    print(c.equip(d))
     pprint(c)
- 
+    print(c.equip(d))
+    pprint(c)
+    print(c.calculateTotalWorth())
+    print(c.calculateItemWorth(d))
+    # c.equip(ig1)
+    # c.equip(d)
+    # pprint(c)
+    # c.unequip(d)
+    # pprint(c)
+    # c.equip(items.Dagger())
+    # pprint(c)
+    
+
+    dagger = items.Dagger()
+    copper_coin = items.CopperCoin()
+    bread = items.Bread()
+
+    creature = Creature()
+    creature.addItem(bread, 3)
+    pprint(creature)
+
+
 if __name__ == '__main__':
     main2()
