@@ -7,13 +7,14 @@ import setting
 
 @dataclass() 
 class Creature():
-    head: slots.Slot = slots.Head()
-    body: slots.Slot = slots.Body()
-    legs: slots.Slot = slots.Legs()
-    one_handed: slots.Slot = slots.OneHanded()
-    two_handed: slots.Slot = slots.TwoHanded()
-    inventory: slots.Slot = slots.Miscellaneous()
-    coin: slots.Slot = slots.Coins()
+    def __init__(self):
+        self.head = slots.Head()
+        self.body = slots.Body()
+        self.legs = slots.Legs()
+        self.one_handed = slots.OneHanded()
+        self.two_handed = slots.TwoHanded()
+        self.inventory = slots.Miscellaneous()
+        self.coin = slots.Coins()
 
     def _verifyArguments(self, item=None, amount=None):
         # Verifys if Arguments are enter correctly 
@@ -38,25 +39,38 @@ class Creature():
 
     def removeItem(self, item: BaseItem, amount: int=1) -> bool:
         self._verifyArguments(item, amount)
-        
-        return self.inventory.removeItem(item, amount)
 
-    def equip(self, item: BaseItem):
+        if item.slot_type == setting.COIN_SLOT:
+            return self.coin.removeItem(item, amount)
+        else:
+            return self.inventory.removeItem(item, amount)
+
+    def equip(self, item: BaseItem) -> bool:
         self._verifyArguments(item)
-
+        # Verifying if there is an item to equip
+        if not item in self.inventory.container:
+            return False
         for slot in self.__dict__.values():
             # Finds proper slot for item
             if slot.type == item.slot_type:
-                # Adds item and checks if item was added
-                if slot.addItem(item, 1):
+                try:
+                    # Adds item and checks if item was added
+                    slot.addItem(item, 1)
                     # removes item from default inventory
                     self.removeItem(item, 1)
+                    return True
+                except IndexError:
+                    # Potentially use to warn the player
+                    # That there was no items to equip
+                    # Or capacity was reached
+                    return False
 
     def unequip(self, item: BaseItem) -> bool:
         self._verifyArguments(item)
 
         for slot in self.__dict__.values():
             if slot.type == item.slot_type:
+                # perventing any new/more items to be added if there was no items remove
                 if slot.removeItem(item, 1):
                     self.addItem(item, 1)
     
@@ -168,6 +182,22 @@ def main2():
     creature.addItem(bread, 3)
     pprint(creature)
 
+def main3():
+    import items
+    c1 = Creature()
+    c2 = Creature()
+
+    print(c1 == c2)
+    print(c1 is c2)
+    print(c1.head == c2.head)
+    print(c1.head is c2.head)
+    cc = items.CopperCoin()
+    c1.addItem(items.Dagger())
+    c1.addItem(cc, 8)
+    print(c1.removeItem(cc, 3))
+    print(c1.coin)
+    print(c1.inventory)
+
 
 if __name__ == '__main__':
-    main2()
+    main3()

@@ -11,20 +11,18 @@ class Slot(Container):
     type: str = None
     item_limit: int = None
     
-    def addItem(self, item: BaseItem, amount: int=1) -> bool:
+    def addItem(self, item: BaseItem, amount: int=0) -> bool:
         # Checks if there a limit or not
         if self.item_limit:
             # Check if limit was passed
             if len(self.container) >= self.item_limit: 
-                return False
+                raise IndexError(f"Exceeded Maximum Capacity of {self.item_limit}! Unable to add {item}!")
         # Adds another items if exist
         if item in self.container:
             self.container[item]['amount'] += amount
-            return True
         # Adds new item
         else:
             self.container[item] = {'amount': amount}
-            return True
 
 @dataclass()
 class Head(Slot):
@@ -74,10 +72,15 @@ def main():
     a = OneHanded()
     b = OneHanded()
     c = TwoHanded()
+    a1 = items.Bread()
+    a.addItem(a1, 2)
+
     print(a==b)
     print(a is b)
     print(a.container==b.container)
     print(a.container is b.container)
+
+
 
     print('_'*20)
     print(a == c)
