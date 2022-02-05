@@ -139,7 +139,6 @@ class HealingPotion(Consumable):
 # Currency
 @dataclass(frozen=True)
 class Coin(BaseItem):
-    purity: int = 1
     weight: int = 0.01
     slot_type: str = setting.COIN_SLOT
     sellable: bool = False
