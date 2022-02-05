@@ -1,12 +1,11 @@
-import unittest
 from creatures import Creature
 from pprint import pprint
+import unittest
+import items
 
 
 class TestCreatures(unittest.TestCase):
     def setUp(self):
-        import items
-
         self.dagger = items.Dagger()
         self.copper_coin = items.CopperCoin()
         self.bread = items.Bread()
@@ -58,10 +57,9 @@ class TestCreatures(unittest.TestCase):
         answer = {self.bread: {'amount': 6}, self.dagger: {'amount': 4}}
         self.assertDictEqual(creature.inventory.container, answer)  
 
-    
     def test_removeItem(self):
         creature = Creature()
-        
+
         # Testing when removing an item from a empty dict
         result = creature.removeItem(self.dagger)
         self.assertFalse(result)
@@ -76,8 +74,6 @@ class TestCreatures(unittest.TestCase):
         answer = {self.copper_coin: {'amount': 5}}
         self.assertDictEqual(creature.coin.container, answer)
 
-
-
     def test_equip(self):
         creature = Creature()
         # Equipping dagger that is not in inventory
@@ -85,9 +81,13 @@ class TestCreatures(unittest.TestCase):
         self.assertFalse(result)
         # Verifying that there is no items was added
         answer = {}
-        self.assertDictEqual(creature.inventory.container, answer)
-        answer = {}
+        self.assertDictEqual(creature.head.container, answer)
+        self.assertDictEqual(creature.body.container, answer)
+        self.assertDictEqual(creature.legs.container, answer)
         self.assertDictEqual(creature.one_handed.container, answer)
+        self.assertDictEqual(creature.two_handed.container, answer)
+        self.assertDictEqual(creature.inventory.container, answer)
+        self.assertDictEqual(creature.coin.container, answer)
 
         # Equipping non equipable item
         creature.addItem(self.copper_coin)
@@ -113,21 +113,122 @@ class TestCreatures(unittest.TestCase):
         answer = {self.dagger: {'amount': 1}}
         self.assertDictEqual(creature.one_handed.container, answer)
 
-
     def test_unequip(self):
-        pass
+        creature = Creature()
+
+        # Unequipping a item that doesn't exist
+        result = creature.unequip(self.dagger)
+        self.assertFalse(result)
+        # Verifying that there is no items was added
+        answer = {}
+        self.assertDictEqual(creature.head.container, answer)
+        self.assertDictEqual(creature.body.container, answer)
+        self.assertDictEqual(creature.legs.container, answer)
+        self.assertDictEqual(creature.one_handed.container, answer)
+        self.assertDictEqual(creature.two_handed.container, answer)
+        self.assertDictEqual(creature.inventory.container, answer)
+        self.assertDictEqual(creature.coin.container, answer)
+
+        creature.addItem(self.copper_coin)
+        result = creature.unequip(self.copper_coin)
+        self.assertFalse(result)
+        # Verifying that there is no items was added
+        answer = {}
+        self.assertDictEqual(creature.head.container, answer)
+        self.assertDictEqual(creature.body.container, answer)
+        self.assertDictEqual(creature.legs.container, answer)
+        self.assertDictEqual(creature.one_handed.container, answer)
+        self.assertDictEqual(creature.two_handed.container, answer)
+        self.assertDictEqual(creature.inventory.container, answer)
+        answer = {self.copper_coin: {'amount': 1}}
+        self.assertDictEqual(creature.coin.container, answer)
+        # Preparing for next test case
+        creature.removeItem(self.copper_coin)
+        
+        # Actually tesing the removal of a item
+        creature.addItem(self.dagger)
+        creature.equip(self.dagger)
+        result = creature.unequip(self.dagger)
+        self.assertTrue(result)
+        answer = {}
+        self.assertDictEqual(creature.head.container, answer)
+        self.assertDictEqual(creature.body.container, answer)
+        self.assertDictEqual(creature.legs.container, answer)
+        self.assertDictEqual(creature.one_handed.container, answer)
+        self.assertDictEqual(creature.two_handed.container, answer)
+        self.assertDictEqual(creature.coin.container, answer)
+        answer = {self.dagger: {'amount': 1}}
+        self.assertDictEqual(creature.inventory.container, answer)
 
     def test_calculateItemWorth(self):
-        pass
+        creature = Creature()
+        copper_amount = 10
+        bread_amount = 5
+        dagger_amount = 5
+        creature.addItem(self.copper_coin, copper_amount)
+        creature.addItem(self.bread, bread_amount)
+        creature.addItem(self.dagger, dagger_amount)
+        creature.equip(self.dagger)
+
+        result = creature.calculateItemWorth(self.copper_coin)
+        self.assertEqual(result, copper_amount*self.copper_coin.worth)
+
+        result = creature.calculateItemWorth(self.dagger)
+        self.assertEqual(result, dagger_amount*self.dagger.worth)
+
+        result = creature.calculateItemWorth(self.bread)
+        self.assertEqual(result, bread_amount*self.bread.worth)
 
     def test_calculateTotalWorth(self):
-        pass
+        creature = Creature()
+        copper_amount = 10
+        bread_amount = 5
+        dagger_amount = 5
+        creature.addItem(self.copper_coin, copper_amount)
+        creature.addItem(self.bread, bread_amount)
+        creature.addItem(self.dagger, dagger_amount)
+        creature.equip(self.dagger)
+
+        result = creature.calculateTotalWorth()
+        answer = (self.copper_coin.worth * copper_amount) + \
+                (self.dagger.worth * dagger_amount) + \
+                (self.bread.worth * bread_amount)
+        self.assertEqual(result, answer)
 
     def test_typeError(self):
-        pass
+        creature = Creature()
+        test_num = 2
+        test_string = 'Test'
+        test_list = [7]
+        test_dict = {"s":2}
+        test_tuple = (2, "2")
+
+        test_case = [test_num, test_string, test_list, test_dict, test_tuple, [], {}, ()]
+        for case in test_case:
+            func = creature.addItem
+            self.assertRaises(TypeError, func, case)
+            self.assertRaises(TypeError, func, (self.dagger, case))
+            func = creature.removeItem
+            self.assertRaises(TypeError, func, case)
+            self.assertRaises(TypeError, func, (self.dagger, case))
+            func = creature.equip
+            self.assertRaises(TypeError, func, case)
+            func = creature.unequip
+            self.assertRaises(TypeError, func, case)
+            func = creature.calculateItemWorth
+            self.assertRaises(TypeError, func, case)
+            func = creature.calculateTotalWorth
+            self.assertRaises(TypeError, func, case)
 
     def test_valueError(self):
-        pass
+        creature = Creature()
+        test_case = -32
+
+        func = creature.addItem
+        self.assertRaises(TypeError, func, (self.dagger, test_case))
+        func = creature.removeItem
+        self.assertRaises(TypeError, func, (self.dagger, test_case))
+
 
 def suite():
     suite = unittest.TestSuite()

@@ -18,6 +18,7 @@ class Creature():
 
     def _verifyArguments(self, item=None, amount=None):
         # Verifys if Arguments are enter correctly 
+
         if item:
             if not isinstance(item, BaseItem):
                 raise TypeError(f'The item argument requires to be a BaseItem Object, not a {type(item)}!')
@@ -26,7 +27,8 @@ class Creature():
                 raise TypeError(f'The amount argurment requires to be a intger, not a {type(amount)}!')
             if amount < 0:
                 raise ValueError("The amount argurment can't be an negative real number!")
-
+        if type(item) in [list, dict, tuple] or type(amount) in [list, dict, tuple]:
+            raise TypeError(f"Arguments can't be a empty List, Dictionary or Tuple")
 
     def addItem(self, item: BaseItem, amount: int=1):
         self._verifyArguments(item, amount)
@@ -69,10 +71,14 @@ class Creature():
         self._verifyArguments(item)
 
         for slot in self.__dict__.values():
+            # Slots to Ignore 
+            if slot.type in [setting.MISC_SLOT, setting.COIN_SLOT]: continue
             if slot.type == item.slot_type:
                 # perventing any new/more items to be added if there was no items remove
                 if slot.removeItem(item, 1):
                     self.addItem(item, 1)
+                    return True
+        return False
     
     def calculateItemWorth(self, item):
         self._verifyArguments(item)
@@ -80,6 +86,8 @@ class Creature():
         # Calcuates the total worth for the item, regarding where it is on the "Creature"
         worth = 0
         for slot in self.__dict__.values():
+            # Verify a slot is a slot type
+            if not isinstance(slot, slots.Slot): continue
             # Checks if item in the inventory or if equipped
             if item.slot_type == slot.type or slot.type == setting.MISC_SLOT:
                 worth += slot.calculateItemWorth(item)

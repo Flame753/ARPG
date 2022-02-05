@@ -27,10 +27,12 @@ class Container(ABC):
     def calculateItemWeight(self, item):
         if item in self.container:
             return item.weight * self.container[item]['amount']
+        return 0
 
     def calculateItemWorth(self, item):
         if item in self.container:
             return item.worth * self.container[item]['amount']
+        return 0
 
     def calculateTotalWeight(self):
         weight = 0
@@ -52,15 +54,20 @@ def main():
     print(i == i2)
     print(i is i2)
 
-    print(i.container)
+    # print(i.container)
     a = items.Bread()
     b = items.Bread()
     c = items.Bread()
     i.addItem(a, 2)
-    print(i.container)
 
-    print(a, b, c)
-    print(a, b, c)
+    print(i == i2)
+    print(i is i2)
+    # print(i.container)
+
+    # print(a, b, c)
+    # print(a, b, c)
+
+
 
 
 
