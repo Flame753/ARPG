@@ -1,7 +1,20 @@
-from creatures import Creature
+# Standard library imports 
 from pprint import pprint
 import unittest
-import items
+import os
+import sys
+
+# Added Local Path
+TEST_DIR = os.path.dirname(__file__)
+print(TEST_DIR)
+SRC_DIR = "..\Game"
+sys.path.insert(0, os.path.abspath(os.path.join(TEST_DIR, SRC_DIR)))
+print(os.path.join(TEST_DIR, SRC_DIR))
+
+# Local application imports
+from creatures import Creature
+import items as items
+
 
 
 class TestCreatures(unittest.TestCase):

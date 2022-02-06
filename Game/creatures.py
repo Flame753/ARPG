@@ -1,6 +1,5 @@
-from optparse import AmbiguousOptionError
-from items import BaseItem
 from dataclasses import dataclass, field
+from items import BaseItem
 import slots
 import setting
 
@@ -18,7 +17,6 @@ class Creature():
 
     def _verifyArguments(self, item=None, amount=None):
         # Verifys if Arguments are enter correctly 
-
         if item:
             if not isinstance(item, BaseItem):
                 raise TypeError(f'The item argument requires to be a BaseItem Object, not a {type(item)}!')
