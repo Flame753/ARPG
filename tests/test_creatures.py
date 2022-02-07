@@ -1,20 +1,10 @@
 # Standard library imports 
 from pprint import pprint
 import unittest
-import os
-import sys
-
-# Added Local Path
-TEST_DIR = os.path.dirname(__file__)
-print(TEST_DIR)
-SRC_DIR = "..\Game"
-sys.path.insert(0, os.path.abspath(os.path.join(TEST_DIR, SRC_DIR)))
-print(os.path.join(TEST_DIR, SRC_DIR))
 
 # Local application imports
-from creatures import Creature
-import items as items
-
+from context import items
+from context import creatures
 
 
 class TestCreatures(unittest.TestCase):
@@ -24,8 +14,8 @@ class TestCreatures(unittest.TestCase):
         self.bread = items.Bread()
 
     def test_class_initializer(self):
-        creature_A = Creature()
-        creature_B = Creature()
+        creature_A = creatures.Creature()
+        creature_B = creatures.Creature()
 
         self.assertEqual(creature_A, creature_B)
         self.assertFalse(creature_A is creature_B)
@@ -52,7 +42,7 @@ class TestCreatures(unittest.TestCase):
         self.assertFalse(creature_A.coin is creature_B.coin)
 
     def test_addItem(self):
-        creature = Creature()
+        creature = creatures.Creature()
 
         creature.addItem(self.dagger)
         answer = {self.dagger: {'amount': 1}}
@@ -71,7 +61,7 @@ class TestCreatures(unittest.TestCase):
         self.assertDictEqual(creature.inventory.container, answer)  
 
     def test_removeItem(self):
-        creature = Creature()
+        creature = creatures.Creature()
 
         # Testing when removing an item from a empty dict
         result = creature.removeItem(self.dagger)
@@ -88,7 +78,7 @@ class TestCreatures(unittest.TestCase):
         self.assertDictEqual(creature.coin.container, answer)
 
     def test_equip(self):
-        creature = Creature()
+        creature = creatures.Creature()
         # Equipping dagger that is not in inventory
         result = creature.equip(self.dagger)
         self.assertFalse(result)
@@ -127,7 +117,7 @@ class TestCreatures(unittest.TestCase):
         self.assertDictEqual(creature.one_handed.container, answer)
 
     def test_unequip(self):
-        creature = Creature()
+        creature = creatures.Creature()
 
         # Unequipping a item that doesn't exist
         result = creature.unequip(self.dagger)
@@ -174,7 +164,7 @@ class TestCreatures(unittest.TestCase):
         self.assertDictEqual(creature.inventory.container, answer)
 
     def test_calculateItemWorth(self):
-        creature = Creature()
+        creature = creatures.Creature()
         copper_amount = 10
         bread_amount = 5
         dagger_amount = 5
@@ -193,7 +183,7 @@ class TestCreatures(unittest.TestCase):
         self.assertEqual(result, bread_amount*self.bread.worth)
 
     def test_calculateTotalWorth(self):
-        creature = Creature()
+        creature = creatures.Creature()
         copper_amount = 10
         bread_amount = 5
         dagger_amount = 5
@@ -209,7 +199,7 @@ class TestCreatures(unittest.TestCase):
         self.assertEqual(result, answer)
 
     def test_typeError(self):
-        creature = Creature()
+        creature = creatures.Creature()
         test_num = 2
         test_string = 'Test'
         test_list = [7]
@@ -234,7 +224,7 @@ class TestCreatures(unittest.TestCase):
             self.assertRaises(TypeError, func, case)
 
     def test_valueError(self):
-        creature = Creature()
+        creature = creatures.Creature()
         test_case = -32
 
         func = creature.addItem
