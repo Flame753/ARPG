@@ -49,6 +49,7 @@ class Creature():
         self._verifyArguments(item)
         # Verifying if there is an item to equip
         if not item in self.inventory.container:
+            # No items to equip
             return False
         for slot in self.__dict__.values():
             # Finds proper slot for item
@@ -56,14 +57,13 @@ class Creature():
                 try:
                     # Adds item and checks if item was added
                     slot.addItem(item, 1)
-                    # removes item from default inventory
+                except IndexError:
+                    # Capacity was reached
+                    return False
+                else:
+                     # removes item from default inventory
                     self.removeItem(item, 1)
                     return True
-                except IndexError:
-                    # Potentially use to warn the player
-                    # That there was no items to equip
-                    # Or capacity was reached
-                    return False
 
     def unequip(self, item: BaseItem) -> bool:
         self._verifyArguments(item)
