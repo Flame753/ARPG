@@ -45,15 +45,14 @@ class TestCreatures(unittest.TestCase):
         self.assertRaises(TypeError, h_func.span, 2, 2, (2, 2))
         self.assertRaises(TypeError, h_func.span, 2, 2, {'s': 2})
 
-    def test_span_indexError(self):
-        self.assertRaises(IndexError, h_func.span, 2, (6, 2, 6))
-        self.assertRaises(IndexError, h_func.span, 2, (6,))
-
     def test_span_valueError(self):
         self.assertRaises(ValueError, h_func.span, 2, (6, "2"))
         self.assertRaises(ValueError, h_func.span, 2, (6, True))
         self.assertRaises(ValueError, h_func.span, 2, ("2", 7))
         self.assertRaises(ValueError, h_func.span, 2, (True, 7))
+
+        self.assertRaises(ValueError, h_func.span, 2, (6, 2, 6))
+        self.assertRaises(ValueError, h_func.span, 2, (6,))
 
 
 

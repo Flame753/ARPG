@@ -13,12 +13,10 @@ def span(base_number: int, spread, negative: bool=False):
             return (max(0, base_number-spread), base_number+spread)
 
     if type(spread) == tuple:
-        if not len(spread) == 2:
-            raise IndexError(f"The 'spread' argurment as a {type(spread)}, requeres only 2 numbers!")
-        # Determining if all 2 value are numbers in tuple
+        # Determining if all *2* values, are numbers in tuple
         result = [True for value in spread if type(value) in (int, float)]
         if len(result) != 2:
-            raise ValueError(f"The values in the spread arn't numbers!")
+            raise ValueError(f"The 'spread' argurment as a {type(spread)}, requeres only 2 numbers!")
         if negative:
             return (base_number-spread[0], base_number+spread[1])
         else:
