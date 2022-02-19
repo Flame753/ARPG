@@ -14,9 +14,9 @@ class Player(Creature):
         self.max_hp = 100
         self.victory = False
 
-        self.addItem(items.Dagger())
-        self.addItem(items.Bread())
-        self.addItem(items.SilverCoin(), 3)
+        self.inventory.addItem(items.Dagger())
+        self.inventory.addItem(items.Bread())
+        self.inventory.addItem(items.SilverCoin(), 3)
         # self.addItem(items.CoinPouch(sellable=False))
 
 

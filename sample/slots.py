@@ -242,7 +242,6 @@ class Inventory(Container):
 
 
 
-
 def main():
     import items
     a = OneHanded()
