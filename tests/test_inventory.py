@@ -53,7 +53,6 @@ class TestInventory(unittest.TestCase):
         self.assertEqual(result_A, result_B)
         self.assertFalse(result_A is result_B)
 
-    
     def test_addItem(self):
         inventory = slots.Inventory()
 
@@ -285,6 +284,22 @@ class TestInventory(unittest.TestCase):
                 (self.dagger.worth * dagger_amount) + \
                 (self.bread.worth * bread_amount)
         self.assertEqual(result, answer)
+
+    def test_isEmpty(self):
+        inventory = slots.Inventory()
+        self.assertTrue(inventory.isEmpty())
+
+        inventory.addItem(self.dagger)
+        self.assertFalse(inventory.isEmpty())
+
+        inventory.equip(self.dagger)
+        self.assertFalse(inventory.isEmpty())
+
+        inventory.unequip(self.dagger)
+        self.assertFalse(inventory.isEmpty())
+
+        inventory.removeItem(self.dagger)
+        self.assertTrue(inventory.isEmpty())
 
     def test_typeError(self):
         inventory = slots.Inventory()

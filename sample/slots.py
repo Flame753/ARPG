@@ -236,6 +236,11 @@ class Inventory(Container):
             worth += slot.calculateTotalWorth()
         return worth
 
+    def isEmpty(self):
+        check = [True for slot in self.container.values() if slot.container]
+        return not bool(check)
+
+
 
 
 def main():
@@ -246,20 +251,10 @@ def main():
     a1 = items.Bread()
     a.addItem(a1, 2)
 
-    print(a==b)
-    print(a is b)
-    print(a.container==b.container)
-    print(a.container is b.container)
-
-
-
-    print('_'*20)
-    print(a == c)
-    print(a is c , "here")
-    print(a.container==c.container)
-    print(a.container is c.container)
-
-    Inventory()
+    i = Inventory()
+    print('test', i.isEmpty())
+    i.addItem(items.Dagger())
+    print('test', i.isEmpty())
 
 
 if __name__ == "__main__":
