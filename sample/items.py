@@ -51,14 +51,14 @@ class Rock(OneHandedWeapon):
 @dataclass(frozen=True)
 class Dagger(OneHandedWeapon):
     name: str = 'Dagger'
-    worth: int = 1
+    worth: int = 20
     weight: int = 1
     damage: int = 5
 
 @dataclass(frozen=True)
 class Sword(OneHandedWeapon):
     name: str = 'Sword'
-    worth: int = 1
+    worth: int = 50
     weight: int = 1
     damage: int = 5
 
