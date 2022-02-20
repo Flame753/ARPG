@@ -34,7 +34,6 @@ class Container(ABC):
     def calculateTotalWorth(self):
         pass
 
-
 @dataclass()
 class Slot(Container):
     type: str = None
@@ -85,9 +84,6 @@ class Slot(Container):
         for item, data in self.items.items():
             worth += item.worth * data['amount']
         return worth
-
-    def isEmpty(self):
-        return not bool(self.items)
 
 @dataclass()
 class Head(Slot):

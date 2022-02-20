@@ -4,6 +4,14 @@ import slots
 import setting
 
 
+class EquippedItemRemovealError(Exception):
+    """Exception raised for not unequipped existing item before removing the item."""
+    
+    def __init__(self, message="Item was attempted to be removed, before being unequipped!"):
+        self.message = message
+        super().__init__(self.message)
+
+
 @dataclass() 
 class Creature():
     def __init__(self):
@@ -42,6 +50,8 @@ class Creature():
     def removeItem(self, item: BaseItem, amount: int=1) -> bool:
         self._verifyArguments(item, amount)
 
+        if self.isItemEquipped(item): raise EquippedItemRemovealError
+
         if item.slot_type == setting.COIN_SLOT:
             return self.coin_pouch.removeItem(item, amount)
         else:
@@ -53,28 +63,39 @@ class Creature():
         if not item in self.inventory.items:
             # No items to equip
             return False
-        for slot in self.__dict__.values():
-            # Finds proper slot for item
-            if slot.type == item.slot_type:
-                try:
-                    # Adds item and checks if item was added
-                    slot.addItem(item, 1)
-                    return True
-                except IndexError:
-                    # Capacity was reached
-                    return False
+        slot = self._findSlot(item)
+        if not slot: return False
+        try:
+            # Adds item and checks if item was added
+            slot.addItem(item, 1)
+            return True
+        except IndexError:
+            # Capacity was reached
+            return False
 
     def unequip(self, item: BaseItem) -> bool:
         self._verifyArguments(item)
 
+        slot = self._findSlot(item)
+        if not slot: return False
+        if slot.removeItem(item, 1):
+            return True
+        return False
+
+    def isItemEquipped(self, item: BaseItem) -> bool:
+        slot = self._findSlot(item)
+        if not slot: return False
+        if item in slot.items: return True
+        return False
+    
+    def _findSlot(self, item: BaseItem):
         for slot in self.__dict__.values():
             # Slots to Ignore 
             if slot.type in [setting.MISC_SLOT, setting.COIN_SLOT]: continue
-            if slot.type == item.slot_type:
-                # perventing any new/more items to be added if there was no items remove
-                if slot.removeItem(item, 1):
-                    return True
-        return False
+            # Not found the proper slot for item
+            if slot.type != item.slot_type: continue
+            return slot
+
     
     def calculateItemWorth(self, item):
         self._verifyArguments(item)
@@ -95,13 +116,18 @@ class Creature():
 
 def main():
     import items
-    h = Creature()
+    c = Creature()
 
     d = items.Dagger()
     b = items.Bread()
+    c.addItem(b)
+    print(c.equip(b))
+    print(c.inventory.items)
+    print(c.unequip(b))
+    print(b.slot_type)
 
 
 
 
 if __name__ == '__main__':
-    pass
+    main()

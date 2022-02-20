@@ -87,6 +87,7 @@ class TestCreature(unittest.TestCase):
         answer = {self.copper_coin: {'amount': 5}}
         self.assertDictEqual(result, answer) 
 
+
     def test_equip(self):
         creature = creatures.Creature()
         # Equipping dagger that is not in creature
@@ -158,6 +159,11 @@ class TestCreature(unittest.TestCase):
         answer = {self.dagger: {'amount': 1}}
         result = creature.one_handed.items
         self.assertDictEqual(result, answer) 
+
+        # equipping a non equipable item
+        creature.addItem(self.bread)
+        result = creature.equip(self.bread)
+        self.assertFalse(result)
 
     def test_unequip(self):
         creature = creatures.Creature()
@@ -280,7 +286,6 @@ class TestCreature(unittest.TestCase):
                 (self.bread.worth * bread_amount)
         self.assertEqual(result, answer)
 
-
     def test_typeError(self):
         creature = creatures.Creature()
         test_num = 2
@@ -314,6 +319,13 @@ class TestCreature(unittest.TestCase):
         self.assertRaises(TypeError, func, (self.dagger, test_case))
         func = creature.removeItem
         self.assertRaises(TypeError, func, (self.dagger, test_case))
+
+    def test_EquippedItemRemovealError(self):
+        creature = creatures.Creature()
+        # Tesing after removing item from inventory item should not exist in equipment slot
+        creature.addItem(self.dagger)
+        creature.equip(self.dagger)
+        self.assertRaises(creatures.EquippedItemRemovealError, creature.removeItem, self.dagger)
 
 
 def suite():
