@@ -17,10 +17,10 @@ class Trader(NonPlayableCharacter):
         super().__init__(name="Trader", **kwargs)
 
         # self.addItem(items.CoinPouch(sellable=False), 2)
-        self.inventory.addItem(items.GoldCoin(), 100)
+        self.addItem(items.GoldCoin(), 100)
         # self.addItem(items.Backpack(sellable=False))
-        self.inventory.addItem(items.Bread(), 4)
-        self.inventory.addItem(items.HealingPotion(), 2)
+        self.addItem(items.Bread(), 4)
+        self.addItem(items.HealingPotion(), 2)
 
 if __name__ == "__main__":
     t = Trader()

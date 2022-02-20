@@ -49,22 +49,22 @@ class TestCreature(unittest.TestCase):
         creature = creatures.Creature()
 
         creature.addItem(self.dagger)
-        result = creature.inventory.items
+        result = creature.inventory.container
         answer = {self.dagger: {'amount': 1}}
         self.assertDictEqual(result, answer) 
 
         creature.addItem(self.copper_coin, 2)
-        result = creature.coin_pouch.items
+        result = creature.coin_pouch.container
         answer = {self.copper_coin: {'amount': 2}}
         self.assertDictEqual(result, answer) 
 
         creature.addItem(self.bread, 6)
-        result = creature.inventory.items
+        result = creature.inventory.container
         answer = {self.bread: {'amount': 6}, self.dagger: {'amount': 1}}
         self.assertDictEqual(result, answer) 
 
         creature.addItem(self.dagger, 3)
-        result = creature.inventory.items
+        result = creature.inventory.container
         answer = {self.bread: {'amount': 6}, self.dagger: {'amount': 4}}
         self.assertDictEqual(result, answer) 
 
@@ -77,13 +77,13 @@ class TestCreature(unittest.TestCase):
  
         creature.addItem(self.dagger)
         creature.removeItem(self.dagger)
-        result = creature.inventory.items
+        result = creature.inventory.container
         answer = {}
         self.assertDictEqual(result, answer) 
 
         creature.addItem(self.copper_coin, 8)
         creature.removeItem(self.copper_coin, 3)
-        result = creature.coin_pouch.items
+        result = creature.coin_pouch.container
         answer = {self.copper_coin: {'amount': 5}}
         self.assertDictEqual(result, answer) 
 
@@ -93,58 +93,58 @@ class TestCreature(unittest.TestCase):
         # Equipping dagger that is not in creature
         result = creature.equip(self.dagger)
         self.assertFalse(result)
-        # Verifying that there is no items was added
+        # Verifying that there is no container was added
         answer = {}
-        result = creature.helmet.items
+        result = creature.helmet.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.chest.items
+        result = creature.chest.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.legs.items
+        result = creature.legs.container
         self.assertDictEqual(result, answer)
 
-        result = creature.boots.items
+        result = creature.boots.container
         self.assertDictEqual(result, answer)
 
-        result = creature.one_handed.items
+        result = creature.one_handed.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.two_handed.items
+        result = creature.two_handed.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.inventory.items
+        result = creature.inventory.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.coin_pouch.items
+        result = creature.coin_pouch.container
         self.assertDictEqual(result, answer) 
 
         # Equipping non equipable item
         creature.addItem(self.copper_coin)
         result = creature.equip(self.copper_coin)
         self.assertFalse(result)
-        # Verifying that there is no items was added
+        # Verifying that there is no container was added
         answer = {self.copper_coin: {'amount': 1}}
-        result = creature.coin_pouch.items
+        result = creature.coin_pouch.container
         self.assertDictEqual(result, answer) 
 
         answer = {}
-        result = creature.helmet.items
+        result = creature.helmet.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.chest.items
+        result = creature.chest.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.legs.items
+        result = creature.legs.container
         self.assertDictEqual(result, answer)
 
-        result = creature.one_handed.items
+        result = creature.one_handed.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.two_handed.items
+        result = creature.two_handed.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.inventory.items
+        result = creature.inventory.container
         self.assertDictEqual(result, answer) 
 
 
@@ -153,11 +153,11 @@ class TestCreature(unittest.TestCase):
         result = creature.equip(self.dagger)
         self.assertTrue(result)
         answer = {self.dagger: {'amount': 1}}
-        result = creature.inventory.items
+        result = creature.inventory.container
         self.assertDictEqual(result, answer)
 
         answer = {self.dagger: {'amount': 1}}
-        result = creature.one_handed.items
+        result = creature.one_handed.container
         self.assertDictEqual(result, answer) 
 
         # equipping a non equipable item
@@ -171,54 +171,54 @@ class TestCreature(unittest.TestCase):
         # Unequipping a item that doesn't exist
         result = creature.unequip(self.dagger)
         self.assertFalse(result)
-        # Verifying that there is no items was added
+        # Verifying that there is no container was added
         answer = {}
-        result = creature.helmet.items
+        result = creature.helmet.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.chest.items
+        result = creature.chest.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.legs.items
+        result = creature.legs.container
         self.assertDictEqual(result, answer)
 
-        result = creature.one_handed.items
+        result = creature.one_handed.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.two_handed.items
+        result = creature.two_handed.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.inventory.items
+        result = creature.inventory.container
         self.assertDictEqual(result, answer)
     
-        result = creature.coin_pouch.items
+        result = creature.coin_pouch.container
         self.assertDictEqual(result, answer) 
 
         creature.addItem(self.copper_coin)
         result = creature.unequip(self.copper_coin)
         self.assertFalse(result)
-        # Verifying that there is no items was added
+        # Verifying that there is no container was added
         answer = {}
-        result = creature.helmet.items
+        result = creature.helmet.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.chest.items
+        result = creature.chest.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.legs.items
+        result = creature.legs.container
         self.assertDictEqual(result, answer)
 
-        result = creature.one_handed.items
+        result = creature.one_handed.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.two_handed.items
+        result = creature.two_handed.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.inventory.items
+        result = creature.inventory.container
         self.assertDictEqual(result, answer)
 
         answer = {self.copper_coin: {'amount': 1}}
-        result = creature.coin_pouch.items
+        result = creature.coin_pouch.container
         self.assertDictEqual(result, answer) 
         # Preparing for next test case
         creature.removeItem(self.copper_coin)
@@ -229,26 +229,26 @@ class TestCreature(unittest.TestCase):
         result = creature.unequip(self.dagger)
         self.assertTrue(result)
         answer = {}
-        result = creature.helmet.items
+        result = creature.helmet.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.chest.items
+        result = creature.chest.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.legs.items
+        result = creature.legs.container
         self.assertDictEqual(result, answer)
 
-        result = creature.one_handed.items
+        result = creature.one_handed.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.two_handed.items
+        result = creature.two_handed.container
         self.assertDictEqual(result, answer) 
 
-        result = creature.coin_pouch.items
+        result = creature.coin_pouch.container
         self.assertDictEqual(result, answer)
          
         answer = {self.dagger: {'amount': 1}}
-        result = creature.inventory.items
+        result = creature.inventory.container
         self.assertDictEqual(result, answer)
 
     def test_calculateItemWorth(self):

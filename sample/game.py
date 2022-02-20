@@ -26,7 +26,7 @@ def get_available_actions(room, player):
     """
     actions = OrderedDict()
     print("Choose an action: ")
-    if player.inventory.items or player.coin_pouch.items:
+    if player.inventory.container or player.coin_pouch.container:
         action_adder(actions, 'i', player.print_inventory, "Print Inventory")
     if isinstance(room, world.TraderTile):
         action_adder(actions, 't', player.trade, "Trade")

@@ -2,6 +2,7 @@ from creatures import Creature
 import setting
 import items
 import world
+from pprint import pprint
 
 
 
@@ -14,9 +15,9 @@ class Player(Creature):
         self.max_hp = 100
         self.victory = False
 
-        self.inventory.addItem(items.Dagger())
-        self.inventory.addItem(items.Bread())
-        self.inventory.addItem(items.SilverCoin(), 3)
+        self.addItem(items.Dagger())
+        self.addItem(items.Bread())
+        self.addItem(items.SilverCoin(), 3)
         # self.addItem(items.CoinPouch(sellable=False))
 
 
@@ -38,7 +39,7 @@ class Player(Creature):
 
     def print_inventory(self):
         print("Inventory:")
-        for item, amount in self.getAllItems():
+        for item, amount in self.inventory.container.items():
             if isinstance(item, items.Coin): continue
             amount = amount['amount']
             print(f'* {amount} {item}')
@@ -46,20 +47,15 @@ class Player(Creature):
         print(f"Your best weapon is your {best_weapon}")
 
         print("Coins:")
-        self.getSlot(setting.COIN_SLOT).order()
-        for coin, amount in self.getSlot(setting.COIN_SLOT).inventory.items():
+        for coin, amount in self.coin_pouch.container.items():
             amount = amount['amount']
             print(f'* {amount} {coin}')
 
     def most_powerful_weapon(self):
         max_damage = 0
         best_weapon = None
-        one_hand = self.getSlot(setting.ONE_HANDED_SLOT)
-        two_hands = self.getSlot(setting.TWO_HANDED_SLOT)
-        misc = self.getSlot(setting.MISC_SLOT)
-        # for slot in misc:
-        for item in misc.inventory.keys():
-            print(item)
+        for item in self.inventory.container.keys():
+            if not hasattr(item, 'damage'): continue
             if item.damage > max_damage:
                 best_weapon = item
                 max_damage = item.damage
@@ -77,7 +73,8 @@ class Player(Creature):
             print(f"{enemy.name} HP is {enemy.hp}.")
 
     def heal(self):
-        consumables = [(item, amount['amount']) for item, amount in self.getSlot(setting.MISC_SLOT).items() if isinstance(item, items.Consumable)]
+        consumables = [(item, amount['amount']) for item, amount in self.inventory.container.items() if isinstance(item, items.Consumable)]
+        print(consumables)
         if not consumables:
             print("You don't have any items to heal you!")
             return
@@ -120,13 +117,11 @@ def main():
     #     return player
     world.parse_world_dsl()
     player = Player()
-    best = player.most_powerful_weapon()
-    print(best)
-    player.print_inventory()
-    # p = GeneratePlayer()
-    # p.heal()
-    # p.heal()
-    # print(p.bag.inventory)
+    # best = player.most_powerful_weapon()
+    # print(best)
+    # player.print_inventory()
+    pprint(player.inventory.container)
+    pprint(player.coin_pouch.container)
 
 
 if __name__ == "__main__":

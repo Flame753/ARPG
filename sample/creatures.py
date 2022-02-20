@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from items import BaseItem
 import slots
 import setting
+from pprint import pprint
 
 
 class EquippedItemRemovealError(Exception):
@@ -60,7 +61,7 @@ class Creature():
     def equip(self, item: BaseItem) -> bool:
         self._verifyArguments(item)
         # Verifying if there is an item to equip
-        if not item in self.inventory.items:
+        if not item in self.inventory.container:
             # No items to equip
             return False
         slot = self._findSlot(item)
@@ -85,12 +86,13 @@ class Creature():
     def isItemEquipped(self, item: BaseItem) -> bool:
         slot = self._findSlot(item)
         if not slot: return False
-        if item in slot.items: return True
+        if item in slot.container: return True
         return False
     
     def _findSlot(self, item: BaseItem):
         for slot in self.__dict__.values():
             # Slots to Ignore 
+            if not isinstance(slot, slots.Slot):continue
             if slot.type in [setting.MISC_SLOT, setting.COIN_SLOT]: continue
             # Not found the proper slot for item
             if slot.type != item.slot_type: continue
@@ -122,7 +124,7 @@ def main():
     b = items.Bread()
     c.addItem(b)
     print(c.equip(b))
-    print(c.inventory.items)
+    print(c.inventory.container)
     print(c.unequip(b))
     print(b.slot_type)
 

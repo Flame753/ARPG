@@ -80,11 +80,9 @@ class TraderTile(MapTile):
     def __init__(self, x, y):
         super().__init__(x, y)
         self.trader = npc.Trader()
-        self.base_price = items.SilverCoin()
     
     def trade(self, buyer, seller):
         selling_list = {}
-        base_price_name = self.base_price.name.split() 
         
         while True:
             seller_items = [(item, amount['amount']) for item, amount in self.sellableItems(seller)]
@@ -92,7 +90,7 @@ class TraderTile(MapTile):
                 # Creating item list that can be traded
                 selling_list.update({str(i): item[0]})
                 # Listing seller's items for sale
-                print(f'{i}. {item[1]} {item[0].name} - {item[0].worth} {base_price_name[0]}')
+                print(f'{i}. {item[1]} {item[0].name} - {item[0].worth} copper')
 
             user_input = input("Choose an item or press Q to exit: ")
             if user_input in ['Q', 'q']: 
@@ -116,7 +114,7 @@ class TraderTile(MapTile):
             return
 
         # Verifying that the buyer has enough cash to buy the item
-        if (item.worth * self.base_price.worth) > buyer.getSlot(setting.COIN_SLOT).calculateTotalWorth():
+        if item.worth > buyer.coin_pouch.calculateTotalWorth():
             print("That's too expensive")
             return
 
@@ -139,8 +137,8 @@ class TraderTile(MapTile):
         # Prints the player's coins
         def display_coins(player):
             print('You currenlty have;')
-            player.getSlot(setting.COIN_SLOT).order()
-            for coin, amount in player.getSlot(setting.COIN_SLOT).inventory.items():
+            player.coin_pouch.order()
+            for coin, amount in player.coin_pouch.container.items():
                 amount = amount['amount']
                 print(f'    {amount} {coin}')
 
@@ -155,7 +153,7 @@ class TraderTile(MapTile):
     def sellableItems(self, seller):
         # Returns a list of value items that can be sold
             items = list()
-            for item, amount in seller.getAllItems():
+            for item, amount in seller.inventory.container.items():
                 if not item.sellable: continue
                 items.append((item, amount))
             return items
@@ -173,12 +171,12 @@ class TraderTile(MapTile):
     #     return False
 
     def transaction(self, seller, buyer, item):
-        price = item.worth * self.base_price.worth
-        buyer_weight = buyer.getSlot(setting.COIN_SLOT).calculateTotalWorth()
+        price = item.worth
+        buyer_weight = buyer.coin_pouch.calculateTotalWorth()
 
         if not isinstance(seller, npc.NonPlayableCharacter):
             # Player is the seller
-            seller.addItem(self.base_price, item.worth)
+            seller.addItem(items.CopperCoin(), item.worth)
             return True
         else:
             # Playser is the buyer
@@ -255,7 +253,7 @@ class FindCoinTile(MapTile):
         #         print(f"You have picked {self.amount} {self.coin}s.")
             
         if not self.coins_claimed:
-            player.getSlot(setting.COIN_SLOT).addItem(self.coin, self.amount)
+            player.coin_pouch.addItem(self.coin, self.amount)
             print(f"You have picked {self.amount} {self.coin}s.")
             self.coins_claimed = True
 
@@ -360,12 +358,12 @@ def main():
     c = items.CopperCoin()
     g = items.GoldCoin()
     t = TraderTile(1, 1)
-    print(t.exchange(9, c, s))
-    print(t.exchange(11, c, s))
-    print(t.exchange(3, s, c))
-    print(t.exchange(9, s, g))
-    print(t.exchange(11, s, g))
-    print(t.exchange(3, g, s))
+    # print(t.exchange(9, c, s))
+    # print(t.exchange(11, c, s))
+    # print(t.exchange(3, s, c))
+    # print(t.exchange(9, s, g))
+    # print(t.exchange(11, s, g))
+    # print(t.exchange(3, g, s))
 
 
 if __name__ == '__main__':

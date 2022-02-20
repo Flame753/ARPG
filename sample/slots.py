@@ -8,7 +8,7 @@ import setting
 
 @dataclass
 class Container(ABC):
-    items: dict = field(default_factory=dict, init=False)
+    container: dict = field(default_factory=dict, init=False)
     
     @abstractmethod
     def addItem(self, item, amount=0):
@@ -43,45 +43,45 @@ class Slot(Container):
         # Checks if there a limit or not
         if self.item_limit:
             # Check if limit was passed
-            if len(self.items) >= self.item_limit: 
+            if len(self.container) >= self.item_limit: 
                 raise IndexError(f"Exceeded Maximum Capacity of {self.item_limit}! Unable to add {item}!")
         # Adds another items if exist
-        if item in self.items:
-            self.items[item]['amount'] += amount
+        if item in self.container:
+            self.container[item]['amount'] += amount
         # Adds new item
         else:
-            self.items[item] = {'amount': amount}
+            self.container[item] = {'amount': amount}
     
     def removeItem(self, item, amount = 0):
-        if item in self.items:
-            if self.items[item]['amount'] >= amount:
-                self.items[item]['amount'] -= amount
-                if self.items[item]['amount'] == 0:
-                    del(self.items[item])
+        if item in self.container:
+            if self.container[item]['amount'] >= amount:
+                self.container[item]['amount'] -= amount
+                if self.container[item]['amount'] == 0:
+                    del(self.container[item])
                 return True
         return False
 
     def calculateItemWeight(self, item):
         raise NotImplementedError()
-        if item in self.items:
-            return item.weight * self.items[item]['amount']
+        if item in self.container:
+            return item.weight * self.container[item]['amount']
         return 0
 
     def calculateItemWorth(self, item):
-        if item in self.items:
-            return item.worth * self.items[item]['amount']
+        if item in self.container:
+            return item.worth * self.container[item]['amount']
         return 0
 
     def calculateTotalWeight(self):
         raise NotImplementedError()
         weight = 0
-        for item, data in self.items.items():
+        for item, data in self.container.items():
             weight += item.weight * data['amount']
         return weight
 
     def calculateTotalWorth(self):
         worth = 0
-        for item, data in self.items.items():
+        for item, data in self.container.items():
             worth += item.worth * data['amount']
         return worth
 
@@ -119,6 +119,15 @@ class TwoHanded(Slot):
 class Coins(Slot):
     type: str = setting.COIN_SLOT
 
+    def order(self) -> list:
+        # Puts the container from largest worth to smallest
+        coins = list(self.container.items())
+        worth = lambda coin: coin[0].worth
+        coins.sort(key=worth)  # Sort function only works with a list type
+        ordict = dict(coins)
+        self.container.clear()
+        self.container.update(ordict)
+
 @dataclass()
 class Miscellaneous(Slot):
     type: str = setting.MISC_SLOT
@@ -133,10 +142,6 @@ def main():
     a1 = items.Bread()
     a.addItem(a1, 2)
 
-    # i = Inventory()
-    # print('test', i.isEmpty())
-    # i.addItem(items.Dagger())
-    # print('test', i.isEmpty())
 
 
 
