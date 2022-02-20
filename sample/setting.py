@@ -2,6 +2,7 @@
 HEAD_SLOT = 'Head'
 BODY_SLOT = 'Body'
 LEGS_SLOT = 'Legs'
+BOOTS_SLOT = 'Boots'
 ONE_HANDED_SLOT = 'One Handed'
 TWO_HANDED_SLOT = 'Two Handed'
 COIN_SLOT = 'Coin'
