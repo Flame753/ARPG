@@ -12,6 +12,18 @@ class EquippedItemRemovealError(Exception):
         self.message = message
         super().__init__(self.message)
 
+# class UnequippableError(Exception):
+#     """Exception raised for attempting to equip or unequip an item to a unequippable slot."""
+    
+#     def __init__(self, message="test g"):
+#         self.message = message
+#         super().__init__(self.message)
+
+
+def _isSlotEquippable(slot: slots.Slot) -> bool:
+    return True if slot.item_limit else False
+    
+
 
 @dataclass() 
 class Creature():
@@ -51,7 +63,7 @@ class Creature():
     def removeItem(self, item: BaseItem, amount: int=1) -> bool:
         self._verifyArguments(item, amount)
 
-        if self.isItemEquipped(item): raise EquippedItemRemovealError
+        if self._isItemEquipped(item): raise EquippedItemRemovealError
 
         if item.slot_type == setting.COIN_SLOT:
             return self.coin_pouch.removeItem(item, amount)
@@ -60,45 +72,36 @@ class Creature():
 
     def equip(self, item: BaseItem) -> bool:
         self._verifyArguments(item)
-        # Verifying if there is an item to equip
-        if not item in self.inventory.container:
-            # No items to equip
-            return False
-        slot = self._findSlot(item)
-        if not slot: return False
+
+        if not item in self.inventory.container: return False # No items to equip
+        if not self._locateSlot(item): return False
+        if not _isSlotEquippable(self._locateSlot(item)): return False
         try:
             # Adds item and checks if item was added
-            slot.addItem(item, 1)
+            self._locateSlot(item).addItem(item, 1)
             return True
-        except IndexError:
+        except slots.CapacityReachedError:
             # Capacity was reached
             return False
 
     def unequip(self, item: BaseItem) -> bool:
         self._verifyArguments(item)
 
-        slot = self._findSlot(item)
-        if not slot: return False
-        if slot.removeItem(item, 1):
-            return True
-        return False
+        if not self._locateSlot(item): return False
+        if not _isSlotEquippable(self._locateSlot(item)): return False
+        return True if self._locateSlot(item).removeItem(item, 1) else False
 
-    def isItemEquipped(self, item: BaseItem) -> bool:
-        slot = self._findSlot(item)
-        if not slot: return False
-        if item in slot.container: return True
-        return False
+    def _isItemEquipped(self, item: BaseItem) -> bool:
+        if not self._locateSlot(item): return False
+        if not _isSlotEquippable(self._locateSlot(item)): return False
+        return True if item in self._locateSlot(item).container else False
     
-    def _findSlot(self, item: BaseItem):
+    def _locateSlot(self, item: BaseItem):
         for slot in self.__dict__.values():
-            # Slots to Ignore 
             if not isinstance(slot, slots.Slot):continue
-            if slot.type in [setting.MISC_SLOT, setting.COIN_SLOT]: continue
-            # Not found the proper slot for item
             if slot.type != item.slot_type: continue
             return slot
 
-    
     def calculateItemWorth(self, item):
         self._verifyArguments(item)
 
@@ -123,11 +126,14 @@ def main():
     d = items.Dagger()
     b = items.Bread()
     c.addItem(b)
-    print(c.equip(b))
-    print(c.inventory.container)
-    print(c.unequip(b))
-    print(b.slot_type)
+    # print(c.equip(b))
+    # print(c.inventory.container)
+    # print(c.unequip(b))
+    # print(b.slot_type)
 
+    print(_isSlotEquippable(slots.Miscellaneous()))
+    print(_isSlotEquippable(slots.Coins()))
+    print(_isSlotEquippable(slots.Head()))
 
 
 

@@ -6,6 +6,15 @@ import setting
 
 
 
+class CapacityReachedError(Exception):
+    """Exception raised for reaching the capacity."""
+    
+    def __init__(self, message="Item was attempted to be added, but capacity already reached!"):
+        self.message = message
+        super().__init__(self.message)
+
+
+
 @dataclass
 class Container(ABC):
     container: dict = field(default_factory=dict, init=False)
@@ -40,17 +49,16 @@ class Slot(Container):
     item_limit: int = None
     
     def addItem(self, item: BaseItem, amount: int=0) -> bool:
-        # Checks if there a limit or not
-        if self.item_limit:
-            # Check if limit was passed
-            if len(self.container) >= self.item_limit: 
-                raise IndexError(f"Exceeded Maximum Capacity of {self.item_limit}! Unable to add {item}!")
-        # Adds another items if exist
+        if self._isCapacityReached():
+            raise CapacityReachedError(f"Exceeded Maximum Capacity of {self.item_limit}! Unable to add {item}!")
         if item in self.container:
-            self.container[item]['amount'] += amount
-        # Adds new item
+            self.container[item]['amount'] += amount # Adding another item
         else:
-            self.container[item] = {'amount': amount}
+            self.container[item] = {'amount': amount} # Adding new item
+
+    def _isCapacityReached(self):
+        if not self.item_limit: return False
+        return len(self.container) >= self.item_limit
     
     def removeItem(self, item, amount = 0):
         if item in self.container:
@@ -63,14 +71,13 @@ class Slot(Container):
 
     def calculateItemWeight(self, item):
         raise NotImplementedError()
-        if item in self.container:
-            return item.weight * self.container[item]['amount']
-        return 0
+        total_amount_weight = item.weight * self.container[item]['amount']
+        return total_amount_weight if item in self.container else 0
 
     def calculateItemWorth(self, item):
-        if item in self.container:
-            return item.worth * self.container[item]['amount']
-        return 0
+        total_amount_worth = item.worth * self.container[item]['amount']
+        return total_amount_worth if item in self.container else 0
+
 
     def calculateTotalWeight(self):
         raise NotImplementedError()
