@@ -5,7 +5,7 @@ import unittest
 # Local application imports
 from context import items
 from context import creatures
-from context import setting
+from context import slots
 
 
 class TestCreature(unittest.TestCase):
@@ -86,7 +86,6 @@ class TestCreature(unittest.TestCase):
         result = creature.coin_pouch.container
         answer = {self.copper_coin: {'amount': 5}}
         self.assertDictEqual(result, answer) 
-
 
     def test_equip(self):
         creature = creatures.Creature()
@@ -326,6 +325,48 @@ class TestCreature(unittest.TestCase):
         creature.addItem(self.dagger)
         creature.equip(self.dagger)
         self.assertRaises(creatures.EquippedItemRemovealError, creature.removeItem, self.dagger)
+
+    def test_locateSlot(self):
+        creature = creatures.Creature()
+        result = creature._locateSlot(self.dagger)
+        self.assertEqual(result, slots.OneHanded())
+        result = creature._locateSlot(self.bread)
+        self.assertEqual(result, slots.Miscellaneous())
+        result = creature._locateSlot(self.copper_coin)
+        self.assertEqual(result, slots.Coins())
+    
+    def test_isSlotEquippable(self):
+        self.assertTrue(creatures._isSlotEquippable(slots.Head()))
+        self.assertTrue(creatures._isSlotEquippable(slots.Body()))
+        self.assertTrue(creatures._isSlotEquippable(slots.Legs()))
+        self.assertTrue(creatures._isSlotEquippable(slots.Boots()))
+        self.assertTrue(creatures._isSlotEquippable(slots.OneHanded()))
+        self.assertTrue(creatures._isSlotEquippable(slots.TwoHanded()))
+
+        self.assertFalse(creatures._isSlotEquippable(slots.Miscellaneous()))
+        self.assertFalse(creatures._isSlotEquippable(slots.Coins()))
+
+    def test_isItemEquipped(self):
+        creature = creatures.Creature()
+        self.assertFalse(creature._isItemEquipped(self.dagger))
+        self.assertFalse(creature._isItemEquipped(self.bread))
+        self.assertFalse(creature._isItemEquipped(self.copper_coin))
+
+        creature.addItem(self.dagger)
+        creature.equip(self.dagger)
+        self.assertTrue(creature._isItemEquipped(self.dagger))
+
+        creature.unequip(self.dagger)
+        creature.removeItem(self.dagger)
+        self.assertFalse(creature._isItemEquipped(self.dagger))
+
+        # Can't equip bread or copper_coin, Therefor function should return False
+        creature.addItem(self.bread)
+        self.assertFalse(creature._isItemEquipped(self.bread))
+        creature.addItem(self.copper_coin)
+        self.assertFalse(creature._isItemEquipped(self.copper_coin))
+
+
 
 
 def suite():
