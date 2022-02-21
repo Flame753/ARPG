@@ -96,7 +96,7 @@ class Creature():
         if not _isSlotEquippable(self._locateSlot(item)): return False
         return True if item in self._locateSlot(item).container else False
     
-    def _locateSlot(self, item: BaseItem):
+    def _locateSlot(self, item: BaseItem) -> slots.Slot:
         for slot in self.__dict__.values():
             if not isinstance(slot, slots.Slot):continue
             if slot.type != item.slot_type: continue
