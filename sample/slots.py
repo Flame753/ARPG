@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from audioop import add
 from dataclasses import dataclass, field
 # from container import Container
 from items import BaseItem
@@ -48,19 +49,25 @@ class Slot(Container):
     type: str = None
     item_limit: int = None
     
-    def addItem(self, item: BaseItem, amount: int=0) -> bool:
-        if self._isCapacityReached():
+    def addItem(self, item: BaseItem, amount: int=1) -> bool:
+        if self._isCapacityReached(amount):
             raise CapacityReachedError(f"Exceeded Maximum Capacity of {self.item_limit}! Unable to add {item}!")
         if item in self.container:
             self.container[item]['amount'] += amount # Adding another item
         else:
             self.container[item] = {'amount': amount} # Adding new item
 
-    def _isCapacityReached(self):
-        if not self.item_limit: return False
-        return len(self.container) >= self.item_limit
-    
-    def removeItem(self, item, amount = 0):
+    def _isCapacityReached(self, additional_amount: int=0) -> bool:
+        if self.item_limit == None: return False
+        amount_list = [amount['amount'] for amount in self.container.values()]
+        total_amount = sum(amount_list) + additional_amount
+        if total_amount == 0 and self.item_limit == 0: return True
+        return total_amount > self.item_limit
+
+    def _isCorrectSlot(self, item: BaseItem) -> bool:
+        pass
+
+    def removeItem(self, item, amount=1):
         if item in self.container:
             if self.container[item]['amount'] >= amount:
                 self.container[item]['amount'] -= amount
@@ -77,7 +84,6 @@ class Slot(Container):
     def calculateItemWorth(self, item):
         total_amount_worth = item.worth * self.container[item]['amount']
         return total_amount_worth if item in self.container else 0
-
 
     def calculateTotalWeight(self):
         raise NotImplementedError()
@@ -138,6 +144,39 @@ class Coins(Slot):
 @dataclass()
 class Miscellaneous(Slot):
     type: str = setting.MISC_SLOT
+
+
+class EquipmentSlots():
+    def __init__(self):
+        self.slots = {setting.HEAD_SLOT: Head(),
+                        setting.BODY_SLOT: Body(),
+                        setting.LEGS_SLOT: Legs(),
+                        setting.BOOTS_SLOT: Boots(),
+                        setting.ONE_HANDED_SLOT: OneHanded(),
+                        setting.TWO_HANDED_SLOT: TwoHanded()}
+
+    def equip(self, item: BaseItem) -> bool:
+        if not self.locateSlotByItem(item): return
+        self.locateSlotByItem(item).addItem(item, 1)
+
+        # try:
+        #     # Adds item and checks if item was added
+        #     self.locateSlotByItem(item).addItem(item, 1)
+        #     return True
+        # except CapacityReachedError:
+        #     # Capacity was reached
+        #     return False
+
+    def unequip(self, item: BaseItem) -> bool:
+        if not self.isItemEquipped(item): return False
+        return True if self.locateSlotByItem(item).removeItem(item, 1) else False
+
+    def isItemEquipped(self, item: BaseItem) -> bool:
+        if not self.locateSlotByItem(item): return False
+        return True if item in self.locateSlotByItem(item).container else False
+
+    def locateSlotByItem(self, item: BaseItem) -> Slot:
+        return self.slots.get(item.slot_type)
 
 
 
