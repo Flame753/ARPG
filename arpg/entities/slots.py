@@ -1,9 +1,15 @@
+# Standard library imports 
 from abc import ABC, abstractmethod
-from audioop import add
 from dataclasses import dataclass, field
-# from container import Container
+from pprint import pprint
+
+# Local application imports
 from items import BaseItem
-import setting
+import setting 
+
+# from entities.items import BaseItem
+# import entities.setting as setting
+
 
 
 
@@ -176,8 +182,6 @@ def main():
     c = TwoHanded()
     a1 = items.Bread()
     # a.addItem(a1, 2)
-
-
 
 
 if __name__ == "__main__":

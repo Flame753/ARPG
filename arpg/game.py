@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from player import Player
+from sample.player import Player
 import world
 
 

@@ -11,8 +11,6 @@ class Player(Creature):
         super().__init__(**kwargs)
         self.x = world.start_tile_location[0]
         self.y = world.start_tile_location[1]
-        self.hp = 100
-        self.max_hp = 100
         self.victory = False
 
         self.addItem(items.Dagger())

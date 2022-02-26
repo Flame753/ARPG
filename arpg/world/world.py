@@ -1,4 +1,5 @@
-import setting
+from arpg import entities
+import entities.setting
 import random
 import enemies
 import npc

@@ -1,8 +1,16 @@
+# Standard library imports 
 from dataclasses import dataclass, field
+from pprint import pprint
+
+# Local application imports
 from items import BaseItem
 import slots
 import setting
-from pprint import pprint
+
+# from entities.items import BaseItem
+# import entities.slots as slots
+# import entities.setting  as setting
+
 
 
 class EquippedItemRemovealError(Exception):
@@ -31,6 +39,8 @@ class Creature():
         self.inventory = slots.Miscellaneous()
         self.coin_pouch = slots.Coins()
         self.equippable_slots = slots.EquipmentSlots()
+        self.hp = 100
+        self.max_hp = 100
 
 
     def _verifyArguments(self, item: BaseItem=None, amount: int=None) -> None:

@@ -3,9 +3,13 @@ from pprint import pprint
 import unittest
 
 # Local application imports
-from context import setting
-from context import items
-from context import slots
+from .context import setting
+from .context import items
+from .context import slots
+
+# import 
+# import items
+# import slots
 
 
 class TestSlot(unittest.TestCase):
