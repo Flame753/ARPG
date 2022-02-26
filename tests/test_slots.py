@@ -3,6 +3,7 @@ from pprint import pprint
 import unittest
 
 # Local application imports
+from context import setting
 from context import items
 from context import slots
 
@@ -12,6 +13,27 @@ class TestSlot(unittest.TestCase):
         self.dagger = items.Dagger()
         self.copper_coin = items.CopperCoin()
         self.bread = items.Bread()
+    
+    def test_class_initializer(self):
+        head_A = slots.Head()
+        body_A = slots.Body()
+        legs_A = slots.Legs()
+
+        head_B = slots.Head()
+        body_B = slots.Body()
+
+        self.assertEqual(head_A, head_B)
+        self.assertFalse(head_A is head_B)
+
+        self.assertEqual(body_A, body_B)
+        self.assertFalse(body_A is body_B)
+
+        head_A.addItem(self.dagger)
+        self.assertNotEqual(head_A, head_B)
+        self.assertFalse(head_A is head_B)
+
+        self.assertNotEqual(legs_A, body_A)
+        self.assertFalse(legs_A is body_A)
 
     def test_addItem(self):
         slot = slots.Slot()
@@ -53,9 +75,6 @@ class TestSlot(unittest.TestCase):
             slot.addItem(self.dagger, 1)
             slot.addItem(self.copper_coin, 3)
 
-    def test_isCorrectSlot(self):
-        pass
-
     def test_removeitem(self):
         slot = slots.Slot()
         self.assertFalse(slot.removeItem(self.dagger))
@@ -68,13 +87,102 @@ class TestSlot(unittest.TestCase):
         self.assertDictEqual(slot.container, {})
 
     def test_calculateItemWorth(self):
-        pass
+        slot = slots.Slot()
 
-    def test_caluclateTotalWorth(self):
-        pass
+        copper_amount = 10
+        slot.addItem(self.copper_coin, copper_amount)
+        self.assertEqual(slot.calculateItemWorth(self.copper_coin), copper_amount*self.copper_coin.worth)
+
+        bread_amount = 5
+        slot.addItem(self.bread, bread_amount)
+        self.assertEqual(slot.calculateItemWorth(self.bread), bread_amount*self.bread.worth)
+
+        dagger_amount = 5
+        slot.addItem(self.dagger, dagger_amount)
+        self.assertEqual(slot.calculateItemWorth(self.dagger), dagger_amount*self.dagger.worth)
+
+    def test_calculateTotalWorth(self):
+        slot = slots.Slot()
+
+        self.assertEqual(slot.calculateTotalWorth(), 0)
+
+        copper_amount = 10
+        slot.addItem(self.copper_coin, copper_amount)
+        answer = copper_amount*self.copper_coin.worth
+        self.assertEqual(slot.calculateTotalWorth(), answer)
+
+        bread_amount = 5
+        slot.addItem(self.bread, bread_amount)
+        answer = answer + (bread_amount * self.bread.worth)
+        self.assertEqual(slot.calculateTotalWorth(), answer)
+
+        dagger_amount = 5
+        slot.addItem(self.dagger, dagger_amount)
+        answer = answer + (dagger_amount * self.dagger.worth)
+        self.assertEqual(slot.calculateTotalWorth(), answer)
+
+
+class TestEquipmentSlots(unittest.TestCase):
+    def setUp(self):
+        self.dagger = items.Dagger()
+        self.copper_coin = items.CopperCoin()
+        self.bread = items.Bread()
+        self.axe = items.Axe()
+
+    def test_class_initializer(self):
+        eq_slot_A = slots.EquipmentSlots()
+        eq_slot_B = slots.EquipmentSlots()
+
+        self.assertEqual(eq_slot_A.slots, eq_slot_B.slots)
+        self.assertFalse(eq_slot_A.slots is eq_slot_B.slots)
+
+        eq_slot_A.equip(self.dagger)
+        self.assertNotEqual(eq_slot_A.slots, eq_slot_B.slots)
+        self.assertFalse(eq_slot_A.slots is eq_slot_B.slots)
+    
+    def test_equip(self):
+        eq_slot = slots.EquipmentSlots()
+
+        self.assertTrue(eq_slot.equip(self.dagger))
+        self.assertDictEqual(eq_slot.slots.get(setting.ONE_HANDED_SLOT).container, {self.dagger: {'amount': 1}})
+        with self.assertRaises(slots.CapacityReachedError):
+            eq_slot.equip(self.dagger)
+
+        self.assertFalse(eq_slot.equip(self.bread))
+        self.assertFalse(eq_slot.equip(self.copper_coin))
+
+    def test_unequip(self):
+        eq_slot = slots.EquipmentSlots()
+
+        self.assertFalse(eq_slot.unequip(self.dagger))
+        self.assertDictEqual(eq_slot.slots.get(setting.ONE_HANDED_SLOT).container, {})
+
+        self.assertFalse(eq_slot.unequip(self.bread))
+        self.assertFalse(eq_slot.unequip(self.copper_coin))
+
+        eq_slot.equip(self.dagger)
+        self.assertTrue(eq_slot.unequip(self.dagger))
+        self.assertDictEqual(eq_slot.slots.get(setting.ONE_HANDED_SLOT).container, {})
+
+    def test_isItemEquipped(self):
+        eq_slot = slots.EquipmentSlots()
+
+        self.assertFalse(eq_slot.isItemEquipped(self.dagger))
+        self.assertFalse(eq_slot.isItemEquipped(self.bread))
+        self.assertFalse(eq_slot.isItemEquipped(self.copper_coin))
+
+        eq_slot.equip(self.dagger)
+        self.assertTrue(eq_slot.isItemEquipped(self.dagger))
+
+    def test_locateSlotByItem(self):
+        eq_slot = slots.EquipmentSlots()
+        # self.assertEqual(eq_slot.locateSlotByItem(), slots.Head())
+        # self.assertEqual(eq_slot.locateSlotByItem(), slots.Body())
+        # self.assertEqual(eq_slot.locateSlotByItem(), slots.Legs())
+        # self.assertEqual(eq_slot.locateSlotByItem(), slots.Boots())
+        self.assertEqual(eq_slot.locateSlotByItem(self.dagger), slots.OneHanded())
+        self.assertEqual(eq_slot.locateSlotByItem(self.axe), slots.TwoHanded())
 
 
 if __name__ == '__main__':
     unittest.main()
-    # runner = unittest.TextTestRunner()
-    # runner.run(suite())
