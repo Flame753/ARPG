@@ -33,7 +33,7 @@ class Creature():
         self.equippable_slots = slots.EquipmentSlots()
 
 
-    def _verifyArguments(self, item=None, amount=None):
+    def _verifyArguments(self, item: BaseItem=None, amount: int=None) -> None:
         # Verifys if Arguments are enter correctly 
         if item:
             if not isinstance(item, BaseItem):
@@ -46,7 +46,7 @@ class Creature():
         if type(item) in [list, dict, tuple] or type(amount) in [list, dict, tuple]:
             raise TypeError(f"Arguments can't be a empty List, Dictionary or Tuple")
 
-    def addItem(self, item: BaseItem, amount: int=1):
+    def addItem(self, item: BaseItem, amount: int=1) -> None:
         self._verifyArguments(item, amount)
 
         # Always adds the amount of items into the invenotry slot excluding any Coin items
@@ -69,14 +69,14 @@ class Creature():
         self._verifyArguments(item)
 
         if not item in self.inventory.container: return False # No items to equip
-        self.equippable_slots.equip(item)
+        return self.equippable_slots.equip(item)
 
     def unequip(self, item: BaseItem) -> bool:
         self._verifyArguments(item)
 
         return True if self.equippable_slots.unequip(item) else False
 
-    def calculateItemWorth(self, item):
+    def calculateItemWorth(self, item: BaseItem) -> int:
         self._verifyArguments(item)
 
         if item.slot_type == setting.COIN_SLOT:

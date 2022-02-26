@@ -64,10 +64,7 @@ class Slot(Container):
         if total_amount == 0 and self.item_limit == 0: return True
         return total_amount > self.item_limit
 
-    def _isCorrectSlot(self, item: BaseItem) -> bool:
-        pass
-
-    def removeItem(self, item, amount=1):
+    def removeItem(self, item: BaseItem, amount: int=1) -> bool:
         if item in self.container:
             if self.container[item]['amount'] >= amount:
                 self.container[item]['amount'] -= amount
@@ -76,23 +73,23 @@ class Slot(Container):
                 return True
         return False
 
-    def calculateItemWeight(self, item):
+    def calculateItemWeight(self, item: BaseItem) -> int:
         raise NotImplementedError()
         total_amount_weight = item.weight * self.container[item]['amount']
         return total_amount_weight if item in self.container else 0
 
-    def calculateItemWorth(self, item):
+    def calculateItemWorth(self, item: BaseItem) -> int:
         total_amount_worth = item.worth * self.container[item]['amount']
         return total_amount_worth if item in self.container else 0
 
-    def calculateTotalWeight(self):
+    def calculateTotalWeight(self) -> int:
         raise NotImplementedError()
         weight = 0
         for item, data in self.container.items():
             weight += item.weight * data['amount']
         return weight
 
-    def calculateTotalWorth(self):
+    def calculateTotalWorth(self) -> int:
         worth = 0
         for item, data in self.container.items():
             worth += item.worth * data['amount']
@@ -145,7 +142,6 @@ class Coins(Slot):
 class Miscellaneous(Slot):
     type: str = setting.MISC_SLOT
 
-
 class EquipmentSlots():
     def __init__(self):
         self.slots = {setting.HEAD_SLOT: Head(),
@@ -156,16 +152,9 @@ class EquipmentSlots():
                         setting.TWO_HANDED_SLOT: TwoHanded()}
 
     def equip(self, item: BaseItem) -> bool:
-        if not self.locateSlotByItem(item): return
+        if not self.locateSlotByItem(item): return False
         self.locateSlotByItem(item).addItem(item, 1)
-
-        # try:
-        #     # Adds item and checks if item was added
-        #     self.locateSlotByItem(item).addItem(item, 1)
-        #     return True
-        # except CapacityReachedError:
-        #     # Capacity was reached
-        #     return False
+        return True
 
     def unequip(self, item: BaseItem) -> bool:
         if not self.isItemEquipped(item): return False
@@ -186,7 +175,7 @@ def main():
     b = OneHanded()
     c = TwoHanded()
     a1 = items.Bread()
-    a.addItem(a1, 2)
+    # a.addItem(a1, 2)
 
 
 
