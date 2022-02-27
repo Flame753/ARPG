@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from abc import ABC
 
 # Local application imports
-# import setting
 from entities import setting
 
 
@@ -88,9 +87,6 @@ class Consumable(BaseItem):
     def __init__(self, *args, **kwargs):
         if type(self) == Consumable:
             raise NotImplementedError('Do not instantiate Consumable directly')
-    
-    # def __str__(self):
-    #     return f'{self.description} {self.name} (+{self.healing_value})'
 
 @dataclass(frozen=True)
 class Bread(Consumable):
@@ -190,27 +186,3 @@ class PlatinumCoin(Coin):
 class GreaterPlatinumCoin(PlatinumCoin):
     name: str = 'Greater Platinum Coin'
     worth: int = setting.PLATINUM_VALUE * setting.HIGH_PURITY
-
-
-
-
-
-def main():
-    # BaseItem()
-    # Weapon()
-    # Consumable()
-    # Container()
-    c = GoldCoin()
-    gc = GreaterSilverCoin()
-    P = GreaterPlatinumCoin()
-    b = Bread()
-    c = Bread()
-    print(b==c)
-    # co = Consumable()
-    # print(co)
-    # print(c)
-    # print(gc)
-    # print(P)
-
-if __name__ == "__main__":
-    main()

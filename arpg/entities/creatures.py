@@ -3,10 +3,6 @@ from dataclasses import dataclass, field
 from pprint import pprint
 
 # Local application imports
-# from items import BaseItem
-# import slots
-# import setting
-
 from entities.items import BaseItem
 import entities.slots as slots
 import entities.setting  as setting
@@ -19,18 +15,6 @@ class EquippedItemRemovealError(Exception):
     def __init__(self, message="Item was attempted to be removed, before being unequipped!"):
         self.message = message
         super().__init__(self.message)
-
-# class UnequippableError(Exception):
-#     """Exception raised for attempting to equip or unequip an item to a unequippable slot."""
-    
-#     def __init__(self, message="test g"):
-#         self.message = message
-#         super().__init__(self.message)
-
-
-# def _isSlotEquippable(slot: slots.Slot) -> bool:
-#     return True if slot.item_limit else False
-    
 
 
 # @dataclass() 

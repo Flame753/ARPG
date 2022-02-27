@@ -4,13 +4,8 @@ from dataclasses import dataclass, field
 from pprint import pprint
 
 # Local application imports
-# from items import BaseItem
-# import setting 
-
 from entities.items import BaseItem
 import entities.setting as setting
-
-
 
 
 class CapacityReachedError(Exception):
@@ -19,7 +14,6 @@ class CapacityReachedError(Exception):
     def __init__(self, message="Item was attempted to be added, but capacity already reached!"):
         self.message = message
         super().__init__(self.message)
-
 
 
 @dataclass
@@ -172,17 +166,3 @@ class EquipmentSlots():
 
     def locateSlotByItem(self, item: BaseItem) -> Slot:
         return self.slots.get(item.slot_type)
-
-
-
-def main():
-    import items
-    a = OneHanded()
-    b = OneHanded()
-    c = TwoHanded()
-    a1 = items.Bread()
-    # a.addItem(a1, 2)
-
-
-if __name__ == "__main__":
-    main()

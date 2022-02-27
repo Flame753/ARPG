@@ -1,9 +1,5 @@
-# import items
-# from creatures import Creature
-
 import entities.items as items
 from entities.creatures import Creature
-
 
 
 class NonPlayableCharacter(Creature):
@@ -25,8 +21,3 @@ class Trader(NonPlayableCharacter):
         # self.addItem(items.Backpack(sellable=False))
         self.addItem(items.Bread(), 4)
         self.addItem(items.HealingPotion(), 2)
-
-if __name__ == "__main__":
-    t = Trader()
-    print(t.name)
-    # print(t.getAllItems())                           
