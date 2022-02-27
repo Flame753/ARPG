@@ -24,7 +24,7 @@ class BaseItem(ABC):
     name: str = ''
     worth: int = 0
     weight: int = 0
-    slot_type: str = slots.Miscellaneous
+    slot_type: slots.Slot = slots.Miscellaneous
     description: Optional[str] = None
 
     def __init__(self, *args, **kwargs):
@@ -42,7 +42,7 @@ class Weapon(BaseItem):
 
 @dataclass(frozen=True)
 class OneHandedWeapon(Weapon):
-    slot_type: str = slots.OneHanded
+    slot_type: slots.Slot = slots.OneHanded
 
     def __init__(self, *args, **kwargs):
         if type(self) == OneHandedWeapon:
@@ -50,7 +50,7 @@ class OneHandedWeapon(Weapon):
 
 @dataclass(frozen=True)
 class TwoHandedWeapon(Weapon):
-    slot_type: str = slots.TwoHanded
+    slot_type: slots.Slot = slots.TwoHanded
 
     def __init__(self, *args, **kwargs):
         if type(self) == TwoHandedWeapon:
@@ -152,7 +152,7 @@ class HealingPotion(Consumable):
 @dataclass(frozen=True)
 class Coin(BaseItem):
     weight: int = 0.01
-    slot_type: str = slots.Coins
+    slot_type: slots.Slot = slots.Coins
 
     def __init__(self, *args, **kwargs):
         if type(self) == Coin:
