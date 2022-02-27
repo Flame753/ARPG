@@ -1,9 +1,8 @@
-from arpg import entities
-import entities.setting
+from arpg.entities import enemies
+from arpg.entities import npc
+from arpg.entities import items
+from arpg.entities import setting
 import random
-import enemies
-import npc
-import items
 
 
 class MapTile:

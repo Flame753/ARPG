@@ -3,10 +3,11 @@ from pprint import pprint
 import unittest
 
 # Local application imports
-from context import items
-from context import creatures
-from context import slots
-from context import setting
+from context import entities
+from entities import creatures
+from entities import slots
+from entities import setting
+from entities import items
 
 
 class TestCreature(unittest.TestCase):

@@ -3,13 +3,14 @@ from pprint import pprint
 import unittest
 
 # Local application imports
-from .context import setting
-from .context import items
-from .context import slots
+# from context import arpg
+# from arpg.entities import items
+# from arpg.entities import slots
 
-# import 
-# import items
-# import slots
+from context import entities
+from entities import items
+from entities import slots
+from entities import setting
 
 
 class TestSlot(unittest.TestCase):

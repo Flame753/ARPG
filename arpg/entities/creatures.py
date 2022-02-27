@@ -3,13 +3,13 @@ from dataclasses import dataclass, field
 from pprint import pprint
 
 # Local application imports
-from items import BaseItem
-import slots
-import setting
+# from items import BaseItem
+# import slots
+# import setting
 
-# from entities.items import BaseItem
-# import entities.slots as slots
-# import entities.setting  as setting
+from entities.items import BaseItem
+import entities.slots as slots
+import entities.setting  as setting
 
 
 
@@ -99,24 +99,3 @@ class Creature():
 
     def is_alive(self) -> bool:
         return self.hp > 0
-  
-
-
-
-def main():
-    import items
-    c = Creature()
-
-    d = items.Dagger()
-    b = items.Bread()
-    c.addItem(b)
-    print(c.equip(b))
-    print(c.inventory.container)
-    print(c.unequip(b))
-    print(b.slot_type)
-    print(c)
-
-
-
-if __name__ == '__main__':
-    main()

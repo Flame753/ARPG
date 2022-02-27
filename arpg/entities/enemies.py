@@ -1,5 +1,5 @@
-# from entities.creatures import Creature
-from creatures import Creature
+from entities.creatures import Creature
+# from creatures import Creature
 
 class Enemy(Creature):
     def __init__(self) -> None:

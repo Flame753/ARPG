@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from abc import ABC
 
 # Local application imports
-import setting
-# import entities.setting as setting
+# import setting
+from entities import setting
 
 
 @dataclass(frozen=True)

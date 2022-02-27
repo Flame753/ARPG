@@ -1,8 +1,8 @@
-import items
-from creatures import Creature
+# import items
+# from creatures import Creature
 
-# import entities.items as items
-# from entities.creatures import Creature
+import entities.items as items
+from entities.creatures import Creature
 
 
 
