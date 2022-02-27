@@ -1,11 +1,12 @@
 # Standard library imports 
+from __future__ import annotations  # Allowing items.BaseItem for typehinting and preventing cycle ImportError
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pprint import pprint
 
 # Local application imports
-from entities.items import BaseItem
-import entities.setting as setting
+import entities.items as items
+
 
 
 class CapacityReachedError(Exception):
@@ -14,6 +15,7 @@ class CapacityReachedError(Exception):
     def __init__(self, message="Item was attempted to be added, but capacity already reached!"):
         self.message = message
         super().__init__(self.message)
+
 
 
 @dataclass
@@ -46,10 +48,10 @@ class Container(ABC):
 
 @dataclass()
 class Slot(Container):
-    type: str = None
+    name: str = None
     item_limit: int = None
     
-    def addItem(self, item: BaseItem, amount: int=1) -> bool:
+    def addItem(self, item: items.BaseItem, amount: int=1) -> bool:
         if self._isCapacityReached(amount):
             raise CapacityReachedError(f"Exceeded Maximum Capacity of {self.item_limit}! Unable to add {item}!")
         if item in self.container:
@@ -64,7 +66,7 @@ class Slot(Container):
         if total_amount == 0 and self.item_limit == 0: return True
         return total_amount > self.item_limit
 
-    def removeItem(self, item: BaseItem, amount: int=1) -> bool:
+    def removeItem(self, item: items.BaseItem, amount: int=1) -> bool:
         if item in self.container:
             if self.container[item]['amount'] >= amount:
                 self.container[item]['amount'] -= amount
@@ -73,12 +75,12 @@ class Slot(Container):
                 return True
         return False
 
-    def calculateItemWeight(self, item: BaseItem) -> int:
+    def calculateItemWeight(self, item: items.BaseItem) -> int:
         raise NotImplementedError()
         total_amount_weight = item.weight * self.container[item]['amount']
         return total_amount_weight if item in self.container else 0
 
-    def calculateItemWorth(self, item: BaseItem) -> int:
+    def calculateItemWorth(self, item: items.BaseItem) -> int:
         total_amount_worth = item.worth * self.container[item]['amount']
         return total_amount_worth if item in self.container else 0
 
@@ -97,72 +99,72 @@ class Slot(Container):
 
 @dataclass()
 class Head(Slot):
-    type: str = setting.HEAD_SLOT
+    name: str = "Head Slot"
     item_limit: int = 1
 
 @dataclass()
 class Body(Slot):
-    type: str = setting.BODY_SLOT
+    name: str = "Body Slot"
     item_limit: int = 1
 
 @dataclass()
 class Legs(Slot):
-    type: str = setting.LEGS_SLOT
+    name: str = "Legs Slot"
     item_limit: int = 1
 
 @dataclass()
 class Boots(Slot):
-    type: str = setting.BOOTS_SLOT
+    name: str = "Boots Slot"
     item_limit: int = 1
 
 @dataclass()
 class OneHanded(Slot):
-    type: str = setting.ONE_HANDED_SLOT
+    name: str = "One Handed Slot"
     item_limit: int = 1
     
 @dataclass()    
 class TwoHanded(Slot):
-    type: str = setting.TWO_HANDED_SLOT
+    name: str = "Two Handed Slot"
     item_limit: int = 1
 
 @dataclass()
 class Coins(Slot):
-    type: str = setting.COIN_SLOT
+    name: str = "Coin Slot"
 
     def order(self) -> list:
         # Puts the container from largest worth to smallest
         coins = list(self.container.items())
         worth = lambda coin: coin[0].worth
-        coins.sort(key=worth)  # Sort function only works with a list type
+        coins.sort(key=worth)  # Sort function only works with a list name
         ordict = dict(coins)
         self.container.clear()
         self.container.update(ordict)
 
 @dataclass()
 class Miscellaneous(Slot):
-    type: str = setting.MISC_SLOT
+    name: str = "Miscellaneous Slot"
 
 class EquipmentSlots():
     def __init__(self):
-        self.slots = {setting.HEAD_SLOT: Head(),
-                        setting.BODY_SLOT: Body(),
-                        setting.LEGS_SLOT: Legs(),
-                        setting.BOOTS_SLOT: Boots(),
-                        setting.ONE_HANDED_SLOT: OneHanded(),
-                        setting.TWO_HANDED_SLOT: TwoHanded()}
+        self.slots = {Head: Head(),
+                        Body: Body(),
+                        Legs: Legs(),
+                        Boots: Boots(),
+                        OneHanded: OneHanded(),
+                        TwoHanded: TwoHanded()}
 
-    def equip(self, item: BaseItem) -> bool:
+    def equip(self, item: items.BaseItem) -> bool:
         if not self.locateSlotByItem(item): return False
         self.locateSlotByItem(item).addItem(item, 1)
         return True
 
-    def unequip(self, item: BaseItem) -> bool:
+    def unequip(self, item: items.BaseItem) -> bool:
         if not self.isItemEquipped(item): return False
         return True if self.locateSlotByItem(item).removeItem(item, 1) else False
 
-    def isItemEquipped(self, item: BaseItem) -> bool:
+    def isItemEquipped(self, item: items.BaseItem) -> bool:
         if not self.locateSlotByItem(item): return False
         return True if item in self.locateSlotByItem(item).container else False
 
-    def locateSlotByItem(self, item: BaseItem) -> Slot:
+    def locateSlotByItem(self, item: items.BaseItem) -> Slot:
         return self.slots.get(item.slot_type)

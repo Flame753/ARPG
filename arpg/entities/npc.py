@@ -2,6 +2,7 @@ import entities.items as items
 from entities.creatures import Creature
 
 
+
 class NonPlayableCharacter(Creature):
     def __init__(self, name, **kwargs) -> None:
         super().__init__(**kwargs)

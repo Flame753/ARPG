@@ -17,12 +17,12 @@ class TestCreature(unittest.TestCase):
         self.bread = items.Bread()
 
     def equipment_slot_helper(self, creature_obj, answer):
-        self.assertDictEqual(creature_obj.equippable_slots.slots.get(setting.HEAD_SLOT).container, answer) 
-        self.assertDictEqual(creature_obj.equippable_slots.slots.get(setting.BODY_SLOT).container, answer) 
-        self.assertDictEqual(creature_obj.equippable_slots.slots.get(setting.LEGS_SLOT).container, answer)
-        self.assertDictEqual(creature_obj.equippable_slots.slots.get(setting.BOOTS_SLOT).container, answer)
-        self.assertDictEqual(creature_obj.equippable_slots.slots.get(setting.ONE_HANDED_SLOT).container, answer) 
-        self.assertDictEqual(creature_obj.equippable_slots.slots.get(setting.TWO_HANDED_SLOT).container, answer) 
+        self.assertDictEqual(creature_obj.equippable_slots.slots.get(slots.Head).container, answer) 
+        self.assertDictEqual(creature_obj.equippable_slots.slots.get(slots.Body).container, answer) 
+        self.assertDictEqual(creature_obj.equippable_slots.slots.get(slots.Legs).container, answer)
+        self.assertDictEqual(creature_obj.equippable_slots.slots.get(slots.Boots).container, answer)
+        self.assertDictEqual(creature_obj.equippable_slots.slots.get(slots.OneHanded).container, answer) 
+        self.assertDictEqual(creature_obj.equippable_slots.slots.get(slots.TwoHanded).container, answer) 
 
     def test_class_initializer(self):
         creature_A = creatures.Creature()
@@ -113,7 +113,7 @@ class TestCreature(unittest.TestCase):
         self.assertDictEqual(result, answer)
 
         answer = {self.dagger: {'amount': 1}}
-        result = creature.equippable_slots.slots.get(setting.ONE_HANDED_SLOT).container
+        result = creature.equippable_slots.slots.get(slots.OneHanded).container
         self.assertDictEqual(result, answer) 
 
         # equipping a non equipable item

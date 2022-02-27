@@ -1,6 +1,8 @@
+# Local application imports
 from collections import OrderedDict
-from sample.player import Player
+from player import Player
 import world
+
 
 
 def play():

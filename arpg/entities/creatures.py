@@ -4,8 +4,7 @@ from pprint import pprint
 
 # Local application imports
 from entities.items import BaseItem
-import entities.slots as slots
-import entities.setting  as setting
+from entities import slots
 
 
 
@@ -44,7 +43,7 @@ class Creature():
         self._verifyArguments(item, amount)
 
         # Always adds the amount of items into the invenotry slot excluding any Coin items
-        if item.slot_type == setting.COIN_SLOT:
+        if item.slot_type == slots.Coins:
             self.coin_pouch.addItem(item, amount)
         else:
             self.inventory.addItem(item, amount)
@@ -54,7 +53,7 @@ class Creature():
 
         if self.equippable_slots.isItemEquipped(item): raise EquippedItemRemovealError
 
-        if item.slot_type == setting.COIN_SLOT:
+        if item.slot_type == slots.Coins:
             return self.coin_pouch.removeItem(item, amount)
         else:
             return self.inventory.removeItem(item, amount)
@@ -73,7 +72,7 @@ class Creature():
     def calculateItemWorth(self, item: BaseItem) -> int:
         self._verifyArguments(item)
 
-        if item.slot_type == setting.COIN_SLOT:
+        if item.slot_type == slots.Coins:
             return self.coin_pouch.calculateItemWorth(item)
         else:
             return self.inventory.calculateItemWorth(item)

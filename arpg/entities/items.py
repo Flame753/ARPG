@@ -1,19 +1,31 @@
 # Standard library imports 
 from dataclasses import dataclass
+from typing import Optional
 from abc import ABC
 
 # Local application imports
-from entities import setting
+import entities.slots as slots
+
+
+
+# Coin Value
+COPPER_VALUE = 1
+SILVER_VALUE = 10
+GOLD_VALUE = 100
+PLATINUM_VALUE = 1000
+
+LOW_PURITY = 1
+HIGH_PURITY = 5
+
 
 
 @dataclass(frozen=True)
 class BaseItem(ABC):
-    name: str = None
+    name: str = ''
     worth: int = 0
     weight: int = 0
-    slot_type: str = setting.MISC_SLOT
-    description: str = None
-    sellable: bool = True
+    slot_type: str = slots.Miscellaneous
+    description: Optional[str] = None
 
     def __init__(self, *args, **kwargs):
         if type(self) == BaseItem:
@@ -30,7 +42,7 @@ class Weapon(BaseItem):
 
 @dataclass(frozen=True)
 class OneHandedWeapon(Weapon):
-    slot_type: str = setting.ONE_HANDED_SLOT
+    slot_type: str = slots.OneHanded
 
     def __init__(self, *args, **kwargs):
         if type(self) == OneHandedWeapon:
@@ -38,7 +50,7 @@ class OneHandedWeapon(Weapon):
 
 @dataclass(frozen=True)
 class TwoHandedWeapon(Weapon):
-    slot_type: str = setting.TWO_HANDED_SLOT
+    slot_type: str = slots.TwoHanded
 
     def __init__(self, *args, **kwargs):
         if type(self) == TwoHandedWeapon:
@@ -140,8 +152,7 @@ class HealingPotion(Consumable):
 @dataclass(frozen=True)
 class Coin(BaseItem):
     weight: int = 0.01
-    slot_type: str = setting.COIN_SLOT
-    sellable: bool = False
+    slot_type: str = slots.Coins
 
     def __init__(self, *args, **kwargs):
         if type(self) == Coin:
@@ -150,39 +161,39 @@ class Coin(BaseItem):
 @dataclass(frozen=True)
 class CopperCoin(Coin):
     name: str = 'Copper Coin'
-    worth: int = setting.COPPER_VALUE * setting.LOW_PURITY
+    worth: int = COPPER_VALUE * LOW_PURITY
 
 @dataclass(frozen=True)
 class GreaterCopperCoin(CopperCoin):
     name: str = 'Greater Copper Coin'
-    worth: int = setting.COPPER_VALUE * setting.HIGH_PURITY
+    worth: int = COPPER_VALUE * HIGH_PURITY
 
 @dataclass(frozen=True)
 class SilverCoin(Coin):
     name: str = 'Silver Coin'
-    worth: int = setting.SILVER_VALUE * setting.LOW_PURITY
+    worth: int = SILVER_VALUE * LOW_PURITY
 
 @dataclass(frozen=True)
 class GreaterSilverCoin(SilverCoin):
     name: str = 'Greater Silver Coin'
-    worth: int = setting.SILVER_VALUE * setting.HIGH_PURITY
+    worth: int = SILVER_VALUE * HIGH_PURITY
 
 @dataclass(frozen=True)
 class GoldCoin(Coin):
     name: str = 'Gold Coin'
-    worth: int = setting.GOLD_VALUE * setting.LOW_PURITY
+    worth: int = GOLD_VALUE * LOW_PURITY
 
 @dataclass(frozen=True)
 class GreaterGoldCoin(GoldCoin):
     name: str = 'Greater Gold Coin'
-    worth: int = setting.GOLD_VALUE * setting.HIGH_PURITY
+    worth: int = GOLD_VALUE * HIGH_PURITY
 
 @dataclass(frozen=True)
 class PlatinumCoin(Coin):
     name: str = 'Platinum Coin'
-    worth: int = setting.PLATINUM_VALUE * setting.LOW_PURITY
+    worth: int = PLATINUM_VALUE * LOW_PURITY
 
 @dataclass(frozen=True)
 class GreaterPlatinumCoin(PlatinumCoin):
     name: str = 'Greater Platinum Coin'
-    worth: int = setting.PLATINUM_VALUE * setting.HIGH_PURITY
+    worth: int = PLATINUM_VALUE * HIGH_PURITY

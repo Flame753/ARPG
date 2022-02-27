@@ -1,8 +1,10 @@
-from creatures import Creature
-import setting
-import items
-import world
+# Standard library imports 
 from pprint import pprint
+
+# Local application imports
+from entities.creatures import Creature
+from entities import items
+import world
 
 
 
@@ -17,7 +19,6 @@ class Player(Creature):
         self.addItem(items.Bread())
         self.addItem(items.SilverCoin(), 3)
         # self.addItem(items.CoinPouch(sellable=False))
-
 
     def move(self, dx, dy):
         self.x += dx

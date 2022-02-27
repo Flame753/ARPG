@@ -149,7 +149,7 @@ class TestEquipmentSlots(unittest.TestCase):
         eq_slot = slots.EquipmentSlots()
 
         self.assertTrue(eq_slot.equip(self.dagger))
-        self.assertDictEqual(eq_slot.slots.get(setting.ONE_HANDED_SLOT).container, {self.dagger: {'amount': 1}})
+        self.assertDictEqual(eq_slot.slots.get(slots.OneHanded).container, {self.dagger: {'amount': 1}})
         with self.assertRaises(slots.CapacityReachedError):
             eq_slot.equip(self.dagger)
 
@@ -160,14 +160,14 @@ class TestEquipmentSlots(unittest.TestCase):
         eq_slot = slots.EquipmentSlots()
 
         self.assertFalse(eq_slot.unequip(self.dagger))
-        self.assertDictEqual(eq_slot.slots.get(setting.ONE_HANDED_SLOT).container, {})
+        self.assertDictEqual(eq_slot.slots.get(slots.OneHanded).container, {})
 
         self.assertFalse(eq_slot.unequip(self.bread))
         self.assertFalse(eq_slot.unequip(self.copper_coin))
 
         eq_slot.equip(self.dagger)
         self.assertTrue(eq_slot.unequip(self.dagger))
-        self.assertDictEqual(eq_slot.slots.get(setting.ONE_HANDED_SLOT).container, {})
+        self.assertDictEqual(eq_slot.slots.get(slots.OneHanded).container, {})
 
     def test_isItemEquipped(self):
         eq_slot = slots.EquipmentSlots()
