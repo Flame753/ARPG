@@ -1,17 +1,17 @@
 # Local application imports
 from collections import OrderedDict
 from player import Player
-import world
+from world import tiles
 
 
 
 def play():
     print("Escape from Cave Terror!")
-    world.parse_world_dsl()
+    tiles.parse_world_dsl()
     player = Player()
         
     while player.is_alive() and not player.victory:
-        room = world.tile_at(player.x, player.y)
+        room = tiles.tile_at(player.x, player.y)
         text_separator()
         print(room.intro_text())
         text_separator()
@@ -30,18 +30,18 @@ def get_available_actions(room, player):
     print("Choose an action: ")
     if player.inventory.container or player.coin_pouch.container:
         action_adder(actions, 'i', player.print_inventory, "Print Inventory")
-    if isinstance(room, world.TraderTile):
+    if isinstance(room, tiles.TraderTile):
         action_adder(actions, 't', player.trade, "Trade")
-    if isinstance(room, world.EnemyTile) and room.enemy.is_alive():
+    if isinstance(room, tiles.EnemyTile) and room.enemy.is_alive():
         action_adder(actions, 'a', player.attack, "Attack")
     else:
-        if world.tile_at(room.x, room.y - 1):
+        if tiles.tile_at(room.x, room.y - 1):
             action_adder(actions, 'n', player.move_north, "Go north")
-        if world.tile_at(room.x, room.y + 1):
+        if tiles.tile_at(room.x, room.y + 1):
             action_adder(actions, 's', player.move_south, "Go south")
-        if world.tile_at(room.x + 1, room.y):
+        if tiles.tile_at(room.x + 1, room.y):
             action_adder(actions, 'e', player.move_east, "Go east")
-        if world.tile_at(room.x - 1, room.y):
+        if tiles.tile_at(room.x - 1, room.y):
             action_adder(actions, 'w', player.move_west, "Go west")
     if player.hp < player.max_hp:
         action_adder(actions, 'h', player.heal, "Heal")

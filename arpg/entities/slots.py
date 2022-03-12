@@ -1,5 +1,5 @@
 # Standard library imports 
-from __future__ import annotations  # Allowing items.BaseItem for typehinting and preventing cycle ImportError
+from __future__ import annotations  # Allowing commodity.items for typehinting and preventing cycle ImportError
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pprint import pprint
@@ -131,14 +131,26 @@ class TwoHanded(Slot):
 class Coins(Slot):
     name: str = "Coin Slot"
 
-    def order(self) -> list:
-        # Puts the container from largest worth to smallest
+    def have_coin(self, coin, amount=1):
+        currently_own = self.container.get(coin, 0)
+        if type(currently_own) == dict:
+            currently_own = currently_own['amount']
+        return currently_own >= amount
+
+    def order(self, reverse:bool=False) -> None:
+        # rearrange the container from smallest to largest worth
         coins = list(self.container.items())
         worth = lambda coin: coin[0].worth
-        coins.sort(key=worth)  # Sort function only works with a list name
+        coins.sort(key=worth, reverse=reverse)  # Sort function only works with a list name
         ordict = dict(coins)
         self.container.clear()
         self.container.update(ordict)
+
+    def find_largest_coin(self) -> items.Coin:
+        self.order()
+        coins = list(self.container.items())
+        return coins[-1][0]
+
 
 @dataclass()
 class Miscellaneous(Slot):

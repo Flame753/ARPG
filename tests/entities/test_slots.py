@@ -3,20 +3,17 @@ from pprint import pprint
 import unittest
 
 # Local application imports
-# from context import arpg
-# from arpg.entities import items
-# from arpg.entities import slots
-
 from context import entities
 from entities import items
+from entities import currency
 from entities import slots
-from entities import setting
+
 
 
 class TestSlot(unittest.TestCase):
     def setUp(self):
         self.dagger = items.Dagger()
-        self.copper_coin = items.CopperCoin()
+        self.copper_coin = currency.CopperCoin()
         self.bread = items.Bread()
     
     def test_class_initializer(self):
@@ -127,10 +124,27 @@ class TestSlot(unittest.TestCase):
         self.assertEqual(slot.calculateTotalWorth(), answer)
 
 
+class TestCoinSlot(unittest.TestCase):
+    def setUp(self):
+        self.copper = currency.CopperCoin()
+        self.silver = currency.SilverCoin()
+        self.gold = currency.GoldCoin()
+        self.platinum = currency.PlatinumCoin()
+
+    def test_have_coin(self):
+        pass
+
+    def test_order(self):
+        pass
+
+    def test_find_largest_coin(self):
+        pass
+
+
 class TestEquipmentSlots(unittest.TestCase):
     def setUp(self):
         self.dagger = items.Dagger()
-        self.copper_coin = items.CopperCoin()
+        self.copper_coin = currency.CopperCoin()
         self.bread = items.Bread()
         self.axe = items.Axe()
 

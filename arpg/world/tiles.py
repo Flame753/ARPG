@@ -1,7 +1,14 @@
+# Standard library imports 
+from pprint import pprint
+import random
+
+# Local application imports
 from entities import enemies
 from entities import npc
 from entities import items
-import random
+from entities import currency
+from world import economy
+
 
 
 class MapTile:
@@ -81,12 +88,26 @@ class TraderTile(MapTile):
         self.trader = npc.Trader()
         self.items_on_sell = {}
     
+    def _displayGoods(self, seller, buyer):
+        for i, item in enumerate(seller.inventory.container.keys(), start=1):
+            amount = seller.inventory.container.get(item)['amount']
+
+            item_price_as_coins = economy.price_to_coin_converstion(item.worth, buyer.coin_pouch)
+            economy.remove_all_zeros(item_price_as_coins)
+            coins = [(coin.name, amount) for coin, amount in item_price_as_coins.items()]
+
+            print(f"{i}. {item.name} - Worth: {coins} (amount: {amount})")
+            self.items_on_sell[str(i)] = item
+    
+    def _isPlayerSeller(self, seller):
+        return False if isinstance(seller, npc.NonPlayableCharacter) else True
+
+    def _isPlayerBuyer(self, buyer):
+        return False if isinstance(buyer, npc.NonPlayableCharacter) else True
+    
     def trade(self, seller, buyer):
         while True:
-            for i, item in enumerate(seller.inventory.container.keys(), start=1):
-                amount = seller.inventory.container.get(item)['amount']
-                print(f"{i}. {item.name} - {item.worth} copper (amount: {amount})")
-                self.items_on_sell[str(i)] = item
+            self._displayGoods(seller, buyer)
 
             user_input = input("Choose an item or press Q to exit: ")
             if user_input in ['Q', 'q']: 
@@ -102,7 +123,7 @@ class TraderTile(MapTile):
     def swap(self, seller, buyer, item):
         # seller's inventory is empty
         if not self.items_on_sell:
-            if isinstance(seller, npc.NonPlayableCharacter):
+            if self._isPlayerBuyer(buyer):
                 print('Seller has ran out of stock of items.')
             else:
                 print('You have ran out of things to sell.')
@@ -113,21 +134,11 @@ class TraderTile(MapTile):
             print("That's too expensive")
             return
 
-        # Where exchanging items happen
-        # Buyer.addItem can return expection if buyer has no space for item
-        try:
-            # Where exchanging coins happen
-            if not self.transaction(seller, buyer, item):
-                print(f"Transaction incomplete! No Trade!")
-                return
-            buyer.addItem(item, 1)
-            seller.removeItem(item, 1)
-            print("Trade complete!")
-        except IndexError:
-            if isinstance(buyer, npc.NonPlayableCharacter):
-                print('Buyer has reached thier carring capacity.')
-            else:
-                print(f'You have reached your carring capacity.')
+        # Where exchanging coins happen
+        economy.transaction(seller, buyer, item)
+        buyer.addItem(item, 1)
+        seller.removeItem(item, 1)
+        print("Trade complete!")
 
         # Prints the player's coins
         def display_coins(player):
@@ -144,20 +155,6 @@ class TraderTile(MapTile):
             # Playser is the buyer
             display_coins(buyer)
         print('-'*20)
-
-    def transaction(self, seller, buyer, item):
-        price = item.worth
-        buyer_weight = buyer.coin_pouch.calculateTotalWorth()
-
-        if not isinstance(seller, npc.NonPlayableCharacter):
-            # Player is the seller
-            seller.addItem(items.CopperCoin(), item.worth)
-            return True
-        else:
-            # Playser is the buyer
-            # Need to figure out how to do this part
-            return True
-        return False
 
     def check_if_trade(self, player):
         while True:
@@ -187,22 +184,22 @@ class FindCoinTile(MapTile):
         # self.coins_remainding = False
         r = random.random()
         if r < 0.75:
-            self.coin = items.CopperCoin() 
+            self.coin = currency.CopperCoin() 
             self.amount = random.randint(1, 50)
         elif r < 0.9:
-            self.coin = items.SilverCoin()
+            self.coin = currency.SilverCoin()
             self.amount = random.randint(1, 25)
         elif r < 0.99:
-            self.coin = items.GoldCoin()
+            self.coin = currency.GoldCoin()
             self.amount = random.randint(1, 10)
         else:
-            self.coin = items.PlatinumCoin()
+            self.coin = currency.PlatinumCoin()
             self.amount = random.randint(1, 5)
     
     def modify_player(self, player):
         if not self.coins_claimed:
             player.coin_pouch.addItem(self.coin, self.amount)
-            print(f"You have picked {self.amount} {self.coin}s.")
+            print(f"You have picked {self.amount} {self.coin.name}s.")
             self.coins_claimed = True
 
     def intro_text(self):
@@ -212,7 +209,91 @@ class FindCoinTile(MapTile):
             """
         else:
             return f"""
-            You found {self.amount} {self.coin}s!
+            You found {self.amount} {self.coin.name}s!
             """
 
 
+
+
+world_map = []
+start_tile_location = None
+
+tile_type_dict = {"VT": VictoryTile,
+                    "EN": EnemyTile,
+                    "ST": StartTile,
+                    "FC": FindCoinTile,
+                    "TT": TraderTile,
+                    "  ": None}
+
+world_dsl = """
+|EN|EN|VT|EN|EN|
+|EN|  |  |  |EN|
+|EN|FC|EN|  |TT|
+|TT|  |ST|FC|EN|
+|FC|  |EN|  |FC|
+"""
+# Test World
+world_dsl = """|EN|ST|FC|TT|VT|"""
+
+def tile_at(x, y):
+    """
+    Returns the a specific tile in the world map if exists
+    """
+    if x < 0 or y < 0:
+        return None
+    try:
+        return world_map[y][x]
+    except IndexError:
+        return None
+
+def is_dsl_valid(dsl):
+    # There should be exactly one start tile
+    if dsl.count("|ST|") != 1:
+        return False
+
+    # There should be at least one victory tile    
+    if dsl.count("|VT|") == 0:
+        return False
+
+    # Each row should have the same number of cells
+    lines = dsl.splitlines()
+    lines = [l for l in lines if l]  # Removes any empty strings
+    pipe_counts = [line.count("|") for line in lines]
+    for count in pipe_counts:
+        if count != pipe_counts[0]:
+            return False
+    
+    return True
+
+def parse_world_dsl():
+    if not is_dsl_valid(world_dsl):
+        raise SyntaxError("DSL is invalid!")
+
+    dsl_lines = world_dsl.splitlines()
+    dsl_lines = [x for x in dsl_lines if x]
+    for y, dsl_row in enumerate(dsl_lines):
+        # Create an object to store the tiles
+        row = []
+        # Split the line into abbreviations using the "split method"
+        dsl_cells = dsl_row.split("|")
+        # The split method includes the beginning and end of the line
+        # so we need to remove those nonexistent cells
+        dsl_cells = [c for c in dsl_cells if c]
+        # Iterate over each cell in the DSL line 
+        # Instead of j, the variable x is used because 
+        # we're working with an X-Y grid.
+        for x, dsl_cell in enumerate(dsl_cells):
+            # Look up the abbreviation in the dictionary
+            tile_type = tile_type_dict[dsl_cell]
+            if tile_type == StartTile:
+                # Setting the player at starting tile
+                global start_tile_location
+                start_tile_location = x, y
+            # If the dictionary returned a vaild type, create 
+            # a new tile object, pass it the X-Y coordinates
+            # as required by the tile __init__(), and add
+            # it to the row object. If None was found in the 
+            # dictionary, we just add None.
+            row.append(tile_type(x, y) if tile_type else None)
+        #Add the whole row io the world_map
+        world_map.append(row)

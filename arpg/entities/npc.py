@@ -1,4 +1,5 @@
-import entities.items as items
+from entities import items
+from entities import currency
 from entities.creatures import Creature
 
 
@@ -18,7 +19,7 @@ class Trader(NonPlayableCharacter):
         super().__init__(name="Trader", **kwargs)
 
         # self.addItem(items.CoinPouch(sellable=False), 2)
-        self.addItem(items.GoldCoin(), 100)
+        self.addItem(currency.GoldCoin(), 100)
         # self.addItem(items.Backpack(sellable=False))
         self.addItem(items.Bread(), 4)
         self.addItem(items.HealingPotion(), 2)

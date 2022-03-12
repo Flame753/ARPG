@@ -3,21 +3,22 @@ from pprint import pprint
 
 # Local application imports
 from entities.creatures import Creature
+from world import tiles
 from entities import items
-import world
+from entities import currency
 
 
 
 class Player(Creature):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.x = world.start_tile_location[0]
-        self.y = world.start_tile_location[1]
+        self.x = tiles.start_tile_location[0]
+        self.y = tiles.start_tile_location[1]
         self.victory = False
 
         self.addItem(items.Dagger())
         self.addItem(items.Bread())
-        self.addItem(items.SilverCoin(), 3)
+        self.addItem(currency.SilverCoin(), 3)
         # self.addItem(items.CoinPouch(sellable=False))
 
     def move(self, dx, dy):
@@ -39,16 +40,17 @@ class Player(Creature):
     def print_inventory(self):
         print("Inventory:")
         for item, amount in self.inventory.container.items():
-            if isinstance(item, items.Coin): continue
+            if isinstance(item, currency.Coin): continue
             amount = amount['amount']
-            print(f'* {amount} {item}')
+            print(f'* {amount} {item.name}')
         best_weapon = self.most_powerful_weapon()
-        print(f"Your best weapon is your {best_weapon}")
+        print(f"Your best weapon is your {best_weapon.name}")
 
         print("Coins:")
+        self.coin_pouch.order(reverse=True)
         for coin, amount in self.coin_pouch.container.items():
             amount = amount['amount']
-            print(f'* {amount} {coin}')
+            print(f'* {amount} {coin.name}')
 
     def most_powerful_weapon(self):
         max_damage = 0
@@ -62,7 +64,7 @@ class Player(Creature):
 
     def attack(self):
         best_weapon = self.most_powerful_weapon()
-        room = world.tile_at(self.x, self.y)
+        room = tiles.tile_at(self.x, self.y)
         enemy = room.enemy
         print(f"You use {best_weapon.name} against {enemy.name}!")
         enemy.hp -= best_weapon.damage
@@ -81,7 +83,7 @@ class Player(Creature):
         print(f"Current HP {self.hp}")
         print("Choose an item to use to heal: ")
         for i, item in enumerate(consumables, 1):
-            print(f"{i}. {item[1]} {item[0]}")
+            print(f"{i}. {item[1]} {item[0].name}")
         
         valid = False
         while not valid:
@@ -100,7 +102,7 @@ class Player(Creature):
                 print("Invalid choice, try again.")
 
     def trade(self):
-        room = world.tile_at(self.x, self.y)     
+        room = tiles.tile_at(self.x, self.y)     
         room.check_if_trade(self)
 
 
@@ -114,7 +116,7 @@ def main():
     #     for item, amount in starting_equipment.items():
     #         player.addItem(item, amount)
     #     return player
-    world.parse_world_dsl()
+    tiles.parse_world_dsl()
     player = Player()
     # best = player.most_powerful_weapon()
     # print(best)

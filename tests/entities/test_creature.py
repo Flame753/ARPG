@@ -5,15 +5,16 @@ import unittest
 # Local application imports
 from context import entities
 from entities import creatures
-from entities import slots
-from entities import setting
 from entities import items
+from entities import currency
+from entities import slots
+
 
 
 class TestCreature(unittest.TestCase):
     def setUp(self):
         self.dagger = items.Dagger()
-        self.copper_coin = items.CopperCoin()
+        self.copper_coin = currency.CopperCoin()
         self.bread = items.Bread()
 
     def equipment_slot_helper(self, creature_obj, answer):
