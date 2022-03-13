@@ -23,27 +23,27 @@ class Container(ABC):
     container: dict = field(default_factory=dict, init=False)
     
     @abstractmethod
-    def addItem(self, item, amount=0):
+    def add_item(self, item, amount=0):
         pass
 
     @abstractmethod
-    def removeItem(self, item, amount = 0):
+    def remove_item(self, item, amount = 0):
         pass
 
     @abstractmethod
-    def calculateItemWeight(self, item):
+    def calculate_item_weight(self, item):
         pass
 
     @abstractmethod
-    def calculateItemWorth(self, item):
+    def calculate_item_worth(self, item):
         pass
 
     @abstractmethod
-    def calculateTotalWeight(self):
+    def calculate_total_weight(self):
         pass
 
     @abstractmethod
-    def calculateTotalWorth(self):
+    def calculate_total_worth(self):
         pass
 
 @dataclass()
@@ -51,22 +51,22 @@ class Slot(Container):
     name: str = None
     item_limit: int = None
     
-    def addItem(self, item: items.BaseItem, amount: int=1) -> bool:
-        if self._isCapacityReached(amount):
+    def add_item(self, item: items.BaseItem, amount: int=1) -> bool:
+        if self._is_capacity_reached(amount):
             raise CapacityReachedError(f"Exceeded Maximum Capacity of {self.item_limit}! Unable to add {item}!")
         if item in self.container:
             self.container[item]['amount'] += amount # Adding another item
         else:
             self.container[item] = {'amount': amount} # Adding new item
 
-    def _isCapacityReached(self, additional_amount: int=0) -> bool:
+    def _is_capacity_reached(self, additional_amount: int=0) -> bool:
         if self.item_limit == None: return False
         amount_list = [amount['amount'] for amount in self.container.values()]
         total_amount = sum(amount_list) + additional_amount
         if total_amount == 0 and self.item_limit == 0: return True
         return total_amount > self.item_limit
 
-    def removeItem(self, item: items.BaseItem, amount: int=1) -> bool:
+    def remove_item(self, item: items.BaseItem, amount: int=1) -> bool:
         if item in self.container:
             if self.container[item]['amount'] >= amount:
                 self.container[item]['amount'] -= amount
@@ -75,23 +75,23 @@ class Slot(Container):
                 return True
         return False
 
-    def calculateItemWeight(self, item: items.BaseItem) -> int:
+    def calculate_item_weight(self, item: items.BaseItem) -> int:
         raise NotImplementedError()
         total_amount_weight = item.weight * self.container[item]['amount']
         return total_amount_weight if item in self.container else 0
 
-    def calculateItemWorth(self, item: items.BaseItem) -> int:
+    def calculate_item_worth(self, item: items.BaseItem) -> int:
         total_amount_worth = item.worth * self.container[item]['amount']
         return total_amount_worth if item in self.container else 0
 
-    def calculateTotalWeight(self) -> int:
+    def calculate_total_weight(self) -> int:
         raise NotImplementedError()
         weight = 0
         for item, data in self.container.items():
             weight += item.weight * data['amount']
         return weight
 
-    def calculateTotalWorth(self) -> int:
+    def calculate_total_worth(self) -> int:
         worth = 0
         for item, data in self.container.items():
             worth += item.worth * data['amount']
@@ -166,17 +166,17 @@ class EquipmentSlots():
                         TwoHanded: TwoHanded()}
 
     def equip(self, item: items.BaseItem) -> bool:
-        if not self.locateSlotByItem(item): return False
-        self.locateSlotByItem(item).addItem(item, 1)
+        if not self.locate_slot_by_item(item): return False
+        self.locate_slot_by_item(item).add_item(item, 1)
         return True
 
     def unequip(self, item: items.BaseItem) -> bool:
-        if not self.isItemEquipped(item): return False
-        return True if self.locateSlotByItem(item).removeItem(item, 1) else False
+        if not self.is_item_equipped(item): return False
+        return True if self.locate_slot_by_item(item).remove_item(item, 1) else False
 
-    def isItemEquipped(self, item: items.BaseItem) -> bool:
-        if not self.locateSlotByItem(item): return False
-        return True if item in self.locateSlotByItem(item).container else False
+    def is_item_equipped(self, item: items.BaseItem) -> bool:
+        if not self.locate_slot_by_item(item): return False
+        return True if item in self.locate_slot_by_item(item).container else False
 
-    def locateSlotByItem(self, item: items.BaseItem) -> Slot:
+    def locate_slot_by_item(self, item: items.BaseItem) -> Slot:
         return self.slots.get(item.slot_type)

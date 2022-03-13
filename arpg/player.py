@@ -16,10 +16,10 @@ class Player(Creature):
         self.y = tiles.start_tile_location[1]
         self.victory = False
 
-        self.addItem(items.Dagger())
-        self.addItem(items.Bread())
-        self.addItem(currency.SilverCoin(), 3)
-        # self.addItem(items.CoinPouch(sellable=False))
+        self.add_item(items.Dagger())
+        self.add_item(items.Bread())
+        self.add_item(currency.SilverCoin(), 3)
+        # self.add_item(items.CoinPouch(sellable=False))
 
     def move(self, dx, dy):
         self.x += dx
@@ -94,7 +94,7 @@ class Player(Creature):
                 else:
                     to_eat = consumables[int(choice) - 1][0]
                     self.hp = min(self.max_hp, self.hp + to_eat.healing_value)
-                    self.removeItem(to_eat, 1)
+                    self.remove_item(to_eat, 1)
                     print('')
                     print(f"Now Current HP: {self.hp}")
                     valid = True
@@ -114,7 +114,7 @@ def main():
     #                         items.Bread(): 2}
     #     player = Player()
     #     for item, amount in starting_equipment.items():
-    #         player.addItem(item, amount)
+    #         player.add_item(item, amount)
     #     return player
     tiles.parse_world_dsl()
     player = Player()

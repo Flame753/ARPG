@@ -30,38 +30,38 @@ class TestSlot(unittest.TestCase):
         self.assertEqual(body_A, body_B)
         self.assertFalse(body_A is body_B)
 
-        head_A.addItem(self.dagger)
+        head_A.add_item(self.dagger)
         self.assertNotEqual(head_A, head_B)
         self.assertFalse(head_A is head_B)
 
         self.assertNotEqual(legs_A, body_A)
         self.assertFalse(legs_A is body_A)
 
-    def test_addItem(self):
+    def test_add_item(self):
         slot = slots.Slot()
 
         self.assertDictEqual(slot.container, {})
-        slot.addItem(self.dagger)
+        slot.add_item(self.dagger)
         self.assertDictEqual(slot.container, {self.dagger: {'amount': 1}})
-        slot.addItem(self.copper_coin, 6)
+        slot.add_item(self.copper_coin, 6)
         self.assertDictEqual(slot.container, {self.dagger: {'amount': 1},
                                             self.copper_coin: {'amount': 6}})
 
-    def test_isCapacityReached(self):
+    def test_is_capacity_reached(self):
         slot = slots.Slot()
 
         # testing when item_limit is None
-        self.assertFalse(slot._isCapacityReached())
+        self.assertFalse(slot._is_capacity_reached())
 
         slot.item_limit = 0
-        self.assertTrue(slot._isCapacityReached())
+        self.assertTrue(slot._is_capacity_reached())
 
         slot.item_limit = 2
-        self.assertFalse(slot._isCapacityReached())
+        self.assertFalse(slot._is_capacity_reached())
 
         amount = 2
-        slot.addItem(self.dagger, amount)
-        self.assertTrue(slot._isCapacityReached(amount))
+        slot.add_item(self.dagger, amount)
+        self.assertTrue(slot._is_capacity_reached(amount))
 
     def test_item_limit(self):
         slot = slots.Slot()
@@ -69,59 +69,59 @@ class TestSlot(unittest.TestCase):
 
         # Passing the limit in a singe time
         with self.assertRaises(slots.CapacityReachedError):
-            slot.addItem(self.dagger, 3)
+            slot.add_item(self.dagger, 3)
         self.assertDictEqual(slot.container, {})
 
-        slot.addItem(self.dagger, 2)
+        slot.add_item(self.dagger, 2)
         with self.assertRaises(slots.CapacityReachedError):
-            slot.addItem(self.dagger, 1)
-            slot.addItem(self.copper_coin, 3)
+            slot.add_item(self.dagger, 1)
+            slot.add_item(self.copper_coin, 3)
 
-    def test_removeitem(self):
+    def test_remove_item(self):
         slot = slots.Slot()
-        self.assertFalse(slot.removeItem(self.dagger))
+        self.assertFalse(slot.remove_item(self.dagger))
         
-        slot.addItem(self.dagger)
-        self.assertFalse(slot.removeItem(self.dagger, 2))
+        slot.add_item(self.dagger)
+        self.assertFalse(slot.remove_item(self.dagger, 2))
         self.assertDictEqual(slot.container, {self.dagger: {'amount': 1}})
 
-        self.assertTrue(slot.removeItem(self.dagger))
+        self.assertTrue(slot.remove_item(self.dagger))
         self.assertDictEqual(slot.container, {})
 
-    def test_calculateItemWorth(self):
+    def test_calculate_item_worth(self):
         slot = slots.Slot()
 
         copper_amount = 10
-        slot.addItem(self.copper_coin, copper_amount)
-        self.assertEqual(slot.calculateItemWorth(self.copper_coin), copper_amount*self.copper_coin.worth)
+        slot.add_item(self.copper_coin, copper_amount)
+        self.assertEqual(slot.calculate_item_worth(self.copper_coin), copper_amount*self.copper_coin.worth)
 
         bread_amount = 5
-        slot.addItem(self.bread, bread_amount)
-        self.assertEqual(slot.calculateItemWorth(self.bread), bread_amount*self.bread.worth)
+        slot.add_item(self.bread, bread_amount)
+        self.assertEqual(slot.calculate_item_worth(self.bread), bread_amount*self.bread.worth)
 
         dagger_amount = 5
-        slot.addItem(self.dagger, dagger_amount)
-        self.assertEqual(slot.calculateItemWorth(self.dagger), dagger_amount*self.dagger.worth)
+        slot.add_item(self.dagger, dagger_amount)
+        self.assertEqual(slot.calculate_item_worth(self.dagger), dagger_amount*self.dagger.worth)
 
-    def test_calculateTotalWorth(self):
+    def test_calculate_total_worth(self):
         slot = slots.Slot()
 
-        self.assertEqual(slot.calculateTotalWorth(), 0)
+        self.assertEqual(slot.calculate_total_worth(), 0)
 
         copper_amount = 10
-        slot.addItem(self.copper_coin, copper_amount)
+        slot.add_item(self.copper_coin, copper_amount)
         answer = copper_amount*self.copper_coin.worth
-        self.assertEqual(slot.calculateTotalWorth(), answer)
+        self.assertEqual(slot.calculate_total_worth(), answer)
 
         bread_amount = 5
-        slot.addItem(self.bread, bread_amount)
+        slot.add_item(self.bread, bread_amount)
         answer = answer + (bread_amount * self.bread.worth)
-        self.assertEqual(slot.calculateTotalWorth(), answer)
+        self.assertEqual(slot.calculate_total_worth(), answer)
 
         dagger_amount = 5
-        slot.addItem(self.dagger, dagger_amount)
+        slot.add_item(self.dagger, dagger_amount)
         answer = answer + (dagger_amount * self.dagger.worth)
-        self.assertEqual(slot.calculateTotalWorth(), answer)
+        self.assertEqual(slot.calculate_total_worth(), answer)
 
 
 class TestCoinSlot(unittest.TestCase):
@@ -183,24 +183,24 @@ class TestEquipmentSlots(unittest.TestCase):
         self.assertTrue(eq_slot.unequip(self.dagger))
         self.assertDictEqual(eq_slot.slots.get(slots.OneHanded).container, {})
 
-    def test_isItemEquipped(self):
+    def test_is_item_equipped(self):
         eq_slot = slots.EquipmentSlots()
 
-        self.assertFalse(eq_slot.isItemEquipped(self.dagger))
-        self.assertFalse(eq_slot.isItemEquipped(self.bread))
-        self.assertFalse(eq_slot.isItemEquipped(self.copper_coin))
+        self.assertFalse(eq_slot.is_item_equipped(self.dagger))
+        self.assertFalse(eq_slot.is_item_equipped(self.bread))
+        self.assertFalse(eq_slot.is_item_equipped(self.copper_coin))
 
         eq_slot.equip(self.dagger)
-        self.assertTrue(eq_slot.isItemEquipped(self.dagger))
+        self.assertTrue(eq_slot.is_item_equipped(self.dagger))
 
-    def test_locateSlotByItem(self):
+    def test_locate_slot_by_item(self):
         eq_slot = slots.EquipmentSlots()
-        # self.assertEqual(eq_slot.locateSlotByItem(), slots.Head())
-        # self.assertEqual(eq_slot.locateSlotByItem(), slots.Body())
-        # self.assertEqual(eq_slot.locateSlotByItem(), slots.Legs())
-        # self.assertEqual(eq_slot.locateSlotByItem(), slots.Boots())
-        self.assertEqual(eq_slot.locateSlotByItem(self.dagger), slots.OneHanded())
-        self.assertEqual(eq_slot.locateSlotByItem(self.axe), slots.TwoHanded())
+        # self.assertEqual(eq_slot.locate_slot_by_item(), slots.Head())
+        # self.assertEqual(eq_slot.locate_slot_by_item(), slots.Body())
+        # self.assertEqual(eq_slot.locate_slot_by_item(), slots.Legs())
+        # self.assertEqual(eq_slot.locate_slot_by_item(), slots.Boots())
+        self.assertEqual(eq_slot.locate_slot_by_item(self.dagger), slots.OneHanded())
+        self.assertEqual(eq_slot.locate_slot_by_item(self.axe), slots.TwoHanded())
 
 
 if __name__ == '__main__':

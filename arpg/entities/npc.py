@@ -18,8 +18,8 @@ class Trader(NonPlayableCharacter):
     def __init__(self, **kwargs):
         super().__init__(name="Trader", **kwargs)
 
-        # self.addItem(items.CoinPouch(sellable=False), 2)
-        self.addItem(currency.GoldCoin(), 100)
-        # self.addItem(items.Backpack(sellable=False))
-        self.addItem(items.Bread(), 4)
-        self.addItem(items.HealingPotion(), 2)
+        # self.add_item(items.CoinPouch(sellable=False), 2)
+        self.add_item(currency.GoldCoin(), 100)
+        # self.add_item(items.Backpack(sellable=False))
+        self.add_item(items.Bread(), 4)
+        self.add_item(items.HealingPotion(), 2)

@@ -130,14 +130,14 @@ class TraderTile(MapTile):
             return
 
         # Verifying that the buyer has enough cash to buy the item
-        if item.worth > buyer.coin_pouch.calculateTotalWorth():
+        if item.worth > buyer.coin_pouch.calculate_total_worth():
             print("That's too expensive")
             return
 
         # Where exchanging coins happen
         economy.transaction(seller, buyer, item)
-        buyer.addItem(item, 1)
-        seller.removeItem(item, 1)
+        buyer.add_item(item, 1)
+        seller.remove_item(item, 1)
         print("Trade complete!")
 
         # Prints the player's coins
@@ -198,7 +198,7 @@ class FindCoinTile(MapTile):
     
     def modify_player(self, player):
         if not self.coins_claimed:
-            player.coin_pouch.addItem(self.coin, self.amount)
+            player.coin_pouch.add_item(self.coin, self.amount)
             print(f"You have picked {self.amount} {self.coin.name}s.")
             self.coins_claimed = True
 

@@ -72,7 +72,7 @@ def item_expensive(item_price: int, current_amount: int) -> bool:
     return item_price > current_amount
 
 def transaction(seller, buyer, item):
-    buyer_wealth = buyer.coin_pouch.calculateTotalWorth()
+    buyer_wealth = buyer.coin_pouch.calculate_total_worth()
     
     if item_expensive(item.worth, buyer_wealth):
         raise UnaffordableError
@@ -84,8 +84,8 @@ def transaction(seller, buyer, item):
     #     buyer_amount = coin.get()
 
     for coin, amount in price_as_coins.items():
-        seller.coin_pouch.addItem(coin, amount)
-        buyer.coin_pouch.removeItem(coin, amount)
+        seller.coin_pouch.add_item(coin, amount)
+        buyer.coin_pouch.remove_item(coin, amount)
         # Buyer issue. if buyer has not exact coin amount
         # Like item worth 86 and buyer had only 9 silver.
         # Or buyer had one gold and items is still worth 86 (80 silver and 6 copper)

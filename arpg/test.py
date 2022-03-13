@@ -16,9 +16,9 @@ from entities.slots import Coins
 
 # c = Coins()
 # print(c.haveCoin(CopperCoin()))
-# c.addItem(CopperCoin())
+# c.add_item(CopperCoin())
 # print(c.haveCoin(CopperCoin()))
-# c.addItem(SilverCoin(), 203)
+# c.add_item(SilverCoin(), 203)
 # print(c.haveCoin(SilverCoin(), 204))
 # print(c.haveCoin(SilverCoin(), 200))
 
@@ -63,10 +63,10 @@ p = PlatinumCoin()
 # print(exchange2(20, g, c))
 
 pouch = slots.Coins()
-pouch.addItem(c, 6)
-pouch.addItem(g, 2)
-pouch.addItem(s, 8)
-# pouch.addItem(GreaterPlatinumCoin(), 8)
+pouch.add_item(c, 6)
+pouch.add_item(g, 2)
+pouch.add_item(s, 8)
+# pouch.add_item(GreaterPlatinumCoin(), 8)
 
 pouch.order(reverse=True)
 print(pouch.container)

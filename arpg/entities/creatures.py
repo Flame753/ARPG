@@ -26,7 +26,7 @@ class Creature():
         self.max_hp = 100
 
 
-    def _verifyArguments(self, item: BaseItem=None, amount: int=None) -> None:
+    def _verify_arguments(self, item: BaseItem=None, amount: int=None) -> None:
         # Verifys if Arguments are enter correctly 
         if item:
             if not isinstance(item, BaseItem):
@@ -39,46 +39,46 @@ class Creature():
         if type(item) in [list, dict, tuple] or type(amount) in [list, dict, tuple]:
             raise TypeError(f"Arguments can't be a empty List, Dictionary or Tuple")
 
-    def addItem(self, item: BaseItem, amount: int=1) -> None:
-        self._verifyArguments(item, amount)
+    def add_item(self, item: BaseItem, amount: int=1) -> None:
+        self._verify_arguments(item, amount)
 
         # Always adds the amount of items into the invenotry slot excluding any Coin items
         if item.slot_type == slots.Coins:
-            self.coin_pouch.addItem(item, amount)
+            self.coin_pouch.add_item(item, amount)
         else:
-            self.inventory.addItem(item, amount)
+            self.inventory.add_item(item, amount)
 
-    def removeItem(self, item: BaseItem, amount: int=1) -> bool:
-        self._verifyArguments(item, amount)
+    def remove_item(self, item: BaseItem, amount: int=1) -> bool:
+        self._verify_arguments(item, amount)
 
-        if self.equippable_slots.isItemEquipped(item): raise EquippedItemRemovealError
+        if self.equippable_slots.is_item_equipped(item): raise EquippedItemRemovealError
 
         if item.slot_type == slots.Coins:
-            return self.coin_pouch.removeItem(item, amount)
+            return self.coin_pouch.remove_item(item, amount)
         else:
-            return self.inventory.removeItem(item, amount)
+            return self.inventory.remove_item(item, amount)
 
     def equip(self, item: BaseItem) -> bool:
-        self._verifyArguments(item)
+        self._verify_arguments(item)
 
         if not item in self.inventory.container: return False # No items to equip
         return self.equippable_slots.equip(item)
 
     def unequip(self, item: BaseItem) -> bool:
-        self._verifyArguments(item)
+        self._verify_arguments(item)
 
         return True if self.equippable_slots.unequip(item) else False
 
-    def calculateItemWorth(self, item: BaseItem) -> int:
-        self._verifyArguments(item)
+    def calculate_item_worth(self, item: BaseItem) -> int:
+        self._verify_arguments(item)
 
         if item.slot_type == slots.Coins:
-            return self.coin_pouch.calculateItemWorth(item)
+            return self.coin_pouch.calculate_item_worth(item)
         else:
-            return self.inventory.calculateItemWorth(item)
+            return self.inventory.calculate_item_worth(item)
 
-    def calculateTotalWorth(self) -> int:
-        return self.coin_pouch.calculateTotalWorth() + self.inventory.calculateTotalWorth()
+    def calculate_total_worth(self) -> int:
+        return self.coin_pouch.calculate_total_worth() + self.inventory.calculate_total_worth()
 
     def is_alive(self) -> bool:
         return self.hp > 0
