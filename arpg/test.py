@@ -88,3 +88,23 @@ print(pouch.container)
 #     return min_sum
 
 # min_subarray_sum([-7, 3, 4, -2, -3, 1, -3])
+
+
+
+# from collections import OrderedDict
+
+# ord_dict = OrderedDict()
+# ord_dict['a'] = 1
+# ord_dict['b'] = 2
+# a, b = ord_dict.items()
+# print(a, b)
+# a, b = ord_dict
+# print(a, b)
+
+# ord_dict = dict()
+# ord_dict['a'] = 1
+# ord_dict['b'] = 2
+# a, b = ord_dict.items()
+# print(a, b)
+# a, b = ord_dict
+# print(a, b)

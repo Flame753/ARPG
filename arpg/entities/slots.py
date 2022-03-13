@@ -132,6 +132,8 @@ class Coins(Slot):
     name: str = "Coin Slot"
 
     def have_coin(self, coin, amount=1):
+        if amount <= 0: raise ValueError 
+        
         currently_own = self.container.get(coin, 0)
         if type(currently_own) == dict:
             currently_own = currently_own['amount']
