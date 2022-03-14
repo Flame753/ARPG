@@ -18,12 +18,10 @@ class TestCreature(unittest.TestCase):
         self.bread = items.Bread()
 
     def equipment_slot_helper(self, creature_obj, answer):
-        self.assertDictEqual(creature_obj.equippable_slots.slots.get(slots.Head).container, answer) 
-        self.assertDictEqual(creature_obj.equippable_slots.slots.get(slots.Body).container, answer) 
-        self.assertDictEqual(creature_obj.equippable_slots.slots.get(slots.Legs).container, answer)
-        self.assertDictEqual(creature_obj.equippable_slots.slots.get(slots.Boots).container, answer)
-        self.assertDictEqual(creature_obj.equippable_slots.slots.get(slots.OneHanded).container, answer) 
-        self.assertDictEqual(creature_obj.equippable_slots.slots.get(slots.TwoHanded).container, answer) 
+        list_of_slots = [slots.Head, slots.Body, slots.Legs, slots.Boots, slots.OneHanded, slots.TwoHanded]
+        for slot in list_of_slots:
+            creature_obj.equippable_slots.slots.get(slot)._ensure_inventory()
+            self.assertDictEqual(creature_obj.equippable_slots.slots.get(slot).inventory, answer) 
 
     def test_class_initializer(self):
         creature_A = creatures.Creature()
@@ -42,19 +40,19 @@ class TestCreature(unittest.TestCase):
         creature = creatures.Creature()
 
         creature.add_item(self.dagger)
-        self.assertDictEqual(creature.inventory.container, 
+        self.assertDictEqual(creature.inventory.inventory, 
                             {self.dagger: {'amount': 1}}) 
 
         creature.add_item(self.copper_coin, 2)
-        self.assertDictEqual(creature.coin_pouch.container, 
+        self.assertDictEqual(creature.coin_pouch.inventory, 
                             {self.copper_coin: {'amount': 2}}) 
 
         creature.add_item(self.bread, 6)
-        self.assertDictEqual(creature.inventory.container, 
+        self.assertDictEqual(creature.inventory.inventory, 
                             {self.bread: {'amount': 6}, self.dagger: {'amount': 1}}) 
 
         creature.add_item(self.dagger, 3)
-        self.assertDictEqual(creature.inventory.container, 
+        self.assertDictEqual(creature.inventory.inventory, 
                             {self.bread: {'amount': 6}, self.dagger: {'amount': 4}}) 
 
     def test_remove_item(self):
@@ -66,11 +64,11 @@ class TestCreature(unittest.TestCase):
  
         creature.add_item(self.dagger)
         creature.remove_item(self.dagger)
-        self.assertDictEqual(creature.inventory.container, {}) 
+        self.assertDictEqual(creature.inventory.inventory, {}) 
 
         creature.add_item(self.copper_coin, 8)
         creature.remove_item(self.copper_coin, 3)
-        self.assertDictEqual(creature.coin_pouch.container, 
+        self.assertDictEqual(creature.coin_pouch.inventory, 
                             {self.copper_coin: {'amount': 5}}) 
 
     def test_equip(self):
@@ -78,29 +76,28 @@ class TestCreature(unittest.TestCase):
         # Equipping dagger that is not in creature
         result = creature.equip(self.dagger)
         self.assertFalse(result)
-        # Verifying that there is no container was added
+        # Verifying that there is no inventory was added
         answer = {}
         self.equipment_slot_helper(creature, answer)
 
-        result = creature.inventory.container
+        result = creature.inventory.inventory
         self.assertDictEqual(result, answer) 
 
-        result = creature.coin_pouch.container
-        self.assertDictEqual(result, answer) 
+        self.assertFalse(hasattr(creature.coin_pouch, 'inventory'))
 
         # Equipping non equipable item
         creature.add_item(self.copper_coin)
         result = creature.equip(self.copper_coin)
         self.assertFalse(result)
-        # Verifying that there is no container was added
+        # Verifying that there is no inventory was added
         answer = {self.copper_coin: {'amount': 1}}
-        result = creature.coin_pouch.container
+        result = creature.coin_pouch.inventory
         self.assertDictEqual(result, answer) 
 
         answer = {}
         self.equipment_slot_helper(creature, answer)
 
-        result = creature.inventory.container
+        result = creature.inventory.inventory
         self.assertDictEqual(result, answer) 
 
 
@@ -110,11 +107,11 @@ class TestCreature(unittest.TestCase):
         self.assertTrue(result)
         
         answer = {self.dagger: {'amount': 1}}
-        result = creature.inventory.container
+        result = creature.inventory.inventory
         self.assertDictEqual(result, answer)
 
         answer = {self.dagger: {'amount': 1}}
-        result = creature.equippable_slots.slots.get(slots.OneHanded).container
+        result = creature.equippable_slots.slots.get(slots.OneHanded).inventory
         self.assertDictEqual(result, answer) 
 
         # equipping a non equipable item
@@ -128,28 +125,23 @@ class TestCreature(unittest.TestCase):
         # Unequipping a item that doesn't exist
         result = creature.unequip(self.dagger)
         self.assertFalse(result)
-        # Verifying that there is no container was added
+        # Verifying that there is no inventory was added
         answer = {}
         self.equipment_slot_helper(creature, answer)
 
-        result = creature.inventory.container
-        self.assertDictEqual(result, answer)
-    
-        result = creature.coin_pouch.container
-        self.assertDictEqual(result, answer) 
+        self.assertFalse(hasattr(creature.inventory, 'inventory'))
 
         creature.add_item(self.copper_coin)
         result = creature.unequip(self.copper_coin)
         self.assertFalse(result)
-        # Verifying that there is no container was added
+        # Verifying that there is no inventory was added
         answer = {}
         self.equipment_slot_helper(creature, answer)
 
-        result = creature.inventory.container
-        self.assertDictEqual(result, answer)
+        self.assertFalse(hasattr(creature.inventory, 'inventory'))
 
         answer = {self.copper_coin: {'amount': 1}}
-        result = creature.coin_pouch.container
+        result = creature.coin_pouch.inventory
         self.assertDictEqual(result, answer) 
         # Preparing for next test case
         creature.remove_item(self.copper_coin)
@@ -162,11 +154,11 @@ class TestCreature(unittest.TestCase):
         answer = {}
         self.equipment_slot_helper(creature, answer)
 
-        result = creature.coin_pouch.container
+        result = creature.coin_pouch.inventory
         self.assertDictEqual(result, answer)
          
         answer = {self.dagger: {'amount': 1}}
-        result = creature.inventory.container
+        result = creature.inventory.inventory
         self.assertDictEqual(result, answer)
 
     def test_calculate_item_worth(self):

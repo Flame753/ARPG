@@ -60,8 +60,9 @@ class Creature():
 
     def equip(self, item: BaseItem) -> bool:
         self._verify_arguments(item)
+        self.inventory._ensure_inventory()
 
-        if not item in self.inventory.container: return False # No items to equip
+        if not item in self.inventory.inventory: return False # No items to equip
         return self.equippable_slots.equip(item)
 
     def unequip(self, item: BaseItem) -> bool:

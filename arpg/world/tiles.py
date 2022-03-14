@@ -89,8 +89,8 @@ class TraderTile(MapTile):
         self.items_on_sell = {}
     
     def _displayGoods(self, seller, buyer):
-        for i, item in enumerate(seller.inventory.container.keys(), start=1):
-            amount = seller.inventory.container.get(item)['amount']
+        for i, item in enumerate(seller.inventory.inventory.keys(), start=1):
+            amount = seller.inventory.inventory.get(item)['amount']
 
             item_price_as_coins = economy.price_to_coin_converstion(item.worth, buyer.coin_pouch)
             economy.remove_all_zeros(item_price_as_coins)
@@ -144,7 +144,7 @@ class TraderTile(MapTile):
         def display_coins(player):
             print('You currenlty have;')
             player.coin_pouch.order()
-            for coin, amount in player.coin_pouch.container.items():
+            for coin, amount in player.coin_pouch.inventory.items():
                 amount = amount['amount']
                 print(f'    {amount} {coin.name}')
 

@@ -2,7 +2,6 @@
 from __future__ import annotations  # Allowing commodity.items for typehinting and preventing cycle ImportError
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Optional
 from pprint import pprint
 
 # Local application imports
@@ -20,20 +19,20 @@ class CapacityReachedError(Exception):
 
 
 class Container(ABC):
-    def _ensure_inventory(self) -> None:
+    def ensureInventory(self):
         if not hasattr(self, 'inventory'):
-            self.inventory = dict()
+            self.inventory = {}
 
-    def add_item(self, item: items.BaseItem, amount: int = 0) -> None:
-        self._ensure_inventory()
+    def addItem(self, item, amount = 0):
+        self.ensureInventory()
 
         if item in self.inventory:
             self.inventory[item]['amount'] += amount
         else:
             self.inventory[item] = {'amount': amount}
 
-    def remove_item(self, item: items.BaseItem, amount: int = 0) -> bool:
-        self._ensure_inventory()
+    def removeItem(self, item, amount = 0):
+        self.ensureInventory()
 
         if item in self.inventory:
             if self.inventory[item]['amount'] >= amount:
@@ -43,28 +42,28 @@ class Container(ABC):
                 return True
         return False
 
-    def calculate_item_weight(self, item: items.BaseItem) -> int:
-        self._ensure_inventory()
+    def calculateItemWeight(self, item):
+        self.ensureInventory()
 
         if item in self.inventory:
             return item.weight * self.inventory[item]['amount']
 
-    def calculate_item_worth(self, item: items.BaseItem)  -> int:
-        self._ensure_inventory()
+    def calculateItemWorth(self, item):
+        self.ensureInventory()
 
         if item in self.inventory:
             return item.worth * self.inventory[item]['amount']
 
-    def calculate_total_weight(self) -> int:
-        self._ensure_inventory()
+    def calculateTotalWeight(self):
+        self.ensureInventory()
 
         weight = 0
         for item, data in self.inventory.items():
             weight += item.weight * data['amount']
         return weight
 
-    def calculate_total_worth(self) -> int:
-        self._ensure_inventory()
+    def calculateTotalWorth(self):
+        self.ensureInventory()
 
         worth = 0
         for item, data in self.inventory.items():
@@ -72,33 +71,84 @@ class Container(ABC):
         return worth
 
 
+# @dataclass
+# class Container(ABC):
+#     container: dict = field(default_factory=dict, init=False)
+    
+#     @abstractmethod
+#     def add_item(self, item, amount=0):
+#         pass
+
+#     @abstractmethod
+#     def remove_item(self, item, amount = 0):
+#         pass
+
+#     @abstractmethod
+#     def calculate_item_weight(self, item):
+#         pass
+
+#     @abstractmethod
+#     def calculate_item_worth(self, item):
+#         pass
+
+#     @abstractmethod
+#     def calculate_total_weight(self):
+#         pass
+
+#     @abstractmethod
+#     def calculate_total_worth(self):
+#         pass
+
 @dataclass()
 class Slot(Container):
-    def __init__(self, name, item_limit):
-        self.name: str = name
-        self.item_limit: int = item_limit
+    name: str = None
+    item_limit: int = None
     
     def add_item(self, item: items.BaseItem, amount: int=1) -> bool:
         if self._is_capacity_reached(amount):
             raise CapacityReachedError(f"Exceeded Maximum Capacity of {self.item_limit}! Unable to add {item}!")
-        super().add_item(item, amount)
+        if item in self.container:
+            self.container[item]['amount'] += amount # Adding another item
+        else:
+            self.container[item] = {'amount': amount} # Adding new item
 
     def _is_capacity_reached(self, additional_amount: int=0) -> bool:
-        if not hasattr(self, 'item_limit'): return False
-        self._ensure_inventory()
-        amount_list = [amount['amount'] for amount in self.inventory.values()]
+        if self.item_limit == None: return False
+        amount_list = [amount['amount'] for amount in self.container.values()]
         total_amount = sum(amount_list) + additional_amount
         if total_amount == 0 and self.item_limit == 0: return True
         return total_amount > self.item_limit
 
     def remove_item(self, item: items.BaseItem, amount: int=1) -> bool:
-        return super().remove_item(item, amount)
+        if item in self.container:
+            if self.container[item]['amount'] >= amount:
+                self.container[item]['amount'] -= amount
+                if self.container[item]['amount'] == 0:
+                    del(self.container[item])
+                return True
+        return False
+
+    def calculate_item_weight(self, item: items.BaseItem) -> int:
+        raise NotImplementedError()
+        total_amount_weight = item.weight * self.container[item]['amount']
+        return total_amount_weight if item in self.container else 0
 
     def calculate_item_worth(self, item: items.BaseItem) -> int:
-        self._ensure_inventory()
-        total_amount_worth = item.worth * self.inventory[item]['amount']
-        return total_amount_worth if item in self.inventory else 0
+        total_amount_worth = item.worth * self.container[item]['amount']
+        return total_amount_worth if item in self.container else 0
 
+    def calculate_total_weight(self) -> int:
+        raise NotImplementedError()
+        weight = 0
+        for item, data in self.container.items():
+            weight += item.weight * data['amount']
+        return weight
+
+    def calculate_total_worth(self) -> int:
+        worth = 0
+        for item, data in self.container.items():
+            worth += item.worth * data['amount']
+        return worth
 
 @dataclass()
 class Head(Slot):
@@ -135,27 +185,25 @@ class Coins(Slot):
     name: str = "Coin Slot"
 
     def have_coin(self, coin, amount=1):
-        self._ensure_inventory()
         if amount <= 0: raise ValueError 
 
-        currently_own = self.inventory.get(coin, 0)
+        currently_own = self.container.get(coin, 0)
         if type(currently_own) == dict:
             currently_own = currently_own['amount']
         return currently_own >= amount
 
     def order(self, reverse:bool=False) -> None:
-        # rearrange the inventory from smallest to largest worth
-        self._ensure_inventory()
-        coins = list(self.inventory.items())
+        # rearrange the container from smallest to largest worth
+        coins = list(self.container.items())
         worth = lambda coin: coin[0].worth
         coins.sort(key=worth, reverse=reverse)  # Sort function only works with a list name
         ordict = dict(coins)
-        self.inventory.clear()
-        self.inventory.update(ordict)
+        self.container.clear()
+        self.container.update(ordict)
 
     def find_largest_coin(self) -> items.Coin:
         self.order()
-        coins = list(self.inventory.items())
+        coins = list(self.container.items())
         return coins[-1][0]
 
 
@@ -182,10 +230,8 @@ class EquipmentSlots():
         return True if self.locate_slot_by_item(item).remove_item(item, 1) else False
 
     def is_item_equipped(self, item: items.BaseItem) -> bool:
-        slot = self.locate_slot_by_item(item)
-        if not slot: return False
-        slot._ensure_inventory()
-        return True if item in slot.inventory else False
+        if not self.locate_slot_by_item(item): return False
+        return True if item in self.locate_slot_by_item(item).container else False
 
-    def locate_slot_by_item(self, item: items.BaseItem) -> Optional[Slot]:
+    def locate_slot_by_item(self, item: items.BaseItem) -> Slot:
         return self.slots.get(item.slot_type)

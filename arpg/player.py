@@ -39,7 +39,7 @@ class Player(Creature):
 
     def print_inventory(self):
         print("Inventory:")
-        for item, amount in self.inventory.container.items():
+        for item, amount in self.inventory.inventory.items():
             if isinstance(item, currency.Coin): continue
             amount = amount['amount']
             print(f'* {amount} {item.name}')
@@ -48,14 +48,14 @@ class Player(Creature):
 
         print("Coins:")
         self.coin_pouch.order(reverse=True)
-        for coin, amount in self.coin_pouch.container.items():
+        for coin, amount in self.coin_pouch.inventory.items():
             amount = amount['amount']
             print(f'* {amount} {coin.name}')
 
     def most_powerful_weapon(self):
         max_damage = 0
         best_weapon = None
-        for item in self.inventory.container.keys():
+        for item in self.inventory.inventory.keys():
             if not hasattr(item, 'damage'): continue
             if item.damage > max_damage:
                 best_weapon = item
@@ -74,7 +74,7 @@ class Player(Creature):
             print(f"{enemy.name} HP is {enemy.hp}.")
 
     def heal(self):
-        consumables = [(item, amount['amount']) for item, amount in self.inventory.container.items() if isinstance(item, items.Consumable)]
+        consumables = [(item, amount['amount']) for item, amount in self.inventory.inventory.items() if isinstance(item, items.Consumable)]
         print(consumables)
         if not consumables:
             print("You don't have any items to heal you!")
@@ -121,8 +121,8 @@ def main():
     # best = player.most_powerful_weapon()
     # print(best)
     # player.print_inventory()
-    pprint(player.inventory.container)
-    pprint(player.coin_pouch.container)
+    pprint(player.inventory.inventory)
+    pprint(player.coin_pouch.inventory)
 
 
 if __name__ == "__main__":
