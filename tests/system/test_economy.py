@@ -3,7 +3,7 @@ from pprint import pprint
 import unittest
 
 # Local application imports
-from context import world, system
+from context import system
 from system import economy
 from entities import currency
 from entities import slots

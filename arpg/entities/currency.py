@@ -3,7 +3,6 @@ from dataclasses import dataclass
 
 # Local application imports
 from entities.items import BaseItem 
-from entities import slots
 
 
 
@@ -22,7 +21,6 @@ HIGH_PURITY = 5
 @dataclass(frozen=True)
 class Coin(BaseItem):
     weight: int = 0.01
-    slot_type: slots.Slot = slots.Coins
 
     def __init__(self, *args, **kwargs):
         if type(self) == Coin:

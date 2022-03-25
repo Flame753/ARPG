@@ -4,7 +4,6 @@ from typing import Optional
 from abc import ABC
 
 # Local application imports
-import entities.slots as slots
 
 
 
@@ -13,12 +12,55 @@ class BaseItem(ABC):
     name: str = ''
     worth: int = 0
     weight: int = 0
-    slot_type: slots.Slot = slots.Miscellaneous
     description: Optional[str] = None
 
     def __init__(self, *args, **kwargs):
         if type(self) == BaseItem:
             raise NotImplementedError('Do not instantiate BaseItem directly')
+
+
+@dataclass(frozen=True)
+class Armor(BaseItem):
+
+    def __init__(self, *args, **kwargs):
+        if type(self) == Armor:
+            raise NotImplementedError('Do not instantiate Armor directly')
+
+
+# Helmet
+@dataclass(frozen=True)
+class Helmet(Armor):
+
+    def __init__(self, *args, **kwargs):
+        if type(self) == Helmet:
+            raise NotImplementedError('Do not instantiate Helmet directly')
+
+
+# Chest
+@dataclass(frozen=True)
+class Chest(Armor):
+
+    def __init__(self, *args, **kwargs):
+        if type(self) == Chest:
+            raise NotImplementedError('Do not instantiate Chest directly')
+
+
+# Pants
+@dataclass(frozen=True)
+class Pants(Armor):
+
+    def __init__(self, *args, **kwargs):
+        if type(self) == Pants:
+            raise NotImplementedError('Do not instantiate Pants directly')
+
+
+# Boots
+@dataclass(frozen=True)
+class Boots(Armor):
+
+    def __init__(self, *args, **kwargs):
+        if type(self) == Boots:
+            raise NotImplementedError('Do not instantiate Boots directly')
 
 
 # Weapons
@@ -34,8 +76,6 @@ class Weapon(BaseItem):
 # One Handed Weapons
 @dataclass(frozen=True)
 class OneHandedWeapon(Weapon):
-    slot_type: slots.Slot = slots.OneHanded
-
     def __init__(self, *args, **kwargs):
         if type(self) == OneHandedWeapon:
             raise NotImplementedError('Do not instantiate OneHandedWeapon directly')
@@ -65,8 +105,6 @@ class Sword(OneHandedWeapon):
 # Two Handed Weapons
 @dataclass(frozen=True)
 class TwoHandedWeapon(Weapon):
-    slot_type: slots.Slot = slots.TwoHanded
-
     def __init__(self, *args, **kwargs):
         if type(self) == TwoHandedWeapon:
             raise NotImplementedError('Do not instantiate TwoHandedWeapon directly')

@@ -7,7 +7,7 @@ from entities import enemies
 from entities import npc
 from entities import items
 from entities import currency
-from world import economy
+from system import economy
 
 
 

@@ -44,8 +44,14 @@ def exchange2(amount, coin_one, coin_two):
 
 def find_valid_coins(coin_slot: slots.Coins) -> list[Coin]:
     valid_coins = list()
+    coin_in_slot = coin_slot.find_largest_coin()
+    
+    if not coin_in_slot: 
+        valid_coins.append(CopperCoin())
+        return valid_coins
+
     for coin in reversed(STANDARD_CURRENCY):
-        if coin.worth <= coin_slot.find_largest_coin().worth:
+        if coin.worth <= coin_in_slot.worth:
             valid_coins.append(coin)
     return valid_coins
 
