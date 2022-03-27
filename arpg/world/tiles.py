@@ -7,6 +7,7 @@ from entities import enemies
 from entities import npc
 from entities import items
 from entities import currency
+from entities import creatures
 from system import economy
 
 
@@ -89,8 +90,8 @@ class TraderTile(MapTile):
         self.items_on_sell = {}
     
     def _displayGoods(self, seller, buyer):
-        for i, item in enumerate(seller.inventory.inventory.keys(), start=1):
-            amount = seller.inventory.inventory.get(item)['amount']
+        for i, item in enumerate(seller.get_all_items_to_sell(), start=1):
+            amount = seller.find_equipment_slot(item).get(item)['amount']
 
             item_price_as_coins = economy.price_to_coin_converstion(item.worth, buyer.coin_pouch)
             economy.remove_all_zeros(item_price_as_coins)
@@ -130,7 +131,7 @@ class TraderTile(MapTile):
             return
 
         # Verifying that the buyer has enough cash to buy the item
-        if item.worth > buyer.coin_pouch.calculate_total_worth():
+        if item.worth > buyer.get_slot(creatures.COINS).calculate_total_worth():
             print("That's too expensive")
             return
 
@@ -144,7 +145,7 @@ class TraderTile(MapTile):
         def display_coins(player):
             print('You currenlty have;')
             player.coin_pouch.order()
-            for coin, amount in player.coin_pouch.inventory.items():
+            for coin, amount in player.get_slot(creatures.COINS).inventory.items():
                 amount = amount['amount']
                 print(f'    {amount} {coin.name}')
 
@@ -198,7 +199,7 @@ class FindCoinTile(MapTile):
     
     def modify_player(self, player):
         if not self.coins_claimed:
-            player.coin_pouch.add_item(self.coin, self.amount)
+            player.add_item(self.coin, self.amount)
             print(f"You have picked {self.amount} {self.coin.name}s.")
             self.coins_claimed = True
 

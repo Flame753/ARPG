@@ -10,7 +10,7 @@ from entities import slots
 
 
 
-# Constant Variables
+# Constant Slot Variables
 ITEMS = "items"
 CONSUMABLES = "consumables"
 COINS = "coins"
@@ -35,6 +35,14 @@ class NonEquippableError(Exception):
 
 
 
+def have_items(list_of_slots:list[slots.Slot]) -> bool:
+    for slot in list_of_slots:
+        slot._ensure_inventory()
+        if slot.inventory: return True
+    return False
+
+
+
 # @dataclass() 
 class Creature():
     def __init__(self):
@@ -44,7 +52,7 @@ class Creature():
                         WEAPONS: slots.Weapons(),
                         ARMOR: slots.Armor()}
 
-        self.armor = {HEAD: slots.Head(), 
+        self.equippable = {HEAD: slots.Head(), 
                     BODY: slots.Body(), 
                     LEGS: slots.Legs(), 
                     BOOTS: slots.Boots(),
@@ -67,7 +75,17 @@ class Creature():
         if type(item) in [list, dict, tuple] or type(amount) in [list, dict, tuple]:
             raise TypeError(f"Arguments can't be a empty List, Dictionary or Tuple")
 
-    # Methods that deal with any items
+    # Finding slots
+    def get_slot(self, default_slot_name: str) -> slots.Slot:
+        equipment_slot = self.equipment.get(default_slot_name)
+        armor_slot = self.equippable.get(default_slot_name)
+        if equipment_slot:
+            return equipment_slot
+        elif armor_slot:
+            return armor_slot
+        else:
+            raise ValueError(f"{default_slot_name} No Such Slot Variables Exist!")
+
     def find_equipment_slot(self, item: items.BaseItem) -> slots.Slot:
 
         type_of_items = [COINS, CONSUMABLES, WEAPONS, ARMOR, ITEMS]
@@ -76,6 +94,14 @@ class Creature():
             if isinstance(item, self.equipment.get(slot).items_allowed):
                 return self.equipment.get(slot)
 
+    def find_equippable_slot(self, item: items.BaseItem) -> Optional[slots.Slot]:
+        type_of_items = [HEAD, BODY, LEGS, BOOTS, ONE_HANDED, TWO_HANDED]
+
+        for slot in type_of_items:
+            if isinstance(item, self.equippable.get(slot).items_allowed):
+                return self.equippable.get(slot)
+
+    # Methods that deal with any items
     def add_item(self, item: items.BaseItem, amount: int=1) -> None:
         self._verify_arguments(item, amount)
         slot = self.find_equipment_slot(item)
@@ -87,17 +113,10 @@ class Creature():
         return slot.remove_item(item, amount)
 
     # Methods that deal with equipping items
-    def find_armor_slot(self, item: items.BaseItem) -> Optional[slots.Slot]:
-        type_of_items = [HEAD, BODY, LEGS, BOOTS, ONE_HANDED, TWO_HANDED]
-
-        for slot in type_of_items:
-            if isinstance(item, self.armor.get(slot).items_allowed):
-                return self.armor.get(slot)
-
-    def equip(self, item: items.BaseItem) -> bool:
+    def equip_item(self, item: items.BaseItem) -> bool:
         self._verify_arguments(item)
 
-        armor_slot = self.find_armor_slot(item)
+        armor_slot = self.find_equippable_slot(item)
         equipment_slot = self.find_equipment_slot(item)
 
         if not armor_slot: raise NonEquippableError("Unable to Equip a Non-Equippable Items!") # Preventing any non-equippable items
@@ -113,14 +132,14 @@ class Creature():
         return equipment_slot.remove_item(item)
 
     def item_already_equipped(self, item: items.BaseItem) -> bool:
-        slot = self.find_armor_slot(item)
+        slot = self.find_equippable_slot(item)
         if not slot: raise NonEquippableError() # Preventing any non-equippable items
         slot._ensure_inventory()
         return item in slot.inventory
 
-    def unequip(self, item: items.BaseItem) -> bool:
+    def unequip_item(self, item: items.BaseItem) -> bool:
         self._verify_arguments(item)
-        armor_slot = self.find_armor_slot(item)
+        armor_slot = self.find_equippable_slot(item)
         equipment_slot = self.find_equipment_slot(item)
 
         if not armor_slot: raise NonEquippableError("Unable to Unequip a Non-Equippable Items!") # Preventing any non-equippable items
@@ -136,7 +155,7 @@ class Creature():
     # Caluclations
     def calculate_item_worth(self, item: items.BaseItem) -> int:
         self._verify_arguments(item)
-        armor_slot = self.find_armor_slot(item)
+        armor_slot = self.find_equippable_slot(item)
         equipment_slot = self.find_equipment_slot(item)
         if armor_slot:
             return equipment_slot.calculate_item_worth(item) + armor_slot.calculate_item_worth(item)
@@ -147,13 +166,18 @@ class Creature():
         armor_slot_worth = 0
         equipment_slot_worth = 0
 
-        for slot in self.armor.values():
+        for slot in self.equippable.values():
             armor_slot_worth += slot.calculate_total_worth()
 
         for slot in self.equipment.values():
             equipment_slot_worth += slot.calculate_total_worth()
 
         return armor_slot_worth + equipment_slot_worth
+
+    def get_all_items_to_sell(self):
+        for slot in self.equippable.values():
+            pass
+        return []
 
     def is_alive(self) -> bool:
         return self.hp > 0

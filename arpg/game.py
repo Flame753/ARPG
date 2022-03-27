@@ -2,6 +2,7 @@
 from collections import OrderedDict
 from player import Player
 from world import tiles
+from entities import creatures
 
 
 
@@ -28,8 +29,12 @@ def get_available_actions(room, player):
     """
     actions = OrderedDict()
     print("Choose an action: ")
-    if player.inventory.inventory or player.coin_pouch.inventory:
+    if creatures.have_items(player.equipment.values()) or creatures.have_items(player.equippable.values()):
         action_adder(actions, 'i', player.print_inventory, "Print Inventory")
+        if player.get_slot(creatures.WEAPONS).inventory or player.get_slot(creatures.ARMOR).inventory:
+            action_adder(actions, 'eq', player.equip, "Equip Items")
+        if creatures.have_items(player.equippable.values()):
+            action_adder(actions, 'uneq', player.unequip, "Unequip Items")
     if isinstance(room, tiles.TraderTile):
         action_adder(actions, 't', player.trade, "Trade")
     if isinstance(room, tiles.EnemyTile) and room.enemy.is_alive():

@@ -1,15 +1,16 @@
 # Standard library imports 
+from operator import eq
 from pprint import pprint
 
 # Local application imports
-from entities.creatures import Creature
+from entities import creatures
 from world import tiles
 from entities import items
 from entities import currency
 
 
 
-class Player(Creature):
+class Player(creatures.Creature):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.x = tiles.start_tile_location[0]
@@ -38,28 +39,55 @@ class Player(Creature):
         self.move(dx=-1, dy=0)
 
     def print_inventory(self):
-        print("Inventory:")
-        for item, amount in self.inventory.inventory.items():
-            if isinstance(item, currency.Coin): continue
-            amount = amount['amount']
-            print(f'* {amount} {item.name}')
-        best_weapon = self.most_powerful_weapon()
-        print(f"Your best weapon is your {best_weapon.name}")
+        print("-"*15 + "Inventory" + "-"*15)
 
-        print("Coins:")
-        self.coin_pouch.order(reverse=True)
-        for coin, amount in self.coin_pouch.inventory.items():
-            amount = amount['amount']
-            print(f'* {amount} {coin.name}')
+        for slot_name, equipment_slot in self.equipment.items():
+            equipment_slot._ensure_inventory()
+            print(f"{slot_name.capitalize()}:")
+            if not equipment_slot.inventory:
+                print("* None\n")
+            else:
+                for items, amount in equipment_slot.inventory.items():
+                    print(f"* {amount['amount']} {items.name}\n")
+                    
+
+        print("Equipped Items:")
+        for armor_slot in self.equippable.values():
+            armor_slot._ensure_inventory()
+            for items, amount in armor_slot.inventory.items():
+                print(f"* {amount['amount']} {items.name}")
+
+        best_equipped_weapon = self.most_powerful_equipped_weapon()
+        best_weapon = self.most_powerful_weapon()
+        if best_equipped_weapon:
+            print(f"Your best equipped weapon is your {best_weapon.name}!")
+        else: 
+            print(f"Your best weapon is your {best_weapon.name}, you might want to equip it!")
+
+    def most_powerful_equipped_weapon(self):
+        max_damage = 0
+        best_weapon = None
+        weapons = [self.get_slot(creatures.ONE_HANDED), self.get_slot(creatures.TWO_HANDED)]
+        for weapon in weapons:
+            weapon._ensure_inventory()
+            for item in weapon.inventory.keys():
+                if not hasattr(item, 'damage'): continue
+                if item.damage > max_damage:
+                    best_weapon = item
+                    max_damage = item.damage
+        return best_weapon
 
     def most_powerful_weapon(self):
         max_damage = 0
         best_weapon = None
-        for item in self.inventory.inventory.keys():
-            if not hasattr(item, 'damage'): continue
-            if item.damage > max_damage:
-                best_weapon = item
-                max_damage = item.damage
+        weapons = [self.get_slot(creatures.ONE_HANDED), self.get_slot(creatures.TWO_HANDED), self.get_slot(creatures.WEAPONS)]
+        for weapon in weapons:
+            weapon._ensure_inventory()
+            for item in weapon.inventory.keys():
+                if not hasattr(item, 'damage'): continue
+                if item.damage > max_damage:
+                    best_weapon = item
+                    max_damage = item.damage
         return best_weapon
 
     def attack(self):
@@ -74,8 +102,7 @@ class Player(Creature):
             print(f"{enemy.name} HP is {enemy.hp}.")
 
     def heal(self):
-        consumables = [(item, amount['amount']) for item, amount in self.inventory.inventory.items() if isinstance(item, items.Consumable)]
-        print(consumables)
+        consumables = [(item, amount['amount']) for item, amount in self.get_slot(creatures.CONSUMABLES).inventory.items()]
         if not consumables:
             print("You don't have any items to heal you!")
             return
@@ -101,6 +128,12 @@ class Player(Creature):
             except (ValueError, IndexError):
                 print("Invalid choice, try again.")
 
+    def equip(self):
+        pass
+
+    def unequip(self):
+        pass
+
     def trade(self):
         room = tiles.tile_at(self.x, self.y)     
         room.check_if_trade(self)
@@ -121,8 +154,9 @@ def main():
     # best = player.most_powerful_weapon()
     # print(best)
     # player.print_inventory()
-    pprint(player.inventory.inventory)
-    pprint(player.coin_pouch.inventory)
+    pprint(player.get_slot(creatures.COINS).inventory)
+    player.equip(items.Dagger())
+    player.print_inventory()
 
 
 if __name__ == "__main__":
