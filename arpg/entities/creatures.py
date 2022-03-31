@@ -115,16 +115,11 @@ class Creature():
     # Methods that deal with equipping items
     def equip_item(self, item: items.BaseItem) -> bool:
         self._verify_arguments(item)
-
         armor_slot = self.find_equippable_slot(item)
         equipment_slot = self.find_equipment_slot(item)
 
         if not armor_slot: raise NonEquippableError("Unable to Equip a Non-Equippable Items!") # Preventing any non-equippable items
-        
-        armor_slot._ensure_inventory()
-        equipment_slot._ensure_inventory()
-
-        if item not in equipment_slot.inventory: return False # No items to equip
+        if item not in equipment_slot.get_inventory(): return False # No items to equip
         try:
             armor_slot.add_item(item)
         except slots.CapacityReachedError:
@@ -135,7 +130,7 @@ class Creature():
         slot = self.find_equippable_slot(item)
         if not slot: raise NonEquippableError() # Preventing any non-equippable items
         slot._ensure_inventory()
-        return item in slot.inventory
+        return item in slot.get_inventory()
 
     def unequip_item(self, item: items.BaseItem) -> bool:
         self._verify_arguments(item)
@@ -143,11 +138,7 @@ class Creature():
         equipment_slot = self.find_equipment_slot(item)
 
         if not armor_slot: raise NonEquippableError("Unable to Unequip a Non-Equippable Items!") # Preventing any non-equippable items
-        
-        armor_slot._ensure_inventory()
-        equipment_slot._ensure_inventory()
-
-        if item not in armor_slot.inventory: return False  # Nothing to unequipped
+        if item not in armor_slot.get_inventory(): return False  # Nothing to unequipped
 
         equipment_slot.add_item(item)
         return armor_slot.remove_item(item)
