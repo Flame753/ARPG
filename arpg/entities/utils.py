@@ -7,6 +7,10 @@ class Container(ABC):
         if not hasattr(self, 'inventory'):
             self.inventory = dict()
 
+    def get_inventory(self):
+        self._ensure_inventory()
+        return self.inventory
+
     def add_item(self, item, amount: int = 0) -> None:
         self._ensure_inventory()
 

@@ -41,7 +41,7 @@ class Slot(Container):
         return super().remove_item(item, amount)
 
     def total_amount_of_item(self) -> int:
-        return sum([amount['amount'] for amount in self.inventory.values()])
+        return sum([amount['amount'] for amount in self.get_inventory().values()])
 
 @dataclass()
 class Coins(Slot):
@@ -49,18 +49,16 @@ class Coins(Slot):
     items_allowed: currency.Coin = currency.Coin
 
     def have_coin(self, coin, amount=1):
-        self._ensure_inventory()
         if amount <= 0: raise ValueError 
 
-        currently_own = self.inventory.get(coin, 0)
+        currently_own = self.get_inventory().get(coin, 0)
         if type(currently_own) == dict:
             currently_own = currently_own['amount']
         return currently_own >= amount
 
     def order(self, reverse:bool=False) -> list[currency.Coin]:
         # rearrange the inventory from smallest to largest worth
-        self._ensure_inventory()
-        coins = list(self.inventory.keys())
+        coins = list(self.get_inventory().keys())
         worth = lambda coin: coin.worth
         coins.sort(key=worth, reverse=reverse)  # Sort function only works with a list name
         return coins

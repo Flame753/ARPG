@@ -45,19 +45,19 @@ class TestCreature(unittest.TestCase):
 
     def test_add_item(self):
         self.creature.add_item(self.dagger)
-        self.assertDictEqual(self.creature.get_slot(creatures.WEAPONS).inventory, 
+        self.assertDictEqual(self.creature.get_slot(creatures.WEAPONS).get_inventory(), 
                             {self.dagger: {'amount': 1}}) 
 
         self.creature.add_item(self.copper_coin, 2)
-        self.assertDictEqual(self.creature.get_slot(creatures.COINS).inventory, 
+        self.assertDictEqual(self.creature.get_slot(creatures.COINS).get_inventory(), 
                             {self.copper_coin: {'amount': 2}}) 
 
         self.creature.add_item(self.bread, 6)
-        self.assertDictEqual(self.creature.get_slot(creatures.CONSUMABLES).inventory, 
+        self.assertDictEqual(self.creature.get_slot(creatures.CONSUMABLES).get_inventory(), 
                             {self.bread: {'amount': 6}}) 
 
         self.creature.add_item(self.dagger, 3)
-        self.assertDictEqual(self.creature.get_slot(creatures.WEAPONS).inventory, 
+        self.assertDictEqual(self.creature.get_slot(creatures.WEAPONS).get_inventory(), 
                             {self.dagger: {'amount': 4}}) 
 
     def test_remove_item(self):
@@ -66,11 +66,11 @@ class TestCreature(unittest.TestCase):
  
         self.creature.add_item(self.dagger)
         self.assertTrue(self.creature.remove_item(self.dagger))
-        self.assertDictEqual(self.creature.get_slot(creatures.WEAPONS).inventory, {}) 
+        self.assertDictEqual(self.creature.get_slot(creatures.WEAPONS).get_inventory(), {}) 
 
         self.creature.add_item(self.copper_coin, 8)
         self.assertTrue(self.creature.remove_item(self.copper_coin, 3))
-        self.assertDictEqual(self.creature.get_slot(creatures.COINS).inventory, 
+        self.assertDictEqual(self.creature.get_slot(creatures.COINS).get_inventory(), 
                             {self.copper_coin: {'amount': 5}}) 
 
     def test_find_equipment_slot(self):
@@ -84,14 +84,14 @@ class TestCreature(unittest.TestCase):
     def test_equip_with_empty_inventory(self):
         self.assertFalse(self.creature.equip_item(self.dagger))
 
-        self.assertDictEqual(self.creature.get_slot(creatures.ONE_HANDED).inventory, {}) 
+        self.assertDictEqual(self.creature.get_slot(creatures.ONE_HANDED).get_inventory(), {}) 
 
     def test_equip_item(self):
         self.creature.add_item(self.dagger)
-        self.assertDictEqual(self.creature.get_slot(creatures.WEAPONS).inventory, {self.dagger: {'amount': 1}})
+        self.assertDictEqual(self.creature.get_slot(creatures.WEAPONS).get_inventory(), {self.dagger: {'amount': 1}})
         self.assertTrue(self.creature.equip_item(self.dagger))
-        self.assertDictEqual(self.creature.get_slot(creatures.ONE_HANDED).inventory, {self.dagger: {'amount': 1}})
-        self.assertDictEqual(self.creature.get_slot(creatures.WEAPONS).inventory, {})
+        self.assertDictEqual(self.creature.get_slot(creatures.ONE_HANDED).get_inventory(), {self.dagger: {'amount': 1}})
+        self.assertDictEqual(self.creature.get_slot(creatures.WEAPONS).get_inventory(), {})
 
     def test_equip_non_eqippable_item(self):
         self.creature.add_item(self.copper_coin)
@@ -107,8 +107,8 @@ class TestCreature(unittest.TestCase):
         self.creature.equip_item(self.dagger)
         self.assertFalse(self.creature.equip_item(self.dagger))
 
-        self.assertDictEqual(self.creature.get_slot(creatures.ONE_HANDED).inventory, {self.dagger: {'amount': 1}})
-        self.assertDictEqual(self.creature.get_slot(creatures.WEAPONS).inventory, {self.dagger: {'amount': 1}})
+        self.assertDictEqual(self.creature.get_slot(creatures.ONE_HANDED).get_inventory(), {self.dagger: {'amount': 1}})
+        self.assertDictEqual(self.creature.get_slot(creatures.WEAPONS).get_inventory(), {self.dagger: {'amount': 1}})
 
     def test_item_already_equipped(self):
         self.assertFalse(self.creature.item_already_equipped(self.dagger))
@@ -125,8 +125,8 @@ class TestCreature(unittest.TestCase):
     def test_unequip_with_empty_inventory(self):
         self.assertFalse(self.creature.unequip_item(self.dagger))
 
-        self.assertDictEqual(self.creature.get_slot(creatures.ONE_HANDED).inventory, {})
-        self.assertDictEqual(self.creature.get_slot(creatures.WEAPONS).inventory, {})
+        self.assertDictEqual(self.creature.get_slot(creatures.ONE_HANDED).get_inventory(), {})
+        self.assertDictEqual(self.creature.get_slot(creatures.WEAPONS).get_inventory(), {})
 
     def test_unequip_non_eqippable_item(self):
         self.creature.add_item(self.copper_coin)
@@ -138,21 +138,21 @@ class TestCreature(unittest.TestCase):
             self.creature.unequip_item(self.bread)
 
         # Verifying that there is no inventory was added
-        self.assertDictEqual(self.creature.get_slot(creatures.CONSUMABLES).inventory, {self.bread: {'amount': 1}})
-        self.assertDictEqual(self.creature.get_slot(creatures.COINS).inventory, {self.copper_coin: {'amount': 1}})   
+        self.assertDictEqual(self.creature.get_slot(creatures.CONSUMABLES).get_inventory(), {self.bread: {'amount': 1}})
+        self.assertDictEqual(self.creature.get_slot(creatures.COINS).get_inventory(), {self.copper_coin: {'amount': 1}})   
 
     def test_unequip(self):
         # Actually tesing the removal of a item
         self.creature.add_item(self.dagger)
         self.creature.equip_item(self.dagger)
 
-        self.assertDictEqual(self.creature.get_slot(creatures.ONE_HANDED).inventory, {self.dagger: {'amount': 1}})
-        self.assertDictEqual(self.creature.get_slot(creatures.WEAPONS).inventory, {})
+        self.assertDictEqual(self.creature.get_slot(creatures.ONE_HANDED).get_inventory(), {self.dagger: {'amount': 1}})
+        self.assertDictEqual(self.creature.get_slot(creatures.WEAPONS).get_inventory(), {})
 
         self.assertTrue(self.creature.unequip_item(self.dagger))
 
-        self.assertDictEqual(self.creature.get_slot(creatures.ONE_HANDED).inventory, {})
-        self.assertDictEqual(self.creature.get_slot(creatures.WEAPONS).inventory, {self.dagger: {'amount': 1}})
+        self.assertDictEqual(self.creature.get_slot(creatures.ONE_HANDED).get_inventory(), {})
+        self.assertDictEqual(self.creature.get_slot(creatures.WEAPONS).get_inventory(), {self.dagger: {'amount': 1}})
 
     def test_calculate_item_worth(self):
         copper_amount = 10
