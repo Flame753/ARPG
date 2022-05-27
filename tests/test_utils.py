@@ -1,60 +1,61 @@
-# Standard library imports 
-from pprint import pprint
+# Standard library imports  
 import unittest
 
 # Local application imports
-from context import utils
+from utils import Container, Dice
 
 
-class TestCreatures(unittest.TestCase):
-    def test_span(self):
-        self.assertEqual(utils.span(2, 5), (0, 7))
-        self.assertEqual(utils.span(2, (5, 5)), (0, 7))
-        self.assertEqual(utils.span(2, 5, negative=True), (-3, 7))
-        self.assertEqual(utils.span(2, (5, 5), negative=True), (-3, 7))
+class TestContainer(unittest.TestCase):
+    def test_add_nothing(self):
+        c = Container()
+        c.add(obj="a")
+        self.assertEqual(c.get_inventory(), {"a": {"amount": 0}})
 
-        self.assertEqual(utils.span(2, (4, 6)), (0, 8))
-        self.assertEqual(utils.span(2, (4, 6), negative=True), (-2, 8))
+    def test_add_once(self):
+        c = Container()
+        c.add(obj="a", amount=1)
+        self.assertEqual(c.get_inventory(), {"a": {"amount": 1}})
 
-        self.assertEqual(utils.span(2.4, 5), (0, 7.4))
-        self.assertEqual(utils.span(2.4, (5, 5)), (0, 7.4))
-        self.assertEqual(utils.span(2.4, 5, negative=True), (-2.6, 7.4))
-        self.assertEqual(utils.span(2.4, (5, 5), negative=True), (-2.6, 7.4))
+    def test_add_twice(self):
+        c = Container()
+        c.add(obj="a", amount=1)
+        c.add(obj="a", amount=1)
+        self.assertEqual(c.get_inventory(), {"a": {"amount": 2}})
 
-        self.assertEqual(utils.span(2.4, (4, 6)), (0, 8.4))
-        self.assertEqual(utils.span(2.4, (4, 6), negative=True), (-1.6, 8.4))
+    def test_remove_nothing(self):
+        c = Container()
+        c.add(obj="a", amount=1)
+        self.assertTrue(c.remove(obj="a"))
+        self.assertEqual(c.get_inventory(), {"a": {"amount": 1}})
+
+    def test_remove_once(self):
+        c = Container()
+        c.add(obj="a", amount=1)
+        c.add(obj="b", amount=1)
+        self.assertTrue(c.remove(obj="b", amount=1))
+        self.assertEqual(c.get_inventory(), {"a": {"amount": 1}})
+
+    def test_remove_twice(self):
+        c = Container()
+        c.add(obj="a", amount=2)
+        c.add(obj="b", amount=1)
+        self.assertTrue(c.remove(obj="b", amount=1))
+        self.assertTrue(c.remove(obj="a", amount=2))
+        self.assertEqual(c.get_inventory(), {})
     
-    def test_span_typeError(self):
-        # Testing the first argument
-        self.assertRaises(TypeError, utils.span, "2", 2)
-        self.assertRaises(TypeError, utils.span, ["2"], 2)
-        self.assertRaises(TypeError, utils.span, {"2": 2}, 2)
-        self.assertRaises(TypeError, utils.span, (2, 2), 2)
-        self.assertRaises(TypeError, utils.span, True)
-
-        # Testing the second argument
-        self.assertRaises(TypeError, utils.span, 2, "2")
-        self.assertRaises(TypeError, utils.span, 2, ["2"])
-        self.assertRaises(TypeError, utils.span, 2, {"2": 2})
-        self.assertRaises(TypeError, utils.span, 2, False)
-
-        # Testing the third argument
-        self.assertRaises(TypeError, utils.span, 2, 2, 2)
-        self.assertRaises(TypeError, utils.span, 2, 2, "2")
-        self.assertRaises(TypeError, utils.span, 2, 2, [2])
-        self.assertRaises(TypeError, utils.span, 2, 2, (2, 2))
-        self.assertRaises(TypeError, utils.span, 2, 2, {'s': 2})
-
-    def test_span_valueError(self):
-        self.assertRaises(ValueError, utils.span, 2, (6, "2"))
-        self.assertRaises(ValueError, utils.span, 2, (6, True))
-        self.assertRaises(ValueError, utils.span, 2, ("2", 7))
-        self.assertRaises(ValueError, utils.span, 2, (True, 7))
-
-        self.assertRaises(ValueError, utils.span, 2, (6, 2, 6))
-        self.assertRaises(ValueError, utils.span, 2, (6,))
+    def test_remove_something_not_exist(self):
+        c = Container()
+        c.add(obj="a", amount=2)
+        self.assertFalse(c.remove(obj="z", amount=2))
+        self.assertEqual(c.get_inventory(), {"a": {"amount": 2}})
 
 
+class TestDice(unittest.TestCase):
+    def test_roll_zero(self):
+        with self.assertRaises(ValueError):
+            Dice.d2.roll(0)
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_roll_Negative_number(self):
+        with self.assertRaises(ValueError):
+            Dice.d2.roll(-2)
+    
