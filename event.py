@@ -142,6 +142,10 @@ class Scenario:
     def determine_players_outcome(self, current_event: Event) -> Optional[Event]:
         self._ensure_data()
         # create error for not finshing adding dicisions to all events
+        for event_data in self._data.values():
+            a = [True if event_data.get(d) else False for d in Decision]
+            if all(a): # Need to figure out proper if statements (at lest one needs to be true)
+                raise Exception("No event data")
         self.ui.display_text(current_event.into_text)
         options = dict()
         for dicision in Decision:
@@ -152,6 +156,7 @@ class Scenario:
 
         player_dicision = self.ui.interact_with_user(options)
         self.ui.display_text(player_dicision.get("outcome").text)
+        player_dicision.get("outcome").modify_player(self.player)
         return player_dicision.get("linked_event")
         
 
@@ -166,7 +171,12 @@ class Scenario:
             raise StopIteration
         return current_event
 
-
+class P:
+    def __init__(self, player) -> None:
+        self.player = player
+    
+    def mod(self):
+        self.player.hp -= 2
 
 def main():
     import cli
@@ -176,20 +186,22 @@ def main():
     # events = [cart, hunt]
     # event = random.choice(events)
 
-    # player = Player(name="bob")
-    # ui = cli.CLI()
+    player = Player(name="bob")
+    ui = cli.CLI()
 
-    # e1 = Event("event_1")
-    # e2 = Event("event_2")
+    e1 = Event("event_1")
+    e2 = Event("event_2")
 
-    # s = Scenario(name="test", ui=ui, player=player)
-    # s.set_starting_event(event=e1)
-    # s.set_decision(e1, PlayerTakesDamage(text="player got damaged", damage=3), e2)
+    s = Scenario(name="test", ui=ui, player=player)
+    s.set_starting_event(event=e1)
+    s.set_decision(e1, PlayerTakesDamage(text="player got damaged", damage=3), e2)
     # s.set_decision(e2, PlayerTakesDamage(text="player got damaged", damage=3))
-    # for _ in s:
-    #     pass
+    for _ in s:
+        pass
+    print(player.hp)
 
-    print({x:2 for x in range(10)})
+    # print({x:2 for x in range(10)})
+
 
 
 
