@@ -143,9 +143,9 @@ class Scenario:
         self._ensure_data()
         # create error for not finshing adding dicisions to all events
         for event_data in self._data.values():
-            a = [True if event_data.get(d) else False for d in Decision]
-            if all(a): # Need to figure out proper if statements (at lest one needs to be true)
-                raise Exception("No event data")
+            if not any([event_data.get(d) for d in Decision]):
+                raise Exception("An event was linked to another event. However, wan't properly filled out!")
+
         self.ui.display_text(current_event.into_text)
         options = dict()
         for dicision in Decision:
