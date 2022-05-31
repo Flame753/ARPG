@@ -34,67 +34,58 @@ class RotatingDecision:
         return next(self.rotating_decision)
 
 
-@dataclass
-class Outcome():
-    text: str
+@dataclass(frozen=True)
+class Effect():
+    result_text: str
 
+    def add_requirement(self, requirement) -> None:
+        if not hasattr(requirement, "requirement"):
+            self.requirement = [requirement]
+        else:
+            self.requirement.append(requirement)
+        
     def modify_player(self, player: Player) -> None:
         pass
 
-@dataclass
-class PlayerTakesDamage(Outcome):
+@dataclass(frozen=True)
+class PlayerTakesDamage(Effect):
     damage: int
 
     def modify_player(self, player: Player) -> None:
         player.hp -= self.damage
 
-@dataclass
-class ReceiveReward(Outcome):
+@dataclass(frozen=True)
+class PlayerRestoresHealth(PlayerTakesDamage):
+    def modify_player(self, player: Player) -> None:
+        player.hp += self.damage
+        if player.hp > player.max_hp:
+            player.hp = player.max_hp
+
+@dataclass(frozen=True)
+class ReceiveReward(Effect):
     item: str
     amount: int
 
     def modify_player(self, player: Player) -> None:
         player.add_item(self.item, self.amount)
 
-@dataclass
+@dataclass(frozen=True)
 class LossItem(ReceiveReward):
     def modify_player(self, player: Player) -> None:
         player.remove_item(self.item, self.amount)
 
 
-@dataclass
-class Option:
-    context: str
-    outcomes: list[Outcome]
-
-    def get_random_outcome(self) -> Outcome:
-        return random.choice(self.outcomes)
-
-
-@dataclass(frozen=True)
-class Event():
-    into_text: str = field(repr=False)
-    # options: dict[Decision: Option] = field(default_factory=dict, repr=False)
-
-    # def get_outcome(self, player_decision: Decision) -> str:
-    #     option = self.options.get(player_decision)
-    #     if option:
-    #         return option.get_random_outcome()
-    #     else:
-    #         raise InvalidInput(f"Invalid Input was entered: {player_decision}")
-
-
-def _vaild_arguments(existing_event: Event, outcome: Outcome, next_event: Optional[Event]) -> None:
-    if not isinstance(existing_event, Event):
-        raise TypeError(f"{existing_event} unvalid argument for the existing_event perimeter!")
-    if not isinstance(outcome, Outcome):
+def _vaild_arguments(influence: Effect, outcome: Effect, next_influence: Optional[Effect]) -> None:
+    if not isinstance(influence, Effect):
+        raise TypeError(f"{influence} unvalid argument for the influence perimeter!")
+    if not isinstance(outcome, Effect):
         raise TypeError(f"{outcome} unvalid argument for the outcome perimeter!")
-    if not isinstance(next_event, (Event, type(None))):
-        raise TypeError(f"{next_event} unvalid argument for the next_event perimeter!")
+    if not isinstance(next_influence, (Effect, type(None))):
+        raise TypeError(f"{next_influence} unvalid argument for the next_influence perimeter!")
 
 
 @dataclass
-class Scenario:
+class Event:
     def __init__(self, name: str, ui: UI, player: Player) -> None:
         self.name = name
         self.ui = ui
@@ -104,60 +95,60 @@ class Scenario:
         if not hasattr(self, "_data"):
             self._data = dict()
 
-    def _setup_event(self, event: Event):
-        self._data[event] = {"auto assign": RotatingDecision()}
+    def _setup_event(self, influence: Effect):
+        self._data[influence] = {"auto assign": RotatingDecision()}
  
-    def set_starting_event(self,  event: Event) -> None:
+    def set_starting_link(self,  influence: Effect) -> None:
         self._ensure_data()
         if self._data:
             raise Exception("This method was already once used!")
-        self._setup_event(event)
-        self.next_event = event
+        self._setup_event(influence)
+        self.next_influence = influence
 
-    def set_decision(self, existing_event: Event, outcome: Outcome, next_event: Optional[Event]=None):
-        _vaild_arguments(existing_event, outcome, next_event)
+    def set_decision(self, influence: Effect, outcome: Effect, next_influence: Optional[Effect]=None):
+        _vaild_arguments(influence, outcome, next_influence)
 
         if not hasattr(self, "_data"):
-            raise Exception("<set_starting_event must be called before this method is called!>")
+            raise Exception("<set_starting_link must be called before this method is called!>")
 
-        event_decision = self._data.get(existing_event)
+        event_decision = self._data.get(influence)
         if event_decision == None:
-            raise Exception(f"The entered event <{existing_event}> doesn't exist! Try linking this event with an existing event, first!")
+            raise Exception(f"The entered influence <{influence}> doesn't exist! Try linking this event with an existing event, first!")
 
         try:
             option = event_decision.get("auto assign").next_decision()
         except StopIteration:
             raise Exception(f"Limit was reached! Max limit is ({len(Decision)}) differetn outcomes!")
         
-        event_decision[option] = {"outcome": outcome, "linked_event": next_event}
+        event_decision[option] = {"outcome": outcome, "linked_influence": next_influence}
 
-        if next_event:
-            self._setup_event(next_event)
+        if next_influence:
+            self._setup_event(next_influence)
 
 
     def _ensure_next_event(self):
-        if not hasattr(self, "next_event"):
+        if not hasattr(self, "next_influence"):
             raise Exception("No starting event was set!")
 
-    def determine_players_outcome(self, current_event: Event) -> Optional[Event]:
+    def determine_players_outcome(self, current_influence: Effect) -> Optional[Effect]:
         self._ensure_data()
         # create error for not finshing adding dicisions to all events
         for event_data in self._data.values():
             if not any([event_data.get(d) for d in Decision]):
                 raise Exception("An event was linked to another event. However, wan't properly filled out!")
 
-        self.ui.display_text(current_event.into_text)
+        self.ui.display_text(current_influence.result_text)
         options = dict()
         for dicision in Decision:
-            outcome = self._data.get(current_event).get(dicision)
+            outcome = self._data.get(current_influence).get(dicision)
             if outcome:
                 print("valid input ", dicision.name) # Temp Line
                 utils.action_adder(options, dicision.name, outcome)
 
         player_dicision = self.ui.interact_with_user(options)
-        self.ui.display_text(player_dicision.get("outcome").text)
+        self.ui.display_text(player_dicision.get("outcome").result_text)
         player_dicision.get("outcome").modify_player(self.player)
-        return player_dicision.get("linked_event")
+        return player_dicision.get("linked_influence")
         
 
     def __iter__(self):
@@ -165,21 +156,38 @@ class Scenario:
 
     def __next__(self):
         self._ensure_next_event()
-        current_event = self.next_event
-        self.next_event = self.determine_players_outcome(current_event)
-        if self.next_event == None:
+        current_influence = self.next_influence
+        self.next_influence = self.determine_players_outcome(current_influence)
+        if self.next_influence == None:
             raise StopIteration
-        return current_event
+        return current_influence
 
-class P:
-    def __init__(self, player) -> None:
-        self.player = player
-    
-    def mod(self):
-        self.player.hp -= 2
+
+
+def BrokenCart() -> Event:
+    into_text: str = "You were walking down a path and see a carriage with a broken wheel on the side of the road. "
+
+    options = {Decision.A.name: Option(context="Do you stop and help repaire the carriage? ",
+                                outcomes=[ReceiveReward(text="After spending a few hours fixing the carriage. " \
+                                                            "A old man steps out of the carriage and thanks you for fixing his carriage. " \
+                                                            "He gives you 2 small gold coins. ",
+                                                        item=Currency.Gold,
+                                                        amount=2),
+                                        PlayerTakesDamage(text="After, getting closing to the carriage. " \
+                                                "Suddenly, two bandits jump out from the carriage. " \
+                                                "You fight the bandits off. " \
+                                                "However, you have suffer some damage from the bandits. ",
+                                                damage=2)]),
+            Decision.B.name: Option(context="Or, continue on your journey. ",
+                            outcomes=[Outcome(text="You mind your own business and pass the traveler. Nothing happens. ")])}
+
+    return Event(into_text=into_text, options=options)
+
 
 def main():
     import cli
+    from pprint import pprint
+    from economy import Currency
 
     # cart = BrokenCart()
     # hunt = BridHunt()
@@ -189,20 +197,22 @@ def main():
     player = Player(name="bob")
     ui = cli.CLI()
 
-    e1 = Event("event_1")
-    e2 = Event("event_2")
+    Influence1 = Effect("You were walking down a path and see a carriage with a broken wheel on the side of the road. ")
+    outcome1 = ReceiveReward(result_text="After spending a few hours fixing the carriage. " \
+                                                            "A old man steps out of the carriage and thanks you for fixing his carriage. " \
+                                                            "He gives you 2 small gold coins. ", item=Currency.Gold, amount=2)
+    e2 = Effect("event_2")
 
-    s = Scenario(name="test", ui=ui, player=player)
-    s.set_starting_event(event=e1)
-    s.set_decision(e1, PlayerTakesDamage(text="player got damaged", damage=3), e2)
-    # s.set_decision(e2, PlayerTakesDamage(text="player got damaged", damage=3))
+    s = Event(name="test", ui=ui, player=player)
+    s.set_starting_link(influence=Influence1)
+    s.set_decision(Influence1, outcome1, e2)
+    s.set_decision(e2, PlayerTakesDamage(result_text="player got damaged", damage=3))
     for _ in s:
         pass
     print(player.hp)
+    pprint(s._data)
 
     # print({x:2 for x in range(10)})
-
-
 
 
 if __name__ == "__main__":
