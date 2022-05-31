@@ -89,7 +89,7 @@ class Event():
             for decision, text in self.options.items():
                 ui.display_text(f"{decision}: {text.context}")
 
-            player_input = ui.get_player_input()
+            player_input = ui.get_user_input()
 
             try:
                 outcome = self.get_outcome(player_input.upper())
@@ -139,22 +139,22 @@ def BridHunt() -> Event:
 def main():
     import cli
 
-    # cart = BrokenCart()
-    # hunt = BridHunt()
-    # events = [cart, hunt]
-    # event = random.choice(events)
-    # player = Player(name="bob")
-    # ui = cli.CLI()
+    cart = BrokenCart()
+    hunt = BridHunt()
+    events = [cart, hunt]
+    event = random.choice(events)
+    player = Player(name="bob")
+    ui = cli.CLI()
 
-    # event.run_event(ui, player)
+    event.run_event(ui, player)
 
-    # # Testing
-    # print(f"your current HP is {player.hp}")
-    # player._ensure_inventory()
-    # print("Your inventory: ", player._inventory)
-    # a = Decision
-    # for x in range(10):
-    #     print(next(a.decision_next()))
+    # Testing
+    print(f"your current HP is {player.hp}")
+    player._ensure_inventory()
+    print("Your inventory: ", player._inventory)
+    a = Decision
+    for x in range(10):
+        print(next(a.decision_next()))
 
 
     # def gen():
