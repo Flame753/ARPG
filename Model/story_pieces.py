@@ -8,6 +8,7 @@ import enum
 from Model.player import Player
 from View.ui import UI
 import Model.utils as utils
+from Model.economy import Currency
 
 
 class InvalidInput(Exception):
@@ -106,6 +107,47 @@ class Event:
         self.pre_outcome.append(pre_outcome)
         self.post_outcome.append(post_outcome)
     
+
+def BrokenCart():
+    e = Event()
+    into_text = "You were walking down a path and see a carriage with a broken wheel on the side of the road. "
+    option1 = Outcome(text="Do you stop and help repaire the carriage? ")
+    option2 = Outcome(text="Or, continue on your journey. ")
+    outcome1 = Outcome(text="After spending a few hours fixing the carriage. " \
+                            "A old man steps out of the carriage and thanks you for fixing his carriage. " \
+                            "He gives you 2 small gold coins. ",
+                        effect=ReceiveReward(item=Currency.Gold, amount=2))
+    outcome2 = Outcome(text="You mind your own business and pass the traveler. Nothing happens. ")
+
+    e.set_into_text(into_text)
+    e.add_outcome(option1, outcome1)
+    e.add_outcome(option2, outcome2)
+    return e
+
+
+class RoadEvents(enum.Enum):
+    BrokenCart = BrokenCart()
+
+
+def BrokenCart() -> Event:
+    into_text: str = "You were walking down a path and see a carriage with a broken wheel on the side of the road. "
+
+    options = {Decision.A.name: Option(context="Do you stop and help repaire the carriage? ",
+                                outcomes=[ReceiveReward(text="After spending a few hours fixing the carriage. " \
+                                                            "A old man steps out of the carriage and thanks you for fixing his carriage. " \
+                                                            "He gives you 2 small gold coins. ",
+                                                        item=Currency.Gold,
+                                                        amount=2),
+                                        PlayerTakesDamage(text="After, getting closing to the carriage. " \
+                                                "Suddenly, two bandits jump out from the carriage. " \
+                                                "You fight the bandits off. " \
+                                                "However, you have suffer some damage from the bandits. ",
+                                                damage=2)]),
+            Decision.B.name: Option(context="Or, continue on your journey. ",
+                            outcomes=[Outcome(text="You mind your own business and pass the traveler. Nothing happens. ")])}
+
+    return Event(into_text=into_text, options=options)
+
 
 # @dataclass
 # class Event:
