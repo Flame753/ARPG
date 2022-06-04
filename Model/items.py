@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 import enum
 
 # Local application imports
-from utils import Dice
+from Model.utils import Dice
 
 
 class BaseItem(enum.Enum):

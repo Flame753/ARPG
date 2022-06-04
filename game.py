@@ -3,11 +3,11 @@ from collections import OrderedDict
 import enum
 
 # Local application imports
-from ui import UI, ValidActions
-from cli import CLI
-from player import Player
-import event
-from book import Chapter
+from View.ui import UI, ValidActions
+from View.cli import CLI
+from Model.player import Player
+import Model.story_pieces as story_pieces
+from Model.book import Chapter
 
 
 def action_adder(action_dict, hotkey, action):

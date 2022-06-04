@@ -80,8 +80,8 @@ from dataclasses import dataclass, field, fields, astuple
 from event import Decision, Outcome, RotatingDecision
 from typing import Optional
 import enum
-from ui import UI
-from player import Player
+from View.ui import UI
+from Model.player import Player
 
 # @dataclass
 # class Decision():

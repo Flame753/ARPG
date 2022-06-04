@@ -5,9 +5,9 @@ import random
 import enum
 
 # Local application imports
-from player import Player
-from ui import UI
-import utils
+from Model.player import Player
+from View.ui import UI
+import Model.utils as utils
 
 
 class InvalidInput(Exception):
@@ -16,7 +16,6 @@ class InvalidInput(Exception):
     def __init__(self, message="Invalid Input was entered!"):
         self.message = message
         super().__init__(self.message)
-
 
 
 class Decision(enum.Enum):
@@ -34,121 +33,113 @@ class RotatingDecision:
         return next(self.rotating_decision)
 
 
-@dataclass(frozen=True)
-class Effect():
+class OutcomeEffects(enum.Enum):
+    TakenDamage = "Taken Damage"
+    RestoreHealth = "Restore Health"
+    ReceiveReward = "Receive Reward"
+    LostItem = "Lost Item"
+
+
+class Effect(Protocol):  
+    def modify_player(self, player: Player) -> None:
+        ...
+
+
+@dataclass
+class TakenDamage(Effect):
+    amount: int
+    def modify_player(self, player: Player) -> None:
+        player.hp -= self.amount
+
+
+@dataclass
+class RestoreHealth(TakenDamage):
+    def modify_player(self, player: Player) -> None:
+        player.hp += self.amount
+        if player.hp > player.max_hp:
+            player.hp = player.max_hp
+
+
+@dataclass
+class ReceiveReward(Effect):
+    item: str
+    amount: int
+    def modify_player(self, player: Player) -> None:
+        player.add_item(self.item, self.amount)
+
+
+@dataclass
+class LostItem(ReceiveReward):
+    def modify_player(self, player: Player) -> None:
+        player.remove_item(self.item, self.amount)
+
+
+OUTCOME_EFFECTS: dict[OutcomeEffects, type[Effect]] = {
+    OutcomeEffects.TakenDamage: TakenDamage,
+    OutcomeEffects.RestoreHealth: RestoreHealth,
+    OutcomeEffects.ReceiveReward: ReceiveReward,
+    OutcomeEffects.LostItem: LostItem}
+
+
+@dataclass
+class Outcome():
     text: str = field(repr=False)
+    effect: Optional[Effect] = field(default=None, repr=False)
 
     def add_requirement(self, requirement) -> None:
         if not hasattr(requirement, "requirement"):
             self.requirement = [requirement]
         else:
             self.requirement.append(requirement)
-        
-    def modify_player(self, player: Player) -> None:
-        pass
-
-@dataclass(frozen=True)
-class PlayerTakesDamage(Effect):
-    damage: int
-
-    def modify_player(self, player: Player) -> None:
-        player.hp -= self.damage
-
-@dataclass(frozen=True)
-class PlayerRestoresHealth(PlayerTakesDamage):
-    def modify_player(self, player: Player) -> None:
-        player.hp += self.damage
-        if player.hp > player.max_hp:
-            player.hp = player.max_hp
-
-@dataclass(frozen=True)
-class ReceiveReward(Effect):
-    item: str
-    amount: int
-
-    def modify_player(self, player: Player) -> None:
-        player.add_item(self.item, self.amount)
-
-@dataclass(frozen=True)
-class LossItem(ReceiveReward):
-    def modify_player(self, player: Player) -> None:
-        player.remove_item(self.item, self.amount)
-
-
-# class Effect(Protocol):
-#     # text: str = field(repr=False)
-
-#     # def add_requirement(self, requirement) -> None:
-#     #     if not hasattr(requirement, "requirement"):
-#     #         self.requirement = [requirement]
-#     #     else:
-#     #         self.requirement.append(requirement)
-        
-#     def modify_player(self, player: Player) -> None:
-#         ...
-
-# class TakesDamage(Effect):
-#     def modify_player(self, player: Player, damage: int) -> None:
-#         player.hp -= damage
-
-# class RestoresHealth(Effect):
-#     def modify_player(self, player: Player, damage: int) -> None:
-#         player.hp += damage
-#         if player.hp > player.max_hp:
-#             player.hp = player.max_hp
-
-# class ReceiveReward(Effect):
-#     def modify_player(self, player: Player, item: str, amount: int) -> None:
-#         player.add_item(item, amount)
-
-# class LossItem(Effect):
-#     def modify_player(self, player: Player, item: str, amount: int) -> None:
-#         player.remove_item(item, amount)
-
-
-
-def _vaild_arguments(influence: Effect, outcome: Effect, next_influence: Optional[Effect]) -> None:
-    if not isinstance(influence, Effect):
-        raise TypeError(f"{influence} unvalid argument for the influence perimeter!")
-    if not isinstance(outcome, Effect):
-        raise TypeError(f"{outcome} unvalid argument for the outcome perimeter!")
-    if not isinstance(next_influence, (Effect, type(None))):
-        raise TypeError(f"{next_influence} unvalid argument for the next_influence perimeter!")
 
 
 @dataclass
 class Event:
-    def __init__(self, name: str, ui: UI, player: Player) -> None:
-        self.name = name
-        self.ui = ui
-        self.player = player
+    into_text: str = ""
+    pre_outcome: list = field(default_factory=list)
+    post_outcome: list = field(default_factory=list)
 
-    def _ensure_data(self):
-        if not hasattr(self, "_data"):
-            self._data = dict()
+    def set_into_text(self, text: str):
+        self.into_text = text
 
-    def _setup_influence(self, influence: Effect):
-        self._data[influence] = {"auto assign": RotatingDecision()}
+    def add_outcome(self, pre_outcome: Outcome, post_outcome: Outcome):
+        self.pre_outcome.append(pre_outcome)
+        self.post_outcome.append(post_outcome)
+    
+
+# @dataclass
+# class Event:
+#     def __init__(self, name: str, ui: UI, player: Player) -> None:
+#         self.name = name
+#         self.ui = ui
+#         self.player = player
+
+#     def _ensure_data(self):
+#         if not hasattr(self, "_data"):
+#             self._data = dict()
+
+#     def _setup_influence(self, influence: Effect):
+#         self._data[influence] = {"auto assign": RotatingDecision()}
  
-    def set_initial_link(self,  influence: Effect) -> None:
-        self._ensure_data()
-        self._setup_influence(influence)
+#     def set_initial_link(self,  influence: Effect) -> None:
+#         self._ensure_data()
+#         self._setup_influence(influence)
 
 
-    def set_decision(self, influence: Effect, decision_text: str ,outcome: Effect, next_influence: Optional[Effect]=None):
-        _vaild_arguments(influence, outcome, next_influence)
-        self.set_initial_link(influence)
+#     def set_decision(self, pre_outcome: Outcome, decision_text: str, post_outcome: Outcome, next_outcome: Optional[Outcome] = None) -> None:
+#         _vaild_arguments(pre_outcome, post_outcome, next_outcome)
+#         self.set_initial_link(pre_outcome)
 
-        vaild_decision = self._data.get(influence)
-        try:
-            an_option = vaild_decision.get("auto assign").next_decision()
-        except StopIteration:
-            raise Exception(f"Limit was reached! Max limit is ({len(Decision)}) differetn outcomes!")
+#         vaild_decision = self._data.get(pre_outcome)
+#         try:
+#             an_option = vaild_decision.get("auto assign").next_decision()
+#         except StopIteration:
+#             raise Exception(f"Limit was reached! Max limit is ({len(Decision)}) differetn outcomes!")
         
-        vaild_decision[an_option] = {"text": decision_text, "outcome": outcome, "linked": next_influence}
+#         vaild_decision[an_option] = {"text": decision_text, "outcome": post_outcome, "linked": next_outcome}
 
-        if next_influence:
-            self._setup_influence(next_influence)
+#         if next_outcome:
+#             self._setup_influence(next_outcome)
 
 
     # def _ensure_next_event(self):
@@ -210,34 +201,36 @@ def BrokenCart() -> Event:
 
 
 def main():
-    import cli
+    import View.cli as cli
     from pprint import pprint
-    from economy import Currency
+    from Model.economy import Currency
 
     # cart = BrokenCart()
     # hunt = BridHunt()
     # events = [cart, hunt]
     # event = random.choice(events)
 
-    player = Player(name="bob")
-    ui = cli.CLI()
+    # player = Player(name="bob")
+    # ui = cli.CLI()
 
-    Influence1 = Effect("You were walking down a path and see a carriage with a broken wheel on the side of the road. ")
-    outcome1 = ReceiveReward(text="After spending a few hours fixing the carriage. " \
-                                                            "A old man steps out of the carriage and thanks you for fixing his carriage. " \
-                                                            "He gives you 2 small gold coins. ", item=Currency.Gold, amount=2)
-    e2 = Effect("event_2")
+    # pre_outcome1 = Outcome(text="You were walking down a path and see a carriage with a broken wheel on the side of the road. ")
+    # post_outcome1 = Outcome(text="After spending a few hours fixing the carriage. " \
+    #                             "A old man steps out of the carriage and thanks you for fixing his carriage. " \
+    #                             "He gives you 2 small gold coins. ", 
+    #                         effect=ReceiveReward(item=Currency.Gold, amount=2))
 
-    s = Event(name="test", ui=ui, player=player)
-    s.set_initial_link(influence=Influence1)
-    s.set_decision(Influence1, "test is here",outcome1, e2)
-    s.set_decision(e2,"text is here", PlayerTakesDamage(text="player got damaged", damage=3))
-    # for _ in s:
-    #     pass
-    # print(player.hp)
-    pprint(s._data)
+    # # e2 = Effect("event_2")
 
-    # print({x:2 for x in range(10)})
+    # s = Event(name="test", ui=ui, player=player)
+    # s.set_initial_link(influence=pre_outcome1)
+    # s.set_decision(pre_outcome1, "test is here", post_outcome1)
+    # # s.set_decision(e2,"text is here", Outcome(text="player got damaged", effect=TakenDamage(damage=3)))
+    # # for _ in s:
+    # #     pass
+    # # print(player.hp)
+    # pprint(s._data)
+
+    # # print({x:2 for x in range(10)})
 
 
 if __name__ == "__main__":

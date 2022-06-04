@@ -1,7 +1,7 @@
 # Standard library imports  
 
 # Local application imports
-from utils import Container
+from Model.utils import Container
 
 
 class Player(Container):

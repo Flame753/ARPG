@@ -4,8 +4,8 @@ import random
 
 # Local application imports
 from event import Event, InvalidInput
-from player import Player
-from ui import UI
+from Model.player import Player
+from View.ui import UI
 
 
 def testing(player):
@@ -38,7 +38,7 @@ class Chapter:
 
 
 def main():
-    import cli
+    import View.cli as cli
     import event
     ui = cli.CLI()
     player = Player("Tom")

@@ -1,5 +1,5 @@
 import unittest
-from economy import Currency
+from Model.economy import Currency
 
 
 class TestCurrency(unittest.TestCase):

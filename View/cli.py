@@ -1,9 +1,9 @@
 # Standard library imports
 
 # Local application imports
-from ui import UserInput, ValidActions
+from View.ui import UserInput, ValidActions
 from typing import Any
-import utils
+import Model.utils as utils
 
 
 class CLI:

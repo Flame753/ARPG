@@ -2,7 +2,7 @@
 import unittest
 
 # Local application imports
-from utils import Container, Dice
+from Model.utils import Container, Dice
 
 
 class TestContainer(unittest.TestCase):
