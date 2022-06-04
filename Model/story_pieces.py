@@ -146,26 +146,6 @@ class RoadEvents(enum.Enum):
     BridHunt = BridHunt()
 
 
-def BrokenCart() -> Event:
-    into_text: str = "You were walking down a path and see a carriage with a broken wheel on the side of the road. "
-
-    options = {Decision.A.name: Option(context="Do you stop and help repaire the carriage? ",
-                                outcomes=[ReceiveReward(text="After spending a few hours fixing the carriage. " \
-                                                            "A old man steps out of the carriage and thanks you for fixing his carriage. " \
-                                                            "He gives you 2 small gold coins. ",
-                                                        item=Currency.Gold,
-                                                        amount=2),
-                                        PlayerTakesDamage(text="After, getting closing to the carriage. " \
-                                                "Suddenly, two bandits jump out from the carriage. " \
-                                                "You fight the bandits off. " \
-                                                "However, you have suffer some damage from the bandits. ",
-                                                damage=2)]),
-            Decision.B.name: Option(context="Or, continue on your journey. ",
-                            outcomes=[Outcome(text="You mind your own business and pass the traveler. Nothing happens. ")])}
-
-    return Event(into_text=into_text, options=options)
-
-
 # @dataclass
 # class Event:
 #     def __init__(self, name: str, ui: UI, player: Player) -> None:
@@ -236,27 +216,6 @@ def BrokenCart() -> Event:
     #     if self.next_influence == None:
     #         raise StopIteration
     #     return current_influence
-
-
-
-def BrokenCart() -> Event:
-    into_text: str = "You were walking down a path and see a carriage with a broken wheel on the side of the road. "
-
-    options = {Decision.A.name: Option(context="Do you stop and help repaire the carriage? ",
-                                outcomes=[ReceiveReward(text="After spending a few hours fixing the carriage. " \
-                                                            "A old man steps out of the carriage and thanks you for fixing his carriage. " \
-                                                            "He gives you 2 small gold coins. ",
-                                                        item=Currency.Gold,
-                                                        amount=2),
-                                        PlayerTakesDamage(text="After, getting closing to the carriage. " \
-                                                "Suddenly, two bandits jump out from the carriage. " \
-                                                "You fight the bandits off. " \
-                                                "However, you have suffer some damage from the bandits. ",
-                                                damage=2)]),
-            Decision.B.name: Option(context="Or, continue on your journey. ",
-                            outcomes=[Outcome(text="You mind your own business and pass the traveler. Nothing happens. ")])}
-
-    return Event(into_text=into_text, options=options)
 
 
 def main():
