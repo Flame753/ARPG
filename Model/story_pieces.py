@@ -66,13 +66,13 @@ class ReceiveReward(Effect):
     item: str
     amount: int
     def modify_player(self, player: Player) -> None:
-        player.add_item(self.item, self.amount)
+        player.add(self.item, self.amount)
 
 
 @dataclass
 class LostItem(ReceiveReward):
     def modify_player(self, player: Player) -> None:
-        player.remove_item(self.item, self.amount)
+        player.remove(self.item, self.amount)
 
 
 OUTCOME_EFFECTS: dict[OutcomeEffects, type[Effect]] = {
@@ -92,6 +92,9 @@ class Outcome():
             self.requirement = [requirement]
         else:
             self.requirement.append(requirement)
+    
+    def modify_player(self, player: Player) -> None:
+        if self.effect: self.effect.modify_player(player)
 
 
 @dataclass
