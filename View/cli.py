@@ -1,9 +1,23 @@
 # Standard library imports
+from typing import Any
 
 # Local application imports
 from View.ui import UserInput, ValidActions
-from typing import Any
-import Model.utils as utils
+
+
+def action_adder(action_dict: dict, hotkey: str, action: Any) -> None:
+    action_dict[hotkey.capitalize()] = action
+    action_dict[hotkey.upper()] = action
+    action_dict[hotkey.lower()] = action   
+
+def remove_duplicates_keys(actions_dict: dict) -> dict:
+    result = {}
+
+    for key,value in actions_dict.items():
+        if value not in result.values():
+            result[key.lower()] = value
+
+    return result
 
 
 class CLI:
@@ -12,7 +26,7 @@ class CLI:
         print(style ,title, style, end="\n\n")
     
     def display_actions(self, actions: ValidActions) -> None:
-        without_dup = utils.remove_duplicates_keys(actions)
+        without_dup = remove_duplicates_keys(actions)
         for action in without_dup.keys():
             print(f"{action.capitalize()}: ")
 
@@ -34,18 +48,3 @@ class CLI:
                 return vaild_action
             else:
                 self.display_invalid_input(user_input=user_input)
-
-
-# from utils import action_adder
-# c = CLI()
-# # print(c.interact_with_user({"A": "you got it"}))
-# dic = {}
-# action_adder(dic, "A", "b")
-# action_adder(dic, "As", "d")
-# action_adder(dic, "A", "c")
-# action_adder(dic, "Time", "z")
-# action_adder(dic, "Create", "e")
-# print(dic)
-# # c.display_actions(actions=dic)
-# print(c.interact_with_user(dic))
-

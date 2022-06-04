@@ -9,22 +9,6 @@ import itertools
 # Local application imports
 
 
-def action_adder(action_dict: dict, hotkey: str, action: Any) -> None:
-    action_dict[hotkey.capitalize()] = action
-    action_dict[hotkey.upper()] = action
-    action_dict[hotkey.lower()] = action   
-
-def remove_duplicates_keys(actions_dict: dict) -> dict:
-    result = {}
-
-    for key,value in actions_dict.items():
-        if value not in result.values():
-            result[key.lower()] = value
-
-    return result
-
-
-
 def _verify_amount_arg(amount: int) -> None:
     if not isinstance(amount, int): raise TypeError
     if amount < 0: raise ValueError
