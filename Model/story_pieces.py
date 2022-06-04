@@ -124,9 +124,26 @@ def BrokenCart():
     e.add_outcome(option2, outcome2)
     return e
 
+def BridHunt():
+    e = Event()
+    into_text = "You see a flock of bird flying over head. " \
+                "It seem like a great change to get a easy meal. "
+    option1 = Outcome(text="Shot a it down.")
+    option2 = Outcome(text="Let it fly pass you. ")
+    outcome1 = Outcome(text="After taking aim and releasing your arrow. " \
+                            "It hits your mark and you made a great meal out of your hunt. " \
+                            "Nothing else happened that day. ")
+    outcome2 = Outcome(text="You let the flock of bird fly pass you. " \
+                            "Nothing else eventful happened. ")
+
+    e.set_into_text(into_text)
+    e.add_outcome(option1, outcome1)
+    e.add_outcome(option2, outcome2)
+    return e
 
 class RoadEvents(enum.Enum):
     BrokenCart = BrokenCart()
+    BridHunt = BridHunt()
 
 
 def BrokenCart() -> Event:
