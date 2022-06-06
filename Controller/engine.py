@@ -58,3 +58,16 @@ class EventEngine(Engine):
                 break
             else:
                 ui.display_invalid_input(player_input)
+
+
+@dataclass
+class GameEngine(Engine):
+    def interact_with_player(ui: UI, actions):
+        for act in remove_duplicates_keys(actions).keys():
+            ui.display_choose(act, "")
+        player_input = ui.get_user_input()
+        vaild_action = actions.get(player_input.lower())
+        if vaild_action:
+            vaild_action()
+        else:
+            ui.display_invalid_input(player_input)
