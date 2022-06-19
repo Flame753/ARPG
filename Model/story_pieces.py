@@ -23,15 +23,11 @@ class Decision(enum.Enum):
     A = enum.auto()
     B = enum.auto()
     C = enum.auto()
+    D = enum.auto()
 
-
-@dataclass
-class RotatingDecision:
-    def __init__(self) -> None:
-        self.rotating_decision = iter(Decision)
-
-    def next_decision(self) -> Decision:
-        return next(self.rotating_decision)
+def decision_gen():
+    for d in Decision:
+        yield d 
 
 
 class OutcomeEffects(enum.Enum):
@@ -144,6 +140,28 @@ def BridHunt():
     e.add_outcome(option2, outcome2)
     return e
 
+
+def breakingtest():
+    e = Event()
+    into_text = "Testing!"
+    option1 = Outcome(text="option1")
+    option2 = Outcome(text="option2")
+    option3 = Outcome(text="option3")
+    option4 = Outcome(text="option4")
+    outcome1 = Outcome(text="outcome1")
+    outcome2 = Outcome(text="outcome2")
+    outcome3 = Outcome(text="outcome3")
+    outcome4 = Outcome(text="outcome4")
+
+    e.set_into_text(into_text)
+    e.add_outcome(option1, outcome1)
+    e.add_outcome(option2, outcome2)
+    e.add_outcome(option3, outcome3)
+    e.add_outcome(option4, outcome4)
+    return e
+
+
 class RoadEvents(enum.Enum):
     BrokenCart = BrokenCart()
     BridHunt = BridHunt()
+    bad = breakingtest()

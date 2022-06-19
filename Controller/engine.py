@@ -6,7 +6,7 @@ from dataclasses import dataclass
 # Local application imports
 from View.ui import UI
 from Model.player import Player
-from Model.story_pieces import Event, RotatingDecision
+from Model.story_pieces import Event, decision_gen
 
 
 def action_adder(action_dict: dict, hotkey: str, action: Any) -> None:
@@ -24,9 +24,13 @@ def remove_duplicates_keys(actions_dict: dict) -> dict:
     return result
 
 def set_valid_action(action_dict:dict, options:list) -> None:
-    decision = RotatingDecision()
-    for value in options:
-        action_adder(action_dict, decision.next_decision().name, value)
+    decision = decision_gen()
+    for value in options: 
+        try:
+            decision_letter = decision.__next__().name
+        except StopIteration:
+            break
+        action_adder(action_dict, decision_letter, value)
 
 
 @dataclass
@@ -53,7 +57,7 @@ class EventEngine(Engine):
             player_input = ui.get_user_input()
             vaild_outcome = outcomes.get(player_input.lower(), None)
             if vaild_outcome:
-                print(vaild_outcome.text)
+                ui.display_text(vaild_outcome.text)
                 vaild_outcome.modify_player(player)
                 break
             else:
