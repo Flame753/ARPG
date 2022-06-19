@@ -44,20 +44,20 @@ class Engine(ABC):
 class EventEngine(Engine):
     def interact_with_player(ui: UI, player: Player, event: Event) -> None:
         vaild_actions = {}
-        set_valid_action(vaild_actions, event.pre_outcome)
+        set_valid_action(vaild_actions, event.options)
         
         outcomes = {}
-        set_valid_action(outcomes, event.post_outcome)
+        set_valid_action(outcomes, event.outcomes)
 
-        ui.display_text(event.into_text)
+        ui.display_text(event.situation)
         while True:
-            for key, value in remove_duplicates_keys(vaild_actions).items():
-                ui.display_choose(key, value.text)
+            for key, option in remove_duplicates_keys(vaild_actions).items():
+                ui.display_choose(key, option)
 
             player_input = ui.get_user_input()
             vaild_outcome = outcomes.get(player_input.lower(), None)
             if vaild_outcome:
-                ui.display_text(vaild_outcome.text)
+                ui.display_text(vaild_outcome.result)
                 vaild_outcome.modify_player(player)
                 break
             else:
