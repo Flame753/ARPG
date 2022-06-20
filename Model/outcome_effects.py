@@ -17,15 +17,14 @@ class Effect(Protocol):
 class TakenDamage(Effect):
     amount: int
     def modify_player(self, player: Player) -> None:
-        player.hp -= self.amount
+        player.hp.restore(-self.amount)
+        print("--------> Test print: (in outcome_effect module) ", player.hp.current )
 
 
 @dataclass
 class RestoreHealth(TakenDamage):
     def modify_player(self, player: Player) -> None:
-        player.hp += self.amount
-        if player.hp > player.max_hp:
-            player.hp = player.max_hp
+        player.hp.restore(self.amount)
 
 
 @dataclass

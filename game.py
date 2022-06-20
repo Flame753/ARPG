@@ -60,7 +60,7 @@ class Game:
             eng.GameEngine.interact_with_player(self.ui, actions=self.main_menu())
             
     def play(self):
-        road_events = [RoadEvents.BridHunt.value, RoadEvents.BrokenCart.value, RoadEvents.bad.value]
+        road_events = [RoadEvents.BridHunt_White.value, RoadEvents.BridHunt_Red.value, RoadEvents.BrokenCart.value, RoadEvents.bad.value]
         # scenarios = []
         # ch1 = Chapter(road_events=road_events, scenarios=scenarios)
         
