@@ -50,7 +50,7 @@ class EventEngine(Engine):
         outcomes = {}
         set_valid_action(outcomes, event.outcomes)
 
-        ui.display_text(event.situation)
+        ui.display_text(event.situation.text)
         while True:
             for key, option in remove_duplicates_keys(vaild_actions).items():
                 ui.display_choose(key, option)

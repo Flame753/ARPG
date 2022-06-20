@@ -1,23 +1,36 @@
 # Standard library imports 
 import enum
 from dataclasses import dataclass, field
+from itertools import count
 
 # Local application imports
 from Model.outcome_effects import Effect, Outcome, OUTCOME_EFFECTS, OutcomeEffects
 from Model.economy import Currency
+from Model.utils import Color
 
 
+situation_id_counter = count(0, 1)
 ReceiveReward = OUTCOME_EFFECTS.get(OutcomeEffects.ReceiveReward)
+TakenDamage = OUTCOME_EFFECTS.get(OutcomeEffects.TakenDamage)
+
+
+@dataclass
+class Situation:
+    id: str = field(repr=False, init=False)
+    text: str = ""
+
+    def __post_init__(self):
+        self.id = str(situation_id_counter.__next__())
 
 
 @dataclass
 class Event:
-    situation: str = ""
+    situation: Situation = field(default_factory=Situation)
     options: list[str] = field(default_factory=list)
     outcomes: list[Effect] = field(default_factory=list)
 
-    def set_into_text(self, text: str):
-        self.situation = text
+    def set_situation(self, text: str):
+        self.situation.text = text
 
     def add_outcome(self, options: Outcome, outcomes: Outcome):
         self.options.append(options)
@@ -35,24 +48,41 @@ def BrokenCart():
                         effect=ReceiveReward(item=Currency.Gold, amount=2))
     outcome2 = Outcome(result="You mind your own business and pass the traveler. Nothing happens. ")
 
-    e.set_into_text(situation)
+    e.set_situation(situation)
     e.add_outcome(option1, outcome1)
     e.add_outcome(option2, outcome2)
     return e
 
-def BridHunt():
+def BridHunt(color):
     e = Event()
-    situation = "You see a flock of bird flying over head. " \
+    template = "You see a flock of {color} bird flying over head. " \
                 "It seem like a great change to get a easy meal. "
+
     option1 = "Shot a it down."
     option2 = "Let it fly pass you. "
-    outcome1 = Outcome(result="After taking aim and releasing your arrow. " \
-                            "It hits your mark and you made a great meal out of your hunt. " \
-                            "Nothing else happened that day. ")
-    outcome2 = Outcome(result="You let the flock of bird fly pass you. " \
-                            "Nothing else eventful happened. ")
+    print(color, Color.Red)
+    if color == Color.Red:
+        situation = template.format(color=Color.Red.name.lower())
+        damage_amount = 2
+        outcome1 = Outcome(result="After taking aim and releasing your arrow. " \
+                                "However, you notice it wasn't a flock of birds. " \
+                                f"But, a flock of {color.name} wyverns. " \
+                                f"You have suffered {damage_amount} damage! ",
+                            effect=TakenDamage(damage_amount))
+        outcome2 = Outcome(result="You let the flock of bird fly pass you. " \
+                                "Nothing else eventful happened. ")
+    elif color == Color.White:
+        situation = template.format(color=Color.White.name.lower())
+        outcome1 = Outcome(result="After taking aim and releasing your arrow. " \
+                                "It hits your mark and you made a great meal out of your hunt. " \
+                                "Nothing else happened that day. ")
+        outcome2 = Outcome(result="You let the flock of bird fly pass you. " \
+                                "Nothing else eventful happened. ")
+    else:
+        raise ValueError("Incorrect value was entered for this function." \
+                        "Check perimeter value if it's a type of color.")
 
-    e.set_into_text(situation)
+    e.set_situation(situation)
     e.add_outcome(option1, outcome1)
     e.add_outcome(option2, outcome2)
     return e
@@ -69,7 +99,7 @@ def breakingtest():
     outcome3 = Outcome(result="outcome3")
     outcome4 = Outcome(result="outcome4")
 
-    e.set_into_text(situation)
+    e.set_situation(situation)
     e.add_outcome(option1, outcome1)
     e.add_outcome(option2, outcome2)
     e.add_outcome(option3, outcome3)
@@ -79,5 +109,6 @@ def breakingtest():
 
 class RoadEvents(enum.Enum):
     BrokenCart = BrokenCart()
-    BridHunt = BridHunt()
+    BridHunt_White = BridHunt(Color.White)
+    BridHunt_Red = BridHunt(Color.Red)
     bad = breakingtest()
