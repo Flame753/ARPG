@@ -1,14 +1,14 @@
 # Standard library imports  
 from abc import ABC
-from typing import Any, Callable
 from dataclasses import dataclass
+from typing import Any
 import enum
 import random
-import itertools
 
 # Local application imports
 
 
+# ----------------------------------------------------------------------------------
 def _verify_amount_arg(amount: int) -> None:
     if not isinstance(amount, int): raise TypeError
     if amount < 0: raise ValueError
@@ -75,7 +75,7 @@ class Container(ABC):
     #         worth += obj.worth * data['amount']
     #     return worth
 
-
+# ----------------------------------------------------------------------------------
 class Dice(enum.IntEnum):
     d2 = 2
     d4 = 4
@@ -104,3 +104,15 @@ class DiceContainer(Container):
         if not isinstance(dice, Dice): raise 
         super().remove(dice, amount)
 
+# ----------------------------------------------------------------------------------
+class Decision(enum.Enum):
+    A = enum.auto()
+    B = enum.auto()
+    C = enum.auto()
+    D = enum.auto()
+
+def decision_gen():
+    for d in Decision:
+        yield d 
+
+# ----------------------------------------------------------------------------------

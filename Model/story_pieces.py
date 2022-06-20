@@ -1,96 +1,13 @@
 # Standard library imports 
-from dataclasses import dataclass, field, fields, astuple
-from typing import Optional, Protocol
-import random
 import enum
+from dataclasses import dataclass, field
 
 # Local application imports
-from Model.player import Player
-from View.ui import UI
-import Model.utils as utils
+from Model.outcome_effects import Effect, Outcome, OUTCOME_EFFECTS, OutcomeEffects
 from Model.economy import Currency
 
 
-class InvalidInput(Exception):
-    """Exception raised for an Invalid Input was entered."""
-    
-    def __init__(self, message="Invalid Input was entered!"):
-        self.message = message
-        super().__init__(self.message)
-
-
-class Decision(enum.Enum):
-    A = enum.auto()
-    B = enum.auto()
-    C = enum.auto()
-    D = enum.auto()
-
-def decision_gen():
-    for d in Decision:
-        yield d 
-
-
-class OutcomeEffects(enum.Enum):
-    TakenDamage = "Taken Damage"
-    RestoreHealth = "Restore Health"
-    ReceiveReward = "Receive Reward"
-    LostItem = "Lost Item"
-
-
-class Effect(Protocol):  
-    def modify_player(self, player: Player) -> None:
-        ...
-
-
-@dataclass
-class TakenDamage(Effect):
-    amount: int
-    def modify_player(self, player: Player) -> None:
-        player.hp -= self.amount
-
-
-@dataclass
-class RestoreHealth(TakenDamage):
-    def modify_player(self, player: Player) -> None:
-        player.hp += self.amount
-        if player.hp > player.max_hp:
-            player.hp = player.max_hp
-
-
-@dataclass
-class ReceiveReward(Effect):
-    item: str
-    amount: int
-    def modify_player(self, player: Player) -> None:
-        player.add(self.item, self.amount)
-
-
-@dataclass
-class LostItem(ReceiveReward):
-    def modify_player(self, player: Player) -> None:
-        player.remove(self.item, self.amount)
-
-
-OUTCOME_EFFECTS: dict[OutcomeEffects, type[Effect]] = {
-    OutcomeEffects.TakenDamage: TakenDamage,
-    OutcomeEffects.RestoreHealth: RestoreHealth,
-    OutcomeEffects.ReceiveReward: ReceiveReward,
-    OutcomeEffects.LostItem: LostItem}
-
-
-@dataclass
-class Outcome():
-    result: str = field(repr=False)
-    effect: Optional[Effect] = field(default=None, repr=False)
-
-    def add_requirement(self, requirement) -> None:
-        if not hasattr(requirement, "requirement"):
-            self.requirement = [requirement]
-        else:
-            self.requirement.append(requirement)
-    
-    def modify_player(self, player: Player) -> None:
-        if self.effect: self.effect.modify_player(player)
+ReceiveReward = OUTCOME_EFFECTS.get(OutcomeEffects.ReceiveReward)
 
 
 @dataclass
@@ -105,7 +22,7 @@ class Event:
     def add_outcome(self, options: Outcome, outcomes: Outcome):
         self.options.append(options)
         self.outcomes.append(outcomes)
-    
+
 
 def BrokenCart():
     e = Event()
@@ -139,7 +56,6 @@ def BridHunt():
     e.add_outcome(option1, outcome1)
     e.add_outcome(option2, outcome2)
     return e
-
 
 def breakingtest():
     e = Event()

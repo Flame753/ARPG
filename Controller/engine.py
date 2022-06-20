@@ -6,7 +6,8 @@ from dataclasses import dataclass
 # Local application imports
 from View.ui import UI
 from Model.player import Player
-from Model.story_pieces import Event, decision_gen
+from Model.story_pieces import Event
+from Model.utils import decision_gen
 
 
 def action_adder(action_dict: dict, hotkey: str, action: Any) -> None:
