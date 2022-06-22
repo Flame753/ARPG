@@ -1,14 +1,17 @@
 # Standard library imports  
 from dataclasses import dataclass, field
-from typing import Optional, Protocol
+from typing import Optional
+from abc import ABC, abstractmethod
 import enum
 
 # Local application imports
 from Model.player import Player
+from Model.utils import Dice
 
 
 
-class Effect(Protocol):  
+class Effect(ABC):  
+    @abstractmethod
     def modify_player(self, player: Player) -> None:
         ...
 

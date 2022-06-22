@@ -58,9 +58,9 @@ def BridHunt(color):
     template = "You see a flock of {color} bird flying over head. " \
                 "It seem like a great change to get a easy meal. "
 
-    option1 = "Shot a it down."
-    option2 = "Let it fly pass you. "
-    print(color, Color.Red)
+    option1 = "Shot one down. "
+    option2 = "Let them fly pass you. "
+
     if color == Color.Red:
         situation = template.format(color=Color.Red.name.lower())
         damage_amount = 2
@@ -79,8 +79,8 @@ def BridHunt(color):
         outcome2 = Outcome(result="You let the flock of bird fly pass you. " \
                                 "Nothing else eventful happened. ")
     else:
-        raise ValueError("Incorrect value was entered for this function." \
-                        "Check perimeter value if it's a type of color.")
+        raise ValueError("Incorrect value was entered for this function. " \
+                        "Check perimeter value if it's a type of color. ")
 
     e.set_situation(situation)
     e.add_outcome(option1, outcome1)
