@@ -1,22 +1,22 @@
 ```mermaid
     classDiagram
-        class IntEnum
-        
         class Dice{
-        +d2: int
-        +d4: int
-        +d6: int
-        +d10: int
-        +d12: int
-        +d20: int
-        +roll(num_of_rolls: int) int
-        +roll_all(lis_dice, num_of_rolls: int)$ int
+            <<enumeration>>
+            +d2: int
+            +d4: int
+            +d6: int
+            +d10: int
+            +d12: int
+            +d20: int
+            +roll(num_of_rolls: int) int
+            +roll_all(lis_dice, num_of_rolls: int)$ int
         }
 
         class BaseItem{
-        -cost: int
-        -dice_type: Dice
-        -amount: int
+            <<enumeration>>
+            -cost: int
+            -dice_type: Dice
+            -amount: int
         }
 
         class Weapon{
@@ -34,8 +34,6 @@
             +healing() int
         }
 
-        IntEnum <|-- Dice
-        IntEnum <|-- BaseItem
         Dice o-- BaseItem
         BaseItem <|-- Weapon
         BaseItem <|-- Consumable
