@@ -27,14 +27,14 @@ class Situation:
 class Event:
     situation: Situation = field(default_factory=Situation)
     options: list[str] = field(default_factory=list)
-    outcomes: list[Effect] = field(default_factory=list)
+    outcomes: list[Outcome] = field(default_factory=list)
 
     def set_situation(self, text: str):
         self.situation.text = text
 
-    def add_outcome(self, options: Outcome, outcomes: Outcome):
+    def add_outcome(self, options: str, outcome: Outcome):
         self.options.append(options)
-        self.outcomes.append(outcomes)
+        self.outcomes.append(outcome)
 
 
 def BrokenCart():
