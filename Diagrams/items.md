@@ -1,33 +1,42 @@
 ```mermaid
-graph TD;
-    BaseItem-->Weapon;
-    BaseItem-->Consumable;
-    BaseItem-->Coin;
-        Coin-->GreaterCoin;
+    classDiagram
+        class IntEnum
+        
+        class Dice{
+        +d2: int
+        +d4: int
+        +d6: int
+        +d10: int
+        +d12: int
+        +d20: int
+        +roll(num_of_rolls: int) int
+        +roll_all(lis_dice, num_of_rolls: int)$ int
+        }
 
-    Inventory-->Container;
-    BaseItem-->Backpack;
-    Container-->Backpack;
-    BaseItem-->CoinPouch;
-    Container-->CoinPouch;
-```
-```mermaid
-graph TD;
-    Weapon-->Rock;
-    Weapon-->Dagger;
-    Weapon-->Sword;
-    Weapon-->Crossbow;
-    Weapon-->Axe;
-```
-```mermaid
-graph TD;
-    Consumable-->Bread;
-    Consumable-->HealingPotion;
-```
-```mermaid
-graph TD;
-    coin-->GreaterCoin;
-    coin-->CopperCoin;
-    GreaterCoin-->GreaterCopperCoin;
-    CopperCoin-->GreaterCopperCoin;
+        class BaseItem{
+        -cost: int
+        -dice_type: Dice
+        -amount: int
+        }
+
+        class Weapon{
+            +Rock: tuple
+            +Dagger: tuple
+            +Sword: tuple
+            +Crossbow: tuple
+            +Axe: tuple
+            +damage() int
+        }
+
+        class Consumable{
+            +Bread: tuple
+            +HealingPotion: tuple
+            +healing() int
+        }
+
+        IntEnum <|-- Dice
+        IntEnum <|-- BaseItem
+        Dice o-- BaseItem
+        BaseItem <|-- Weapon
+        BaseItem <|-- Consumable
 ```
