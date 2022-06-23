@@ -12,20 +12,20 @@ from Model.utils import Dice
 
 class Effect(ABC):  
     @abstractmethod
-    def modify_player(self, player: Player) -> None:
+    def modify_player(self, player: Player):
         ...
 
 
 @dataclass
 class RestoreHealth(Effect):
     amount: int
-    def modify_player(self, player: Player) -> None:
+    def modify_player(self, player: Player):
         player.hp.restore(self.amount)
 
 
 @dataclass
 class LoseHealth(RestoreHealth):
-    def modify_player(self, player: Player) -> None:
+    def modify_player(self, player: Player):
         player.hp.restore(-self.amount)
 
 
@@ -33,13 +33,13 @@ class LoseHealth(RestoreHealth):
 class ReceiveItem(Effect):
     item: str
     amount: int
-    def modify_player(self, player: Player) -> None:
+    def modify_player(self, player: Player):
         player.add(self.item, self.amount)
 
 
 @dataclass
 class LoseItem(ReceiveItem):
-    def modify_player(self, player: Player) -> None:
+    def modify_player(self, player: Player):
         player.remove(self.item, self.amount)
 
 
@@ -62,12 +62,12 @@ class Outcome():
     result: str = field(repr=False)
     effect: Optional[Effect] = field(default=None, repr=False)
 
-    def add_requirement(self, requirement) -> None:
+    def add_requirement(self, requirement):
         if not hasattr(requirement, "requirement"):
             self.requirement = [requirement]
         else:
             self.requirement.append(requirement)
     
-    def modify_player(self, player: Player) -> None:
+    def modify_player(self, player: Player):
         if self.effect: self.effect.modify_player(player)
 

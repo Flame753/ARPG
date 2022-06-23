@@ -6,7 +6,7 @@ class CapacityStat:
     capacity: int
     regen_speed: float
     
-    def __post_init__(self) -> None:
+    def __post_init__(self):
         self.current: int = self.capacity
 
         if self.regen_speed < 0 or self.regen_speed > 1:
@@ -16,7 +16,7 @@ class CapacityStat:
         return self.current <= 0
     
     @property
-    def regeneration_amount(self):
+    def regeneration_amount(self) -> int:
         return round(self.regen_speed * self.capacity)
 
     def restore(self, amount: int=0):

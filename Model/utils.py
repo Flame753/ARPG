@@ -16,7 +16,7 @@ def _verify_amount_arg(amount: int) -> None:
 
 @dataclass
 class Container(ABC):
-    def _ensure_inventory(self) -> None:
+    def _ensure_inventory(self):
         if not hasattr(self, '_inventory'):
             self._inventory = dict()
 
@@ -24,7 +24,7 @@ class Container(ABC):
         self._ensure_inventory()
         return self._inventory
 
-    def add(self, obj: Any, amount: int = 0) -> None:
+    def add(self, obj: Any, amount: int = 0):
         self._ensure_inventory()
         _verify_amount_arg(amount)
 
