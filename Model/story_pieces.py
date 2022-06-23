@@ -10,8 +10,8 @@ from Model.utils import Color
 
 
 situation_id_counter = count(0, 1)
-ReceiveReward = OUTCOME_EFFECTS.get(OutcomeEffects.ReceiveReward)
-TakenDamage = OUTCOME_EFFECTS.get(OutcomeEffects.TakenDamage)
+ReceiveItem = OUTCOME_EFFECTS.get(OutcomeEffects.ReceiveItem)
+LoseHealth = OUTCOME_EFFECTS.get(OutcomeEffects.LoseHealth)
 
 
 @dataclass
@@ -45,7 +45,7 @@ def BrokenCart():
     outcome1 = Outcome(result="After spending a few hours fixing the carriage. " \
                             "A old man steps out of the carriage and thanks you for fixing his carriage. " \
                             "He gives you 2 small gold coins. ",
-                        effect=ReceiveReward(item=Currency.Gold, amount=2))
+                        effect=ReceiveItem(item=Currency.Gold, amount=2))
     outcome2 = Outcome(result="You mind your own business and pass the traveler. Nothing happens. ")
 
     e.set_situation(situation)
@@ -68,7 +68,7 @@ def BridHunt(color):
                                 "However, you notice it wasn't a flock of birds. " \
                                 f"But, a flock of {color.name} wyverns. " \
                                 f"You have suffered {damage_amount} damage! ",
-                            effect=TakenDamage(damage_amount))
+                            effect=LoseHealth(damage_amount))
         outcome2 = Outcome(result="You let the flock of bird fly pass you. " \
                                 "Nothing else eventful happened. ")
     elif color == Color.White:

@@ -17,21 +17,20 @@ class Effect(ABC):
 
 
 @dataclass
-class TakenDamage(Effect):
+class RestoreHealth(Effect):
     amount: int
-    def modify_player(self, player: Player) -> None:
-        player.hp.restore(-self.amount)
-        print("--------> Test print: (in outcome_effect module) ", player.hp.current )
-
-
-@dataclass
-class RestoreHealth(TakenDamage):
     def modify_player(self, player: Player) -> None:
         player.hp.restore(self.amount)
 
 
 @dataclass
-class ReceiveReward(Effect):
+class LoseHealth(RestoreHealth):
+    def modify_player(self, player: Player) -> None:
+        player.hp.restore(-self.amount)
+
+
+@dataclass
+class ReceiveItem(Effect):
     item: str
     amount: int
     def modify_player(self, player: Player) -> None:
@@ -39,23 +38,23 @@ class ReceiveReward(Effect):
 
 
 @dataclass
-class LostItem(ReceiveReward):
+class LoseItem(ReceiveItem):
     def modify_player(self, player: Player) -> None:
         player.remove(self.item, self.amount)
 
 
 class OutcomeEffects(enum.Enum):
-    TakenDamage = "Taken Damage"
+    LoseHealth = "Taken Damage"
     RestoreHealth = "Restore Health"
-    ReceiveReward = "Receive Reward"
-    LostItem = "Lost Item"
+    ReceiveItem = "Receive Reward"
+    LoseItem = "Lost Item"
 
 
 OUTCOME_EFFECTS: dict[OutcomeEffects, type[Effect]] = {
-    OutcomeEffects.TakenDamage: TakenDamage,
+    OutcomeEffects.LoseHealth: LoseHealth,
     OutcomeEffects.RestoreHealth: RestoreHealth,
-    OutcomeEffects.ReceiveReward: ReceiveReward,
-    OutcomeEffects.LostItem: LostItem}
+    OutcomeEffects.ReceiveItem: ReceiveItem,
+    OutcomeEffects.LoseItem: LoseItem}
 
 
 @dataclass
