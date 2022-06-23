@@ -5,11 +5,11 @@ classDiagram
         +modify_player(player: Player)*
     }
     class RestoreHealth{
-        -amount: int
+        +amount: int
     }
     class ReceiveItem{
-        -item: str
-        -amount: int
+        +item: str
+        +amount: int
     }
 
     Effect <|-- RestoreHealth 
@@ -19,7 +19,7 @@ classDiagram
 
 
     class Situation{
-        -id: int
+        +id: int
         +text: str
     }
 
@@ -29,9 +29,9 @@ classDiagram
     }
 
     class Event{
-        -situation: Situation
-        -options: list[str]
-        -outcomes: lsit[Outcome]
+        +situation: Situation
+        +options: list[str]
+        +outcomes: lsit[Outcome]
         +set_situation(text: str)
         +add_outcome(options: str, outcome: Outcome)
     }
