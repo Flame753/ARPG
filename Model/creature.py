@@ -1,13 +1,15 @@
 # Standard library imports 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import enum
 
 # Local application imports
 from Model.stats import CapacityStat
+from Model.utils import Container
 
 @dataclass
 class Creature():
     name: str
+    inventory: Container = field(default_factory=Container, repr=False, init=False)
     hp: CapacityStat
     mana: CapacityStat
     stamina: CapacityStat
@@ -22,26 +24,21 @@ class Creature():
         return not self.stamina.is_empty()
 
 
+def GiantSpider():
+    return Creature("Giant Spider", hp=CapacityStat(10, .2), mana=CapacityStat(0, 0), stamina=CapacityStat(30, .5))
+
+def Ogre():
+    return Creature("Ogre", hp=CapacityStat(30, .2), mana=CapacityStat(0, 0), stamina=CapacityStat(30, .1))
+
+def BatColony():
+    return Creature("Bat of Colony",hp=CapacityStat(100, .2), mana=CapacityStat(0, 0), stamina=CapacityStat(15, .5))
+
+def RockMonster():
+    return Creature("Rock Monster", hp=CapacityStat(80, .2), mana=CapacityStat(20, .2), stamina=CapacityStat(4, .1))
+
+
 class Enemy(enum.Enum):
-    GiantSpider = Creature("Giant Spider", hp=CapacityStat(10, .2), mana=CapacityStat(0, 0), stamina=CapacityStat(30, .5))
-    Ogre = Creature("Ogre", hp=CapacityStat(30, .2), mana=CapacityStat(0, 0), stamina=CapacityStat(30, .1))
-    BatColony = Creature("Bat of Colony",hp=CapacityStat(100, .2), mana=CapacityStat(0, 0), stamina=CapacityStat(15, .5))
-    RockMonster = Creature("Rock Monster", hp=CapacityStat(80, .2), mana=CapacityStat(20, .2), stamina=CapacityStat(4, .1))
-
-
-# class Creature():
-#     def __init__(self, name: str, max_hp: int, damage: int) -> None:
-#         self.name = name
-#         self.hp = max_hp
-#         self.max_hp = max_hp
-#         self.damage = damage
-
-#     def is_alive(self) -> bool:
-#         return self.hp > 0
-
-
-# class Enemy(enum.Enum):
-#     GiantSpider = Creature("Giant Spider", max_hp=10, damage=2)
-#     Ogre = Creature("Ogre", max_hp=30, damage=10)
-#     BatColony = Creature("Bat of Colony", max_hp=100, damage=4)
-#     RockMonster = Creature("Rock Monster", max_hp=80, damage=15)
+    GiantSpider = GiantSpider
+    Ogre = Ogre
+    BatColony = BatColony
+    RockMonster = RockMonster
