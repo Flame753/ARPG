@@ -1,12 +1,11 @@
 # Standard library imports  
 
 # Local application imports
-from Model.utils import Container
 from Model.creature import Creature
 from Model.stats import CapacityStat
 
 
-class Player(Creature, Container):
+class Player(Creature):
     pass
 
 def create_player(name) -> Player:
