@@ -5,23 +5,43 @@ import enum
 # Local application imports
 from Model.stats import CapacityStat
 from Model.utils import Container
+from Model.stats import Stats, PrimaryStat
+
 
 @dataclass
 class Creature():
     name: str
+    stats: Stats = field(default_factory=Stats, repr=False, init=False)
     inventory: Container = field(default_factory=Container, repr=False, init=False)
-    hp: CapacityStat
-    mana: CapacityStat
-    stamina: CapacityStat
     
     def is_alive(self) -> bool:
-        return not self.hp.is_empty()
+        return not self.stats.primary.get(PrimaryStat.Vigor).is_empty()
 
-    def have_mana(self) -> bool:
-        return not self.mana.is_empty()
+    def have_enough_mana(self) -> bool:
+        return self.stats.primary.get(PrimaryStat.Arcane).have_enough()
     
-    def have_stamina(self) -> bool:
-        return not self.stamina.is_empty()
+    def have_enough_stamina(self) -> bool:
+        return self.stats.primary.get(PrimaryStat.Endurance).have_enough()
+
+
+# @dataclass
+# class Creature():
+#     name: str
+    
+#     hp: CapacityStat
+#     mana: CapacityStat
+#     stamina: CapacityStat
+#     inventory: Container = field(default_factory=Container, repr=False, init=False)
+    
+#     def is_alive(self) -> bool:
+#         return not self.hp.is_empty()
+
+#     def have_mana(self) -> bool:
+#         return not self.mana.is_empty()
+    
+#     def have_stamina(self) -> bool:
+#         return not self.stamina.is_empty()
+
 
 
 def GiantSpider():
