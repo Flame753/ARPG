@@ -3,7 +3,6 @@ from dataclasses import dataclass, field
 import random
 
 # Local application imports
-from event import Event, InvalidInput
 from Model.player import Player
 from View.ui import UI
 

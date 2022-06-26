@@ -20,7 +20,7 @@ class Container(ABC):
         if not hasattr(self, '_inventory'):
             self._inventory = dict()
 
-    def get_inventory(self):
+    def get_all(self) -> dict:
         self._ensure_inventory()
         return self._inventory
 
