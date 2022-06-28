@@ -4,7 +4,7 @@ import enum
 
 
 # Local application imports
-from Model.experience import Level
+from Model.experience import Level, Algorithms
 
 
 class CoreStat(enum.Enum):
@@ -84,7 +84,7 @@ class Stats:
     def __init__(self) -> None:
         self.points: int = 0
 
-        self.core = {stat: {"level":Level(), "xp_bonus": 0} for stat in CoreStat}
+        self.core = {stat: {"level":Level(Algorithms.Stats.value), "xp_bonus": 0} for stat in CoreStat}
 
         self.primary = {PrimaryStat.Vigor: CapacityStat(primary_core_stat=self.core.get(CoreStat.Con).get("level"),
                                                         secondary_core_stat=self.core.get(CoreStat.Str).get("level")),

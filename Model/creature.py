@@ -6,13 +6,18 @@ import enum
 from Model.stats import CapacityStat
 from Model.utils import Container
 from Model.stats import Stats, PrimaryStat
+from Model.experience import Level, Algorithms
 
 
 @dataclass
 class Creature():
     name: str
+    level: Level = field(repr=False, init=False)
     stats: Stats = field(default_factory=Stats, repr=False, init=False)
     inventory: Container = field(default_factory=Container, repr=False, init=False)
+
+    def __post_init__(self):
+        self.level = Level(Algorithms.Creature.value)
     
     def is_alive(self) -> bool:
         return not self.stats.primary.get(PrimaryStat.Vigor).is_empty()
