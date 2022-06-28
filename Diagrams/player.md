@@ -1,5 +1,19 @@
 ```mermaid
 classDiagram
+    class Level{
+        +xp: int
+        +algorithm: Callable
+        +add(num: int)
+        +subtract(num: int)
+        +get_level() int
+    }
+
+    class BaseStat{
+        +name: str
+        +description: str
+        +lv: Level
+    }
+
     class CapacityStat{
         +capacity: int
         +regen_speed: float
@@ -9,9 +23,39 @@ classDiagram
         +restore()
     }
 
+    class DefenceStat{
+
+    }
+
+    Level o-- BaseStat
+    BaseStat <|-- CapacityStat
+
+
+    %%PrimaryStat
+    class CoreStat{
+        <<enumeration>>
+        +Constitution: BaseStat
+        +Strength: BaseStat
+        +Dexterity: BaseStat
+        +Intelligence: BaseStat
+        +Wisdom: BaseStat
+        +Charisma: BaseStat
+    }
+
+    class SecondaryStat{
+        <<enumeration>>
+        +Vigor: CapacityStat
+        +Endurance: CapacityStat
+        +Magic: CapacityStat
+    }
+
+    BaseStat o-- CoreStat
+
     class Creature{
         <<abstract>>
         +name: str
+        +level: Level
+        +inventory: Container
         +hp: CapacityStat
         +mana: CapacityStat
         +stamina: CapcityStat
@@ -31,12 +75,17 @@ classDiagram
     class Container{
         <<abstract>>
         # ensure_inventory()
+        +get_inventory() dict
         +add(obj: Any, amount: int)
         +remove(obj: Any, amount: int) bool
     }
 
-    Container <|-- Player
+
+
     Creature <|-- Player
+    Container o-- Creature
     CapacityStat o-- Creature
     Creature o-- Enemy
+    Level o-- Creature
+
 ```
